@@ -13,6 +13,7 @@ typedef struct
     float frameTimer;    // Timer to track frame duration
     bool active;         // Is the animation active?
     bool loop;           // Should the animation loop?
+    bool finished;       // Has an animation that doesn't loop reached its end?
 } AnimationData;
 
 // Init Animation

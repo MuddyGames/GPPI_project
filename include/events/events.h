@@ -27,6 +27,9 @@ typedef enum
 	EVENT_COLLISION_START, // Represents the start of a collision (e.g., player colliding with a wall, enemy, or object).
 	EVENT_COLLISION_END,   // Represents the end of a collision (e.g., player moving away from a colliding object or enemy).
 
+	// Animation Events:
+	EVENT_ANIMATION_END, // Represents an animation that plays once (e.g., a sword swipe) reaching its end.
+
 	// Player Actions:
 	// EVENT_JUMP,   // Represents the player character jumping (e.g., player jumps to avoid obstacles or reach higher platforms).
 	// EVENT_CROUCH, // Represents the player character crouching (e.g., ducking to avoid attacks or entering narrow areas).

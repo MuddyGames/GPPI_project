@@ -58,8 +58,9 @@ NPC *InitNPC(const char *name, Vector2 position, int radius)
 	// Set the default aggression level for the NPC
 	npc->aggression = NPC_MIN_AGGRESSION; // Mild agression
 
-	// Nothing to chase yet: game.c sets the target to the player while attacking
+	// Nothing to chase yet: game.c sets the target to the player every frame
 	npc->target = position;
+	npc->facing = DOWN;
 
 	// Initialize the NPC's finite state machine (FSM) with state configurations
 	InitNPCFSM(&npc->base);
@@ -112,9 +113,11 @@ void InitNPCFSM(GameObject *object)
 
 	// ---- STATE_IDLE state configuration ----
 	// Define valid transitions from STATE_IDLE
+	// The AI decides to chase (EVENT_MOVE) or defend; touching the player starts a swipe
 	EventStateTransition idleValidTransitions[] = {
 		// EVENT -> STATE
-		{EVENT_ATTACK, STATE_ATTACKING},
+		{EVENT_MOVE, STATE_WALKING},
+		{EVENT_COLLISION_START, STATE_ATTACKING},
 		{EVENT_DEFEND, STATE_SHIELD},
 		{EVENT_DIE, STATE_DEAD}};
 	// Set up the state configuration for STATE_IDLE
@@ -122,12 +125,26 @@ void InitNPCFSM(GameObject *object)
 	// Configure valid transitions for STATE_IDLE
 	StateTransitions(&object->stateConfigs[STATE_IDLE], idleValidTransitions, sizeof(idleValidTransitions) / sizeof(EventStateTransition));
 
-	// ---- STATE_ATTACKING state configuration ----
-	// Define valid transitions from STATE_ATTACKING
-	EventStateTransition attackValidTransitions[] = {
+	// ---- STATE_WALKING state configuration ----
+	// Define valid transitions from STATE_WALKING
+	// Chasing the player: catching it (EVENT_COLLISION_START) starts a swipe
+	EventStateTransition walkingValidTransitions[] = {
 		// EVENT -> STATE
 		{EVENT_NONE, STATE_IDLE},
+		{EVENT_COLLISION_START, STATE_ATTACKING},
 		{EVENT_DEFEND, STATE_SHIELD},
+		{EVENT_DIE, STATE_DEAD}};
+	// Set up the state configuration for STATE_WALKING
+	InitStateConfig(object, STATE_WALKING, "NPC_Walking", NPCEnterWalking, NPCUpdateWalking, NPCExitWalking);
+	// Configure valid transitions for STATE_WALKING
+	StateTransitions(&object->stateConfigs[STATE_WALKING], walkingValidTransitions, sizeof(walkingValidTransitions) / sizeof(EventStateTransition));
+
+	// ---- STATE_ATTACKING state configuration ----
+	// Define valid transitions from STATE_ATTACKING
+	// A swipe always finishes, then the NPC goes back to chasing
+	EventStateTransition attackValidTransitions[] = {
+		// EVENT -> STATE
+		{EVENT_ANIMATION_END, STATE_WALKING},
 		{EVENT_DIE, STATE_DEAD}};
 	// Set up the state configuration for STATE_ATTACKING
 	InitStateConfig(object, STATE_ATTACKING, "NPC_Attacking", NPCEnterAttacking, NPCUpdateAttacking, NPCExitAttacking);
@@ -139,7 +156,7 @@ void InitNPCFSM(GameObject *object)
 	EventStateTransition sheildingValidTransitions[] = {
 		// EVENT -> STATE
 		{EVENT_NONE, STATE_IDLE},
-		{EVENT_ATTACK, STATE_ATTACKING},
+		{EVENT_MOVE, STATE_WALKING},
 		{EVENT_DIE, STATE_DEAD}};
 	// Set up the state configuration for STATE_SHIELD
 	InitStateConfig(object, STATE_SHIELD, "NPC_Shielding", NPCEnterShielding, NPCUpdateShielding, NPCExitShielding);
@@ -211,9 +228,189 @@ void NPCExitIdle(GameObject *object, float deltaTime)
 }
 
 /**
+ * InitWalkAnimation - Picks the right walk row based on direction.
+ *
+ * Same rows as the player's (the two sheets share a layout).
+ * Uses currentDirection on the GameObject.
+ */
+
+static void InitWalkAnimation(GameObject *object)
+{
+	// WALK UP (Row 9, Pixel : Y = 8 x 64 = 512)
+	// Each frame is 64 x 64, so Pixel X = (Column - 1) x 64
+	static Rectangle walk_UP[9] = {
+		{0, 512, 64, 64},     // Frame 1: Column 1 (Pixel : X 0)
+		{64, 512, 64, 64},    // Frame 2: Column 2 (Pixel : X 64)
+		{128, 512, 64, 64},   // Frame 3: Column 3 (Pixel : X 128)
+		{192, 512, 64, 64},   // Frame 4: Column 4 (Pixel : X 192)
+		{256, 512, 64, 64},   // Frame 5: Column 5 (Pixel : X 256)
+		{320, 512, 64, 64},   // Frame 6: Column 6 (Pixel : X 320)
+		{384, 512, 64, 64},   // Frame 7: Column 7 (Pixel : X 384)
+		{448, 512, 64, 64},   // Frame 8: Column 8 (Pixel : X 448)
+		{512, 512, 64, 64}    // Frame 9: Column 9 (Pixel : X 512)
+	};
+
+	// WALK LEFT (Row 10, Pixel : Y = 9 x 64 = 576)
+	// Each frame is 64 x 64, so Pixel X = (Column - 1) x 64
+	static Rectangle walk_LEFT[9] = {
+		{0, 576, 64, 64},     // Frame 1: Column 1 (Pixel : X 0)
+		{64, 576, 64, 64},    // Frame 2: Column 2 (Pixel : X 64)
+		{128, 576, 64, 64},   // Frame 3: Column 3 (Pixel : X 128)
+		{192, 576, 64, 64},   // Frame 4: Column 4 (Pixel : X 192)
+		{256, 576, 64, 64},   // Frame 5: Column 5 (Pixel : X 256)
+		{320, 576, 64, 64},   // Frame 6: Column 6 (Pixel : X 320)
+		{384, 576, 64, 64},   // Frame 7: Column 7 (Pixel : X 384)
+		{448, 576, 64, 64},   // Frame 8: Column 8 (Pixel : X 448)
+		{512, 576, 64, 64}    // Frame 9: Column 9 (Pixel : X 512)
+	};
+
+	// WALK DOWN (Row 11, Pixel : Y = 10 x 64 = 640)
+	// Each frame is 64 x 64, so Pixel X = (Column - 1) x 64
+	static Rectangle walk_DOWN[9] = {
+		{0, 640, 64, 64},     // Frame 1: Column 1 (Pixel : X 0)
+		{64, 640, 64, 64},    // Frame 2: Column 2 (Pixel : X 64)
+		{128, 640, 64, 64},   // Frame 3: Column 3 (Pixel : X 128)
+		{192, 640, 64, 64},   // Frame 4: Column 4 (Pixel : X 192)
+		{256, 640, 64, 64},   // Frame 5: Column 5 (Pixel : X 256)
+		{320, 640, 64, 64},   // Frame 6: Column 6 (Pixel : X 320)
+		{384, 640, 64, 64},   // Frame 7: Column 7 (Pixel : X 384)
+		{448, 640, 64, 64},   // Frame 8: Column 8 (Pixel : X 448)
+		{512, 640, 64, 64}    // Frame 9: Column 9 (Pixel : X 512)
+	};
+
+	// WALK RIGHT (Row 12, Pixel : Y = 11 x 64 = 704)
+	// Each frame is 64 x 64, so Pixel X = (Column - 1) x 64
+	static Rectangle walk_RIGHT[9] = {
+		{0, 704, 64, 64},     // Frame 1: Column 1 (Pixel : X 0)
+		{64, 704, 64, 64},    // Frame 2: Column 2 (Pixel : X 64)
+		{128, 704, 64, 64},   // Frame 3: Column 3 (Pixel : X 128)
+		{192, 704, 64, 64},   // Frame 4: Column 4 (Pixel : X 192)
+		{256, 704, 64, 64},   // Frame 5: Column 5 (Pixel : X 256)
+		{320, 704, 64, 64},   // Frame 6: Column 6 (Pixel : X 320)
+		{384, 704, 64, 64},   // Frame 7: Column 7 (Pixel : X 384)
+		{448, 704, 64, 64},   // Frame 8: Column 8 (Pixel : X 448)
+		{512, 704, 64, 64}    // Frame 9: Column 9 (Pixel : X 512)
+	};
+	switch (object->currentDirection)
+	{
+	case UP:
+		InitGameObjectAnimation(object, walk_UP, 9, 0.055f);
+		break;
+	case DOWN:
+		InitGameObjectAnimation(object, walk_DOWN, 9, 0.055f);
+		break;
+	case LEFT:
+		InitGameObjectAnimation(object, walk_LEFT, 9, 0.055f);
+		break;
+	case RIGHT:
+		InitGameObjectAnimation(object, walk_RIGHT, 9, 0.055f);
+		break;
+	}
+}
+
+/**
+ * DirectionToTarget - Which way to the target (the player)?
+ *
+ * Returns a unit vector from the NPC to its target, or zero if it's
+ * already standing on it.
+ */
+
+static Vector2 DirectionToTarget(const NPC *npc)
+{
+	Vector2 direction = Vector2Subtract(npc->target, npc->base.position);
+	if (Vector2Length(direction) > 0.0f)
+		direction = Vector2Normalize(direction);
+	return direction;
+}
+
+// Enter function for Walking state, executed once upon entering Walking
+void NPCEnterWalking(GameObject *object, float deltaTime)
+{
+	(void)deltaTime;
+	NPC *npc = (NPC *)object;
+	printf("%s -> ENTER -> Walking\n", object->name);
+	printf("Aggression: %f\n\n", npc->aggression);
+
+	// Face the target and start walking
+	Vector2 direction = DirectionToTarget(npc);
+	if (Vector2Length(direction) > 0.0f)
+		object->currentDirection = DirectionAxis(direction);
+	npc->facing = object->currentDirection;
+	InitWalkAnimation(object);
+}
+
+// Update function for Walking state: chase the target with legs that actually move
+void NPCUpdateWalking(GameObject *object, float deltaTime)
+{
+	// Cast GameObject to NPC to access NPC-specific data
+	NPC *npc = (NPC *)object;
+
+	// Direction from NPC to target (player)
+	Vector2 direction = DirectionToTarget(npc);
+
+	// Calculate distance to target using Raylib function ( 0 to distance n)
+	float distance = Vector2Distance(npc->base.position, npc->target);
+
+	// Face the target. The AI's commands can change currentDirection, so the
+	// NPC keeps track of which way its animation faces in npc->facing
+	if (Vector2Length(direction) > 0.0f)
+	{
+		Direction newDirection = DirectionAxis(direction);
+		object->currentDirection = newDirection;
+
+		// If Direction changed change walk animation
+		if (newDirection != npc->facing)
+		{
+			npc->facing = newDirection;
+			InitWalkAnimation(object);
+		}
+	}
+
+	// Move towards target
+	// Use aggression to affect movement speed example below
+	// aggression already runs from NPC_MIN_AGGRESSION to NPC_MAX_AGGRESSION (see game.c),
+	// so it's used directly as a speed factor: 0.3 = 30% speed, 0.8 = 80% speed
+
+	// Make sure aggression factor is clamped between min and max agression
+	float aggression_factor = Clamp(npc->aggression, NPC_MIN_AGGRESSION, NPC_MAX_AGGRESSION);
+
+	float movement = DEFAULT_MOVEMENT_SPEED * aggression_factor * deltaTime;
+
+	// Dont go past target
+	if (movement > distance)
+		movement = distance;
+
+	// Scale direction by movement size
+	Vector2 delta = (Vector2){direction.x * movement, direction.y * movement};
+
+	// Apply movement
+	npc->base.position = Vector2Add(npc->base.position, delta);
+
+	// Keep NPC on screen
+	ClampGameObjectOnScreen(&npc->base);
+
+	// Update collider position
+	npc->base.collider.p.x = npc->base.position.x;
+	npc->base.collider.p.y = npc->base.position.y;
+
+	// Update walk animation
+	UpdateAnimation(&object->animation, deltaTime);
+}
+
+// Exit function for Walking state, executed once upon leaving Walking
+void NPCExitWalking(GameObject *object, float deltaTime)
+{
+	(void)deltaTime;
+	NPC *npc = (NPC *)object;
+	printf("%s <- EXIT <- Walking\n", object->name);
+	printf("Aggression: %f\n\n", npc->aggression);
+}
+
+/**
  * InitAttackAnimation - Picks the correct attack arc for the direction.
  *
  * Uses the big 192x192 attack frames further down the sprite sheet.
+ * The swipe plays once (it doesn't loop), so the state knows when it's done.
  */
 
 static void InitAttackAnimation(GameObject *object)
@@ -265,16 +462,16 @@ static void InitAttackAnimation(GameObject *object)
 	switch (object->currentDirection)
 	{
 	case UP:
-		InitGameObjectAnimation(object, sword_attack_UP, 6, 0.035f);
+		InitGameObjectAnimationOnce(object, sword_attack_UP, 6, 0.035f);
 		break;
 	case DOWN:
-		InitGameObjectAnimation(object, sword_attack_DOWN, 6, 0.035f);
+		InitGameObjectAnimationOnce(object, sword_attack_DOWN, 6, 0.035f);
 		break;
 	case LEFT:
-		InitGameObjectAnimation(object, sword_attack_LEFT, 6, 0.035f);
+		InitGameObjectAnimationOnce(object, sword_attack_LEFT, 6, 0.035f);
 		break;
 	case RIGHT:
-		InitGameObjectAnimation(object, sword_attack_RIGHT, 6, 0.035f);
+		InitGameObjectAnimationOnce(object, sword_attack_RIGHT, 6, 0.035f);
 		break;
 	}
 }
@@ -287,70 +484,31 @@ void NPCEnterAttacking(GameObject *object, float deltaTime)
 	printf("%s -> ENTER -> Attacking\n", object->name);
 	printf("Aggression: %f\n\n", npc->aggression);
 	// Initialization code for entering Attacking state, such as setting up attack animations.
+
+	// A fresh swipe hasn't landed yet (see AttackHit in collision.c)
+	object->attackHit = false;
+
+	// Turn to face the target, then swing
+	Vector2 direction = DirectionToTarget(npc);
+	if (Vector2Length(direction) > 0.0f)
+		object->currentDirection = DirectionAxis(direction);
 	InitAttackAnimation(object);
 }
 
 // Update function for Attacking state, called repeatedly during game ticks while in Attacking
 void NPCUpdateAttacking(GameObject *object, float deltaTime)
 {
-	// Cast GameObject to NPC to access NPC-specific data
-	NPC *npc = (NPC *)object;
-
-
-	// Direction from NPC to target (player)
-	Vector2 direction;
-	direction.x = npc->target.x - npc->base.position.x;
-	direction.y = npc->target.y - npc->base.position.y;
-
-	// Normalise direction using Raylib function (0,0) to (1,1)
-	direction = Vector2Normalize(direction);
-
-	// Calculate distance to target using Raylib function ( 0 to distance n)
-	float distance = Vector2Distance(npc->base.position, npc->target);
-
-	// Store previous direction (see utils/utils.h)
-	object->previousDirection = object->currentDirection;
-
-	// Update current direction based on movement direction
-	// (see utils/utils.h)
-	object->currentDirection = DirectionAxis(direction);
-
-	// If Direction changed change attack animation
-	if (object->currentDirection != object->previousDirection)
-	{
-		InitAttackAnimation(object);
-		object->previousDirection = object->currentDirection;
-	}
-
-	// Move towards target
-	// Use aggression to affect movement speed example below
-	// aggression already runs from NPC_MIN_AGGRESSION to NPC_MAX_AGGRESSION (see game.c),
-	// so it's used directly as a speed factor: 0.3 = 30% speed, 0.8 = 80% speed
-
-	// Make sure aggression factor is clamped between min and max agression
-	float aggression_factor = Clamp(npc->aggression, NPC_MIN_AGGRESSION, NPC_MAX_AGGRESSION);
-
-	float movement = DEFAULT_MOVEMENT_SPEED * aggression_factor * deltaTime;
-
-	// Dont go past target
-	if (movement > distance)
-		movement = distance;
-
-	// Scale direction by movement size
-	Vector2 delta = (Vector2){direction.x * movement, direction.y * movement};
-
-	// Apply movement
-	npc->base.position = Vector2Add(npc->base.position, delta);
-
-	// Keep NPC on screen
-	ClampGameObjectOnScreen(&npc->base);
-
-	// Update collider position
-	npc->base.collider.p.x = npc->base.position.x;
-	npc->base.collider.p.y = npc->base.position.y;
+	// No movement while swinging (the swipe frames have no walking legs).
+	// The chasing happens in NPCUpdateWalking.
 
 	// Update attack animation
 	UpdateAnimation(&object->animation, deltaTime);
+
+	// Swipe finished? Tell the FSM: the transition table sends the NPC back to chasing
+	if (object->animation.finished)
+	{
+		HandleEvent(object, EVENT_ANIMATION_END, deltaTime);
+	}
 }
 
 // Exit function for Attacking state, executed once upon leaving Attacking

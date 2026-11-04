@@ -124,10 +124,12 @@ void InitPlayerFSM(GameObject *object)
 
 	// ---- STATE_ATTACKING state configuration ----
 	// Define valid transitions from STATE_ATTACKING
+	// A swipe always finishes: letting go of SPACE or pressing a direction doesn't cut it short.
+	// When it ends the player goes Idle, and from there straight back to Walking
+	// (direction held) or into another swipe (SPACE held) on the next frame.
 	EventStateTransition attackValidTransitions[] = {
 		// EVENT -> STATE
-		{EVENT_NONE, STATE_IDLE},
-		{EVENT_MOVE, STATE_WALKING},
+		{EVENT_ANIMATION_END, STATE_IDLE},
 		{EVENT_DIE, STATE_DEAD}};
 	// Set up the state configuration for STATE_ATTACKING
 	InitStateConfig(object, STATE_ATTACKING, "Player_Attacking", PlayerEnterAttacking, PlayerUpdateAttacking, PlayerExitAttacking);
@@ -485,6 +487,7 @@ void PlayerExitWalking(GameObject *object, float deltaTime)
  * InitAttackAnimation - Picks the correct attack arc for the direction.
  *
  * Uses the big 192x192 attack frames further down the sprite sheet.
+ * The swipe plays once (it doesn't loop), so the state knows when it's done.
  */
 
 static void InitAttackAnimation(GameObject *object)
@@ -536,16 +539,16 @@ static void InitAttackAnimation(GameObject *object)
 	switch (object->currentDirection)
 	{
 	case UP:
-		InitGameObjectAnimation(object, sword_attack_UP, 6, 0.035f);
+		InitGameObjectAnimationOnce(object, sword_attack_UP, 6, 0.035f);
 		break;
 	case DOWN:
-		InitGameObjectAnimation(object, sword_attack_DOWN, 6, 0.035f);
+		InitGameObjectAnimationOnce(object, sword_attack_DOWN, 6, 0.035f);
 		break;
 	case LEFT:
-		InitGameObjectAnimation(object, sword_attack_LEFT, 6, 0.035f);
+		InitGameObjectAnimationOnce(object, sword_attack_LEFT, 6, 0.035f);
 		break;
 	case RIGHT:
-		InitGameObjectAnimation(object, sword_attack_RIGHT, 6, 0.035f);
+		InitGameObjectAnimationOnce(object, sword_attack_RIGHT, 6, 0.035f);
 		break;
 	}
 }
@@ -558,6 +561,11 @@ void PlayerEnterAttacking(GameObject *object, float deltaTime)
 	printf("Stamina: %.1f, Mana: %.1f\n\n", player->stamina, player->mana);
 	// Complete the remainder of the method
 	// Example: Deduct some stamina when attacking
+
+	// A fresh swipe hasn't landed yet (see AttackHit in collision.c)
+	object->attackHit = false;
+
+	// One swipe, facing the way the player was going
 	InitAttackAnimation(object);
 }
 
@@ -566,19 +574,17 @@ void PlayerUpdateAttacking(GameObject *object, float deltaTime)
 	// Complete the remainder of the method
 	// Check if the attack should end or be interrupted (e.g., stamina depletion)
 
-	// Move according to inputAxis
-	GameObjectMove(object, object->inputAxis, deltaTime);
-
-	// Check if moving and direction changed since last frame
-	if (Vector2Length(object->inputAxis) > 0.0f &&
-		object->currentDirection != object->previousDirection)
-	{
-		InitAttackAnimation(object);
-		object->previousDirection = object->currentDirection;
-	}
+	// No movement while swinging: the swipe frames have no walking legs,
+	// so moving here looks like sliding on ice. Feet planted, sword out.
 
 	// Update the Animation
 	UpdateAnimation(&object->animation, deltaTime);
+
+	// Swipe finished? Tell the FSM, and the transition table decides what's next
+	if (object->animation.finished)
+	{
+		HandleEvent(object, EVENT_ANIMATION_END, deltaTime);
+	}
 }
 
 void PlayerExitAttacking(GameObject *object, float deltaTime)

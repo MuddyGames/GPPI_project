@@ -42,6 +42,7 @@ void InitAnimation(AnimationData *animationData,
     animationData->currentFrame = 0;  // Start at the first frame
     animationData->frameTimer = 0.0f; // Reset frame timer to zero
     animationData->active = true;     // Set animation as active by default
+    animationData->finished = false;  // Not finished, it has only started
 }
 
 /**
@@ -50,6 +51,9 @@ void InitAnimation(AnimationData *animationData,
  * Adds on the delta time, and when enough has built up, moves to the
  * next frame. If we hit the end, we loop back or hold the last frame,
  * depending on the mood you set with the loop flag.
+ *
+ * An animation that doesn't loop sets finished once its last frame has
+ * had its full turn on screen, so a state can tell when a swipe is done.
  *
  * @animationData: The animation we're updating.
  * @deltaTime:     Time since the last update call.
@@ -81,6 +85,7 @@ void UpdateAnimation(AnimationData *animationData, float deltaTime)
             else
             {
                 animationData->currentFrame = animationData->frameCount - 1; // Stay on last frame if not looping
+                animationData->finished = true;                               // and say so
             }
         }
 
@@ -147,4 +152,5 @@ void FreeAnimation(AnimationData *animationData)
     animationData->currentFrame = 0;
     animationData->frameTimer = 0.0f;
     animationData->active = false;
+    animationData->finished = false;
 }

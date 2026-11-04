@@ -149,19 +149,20 @@ void UpdateGame(GameData *data, float deltaTime)
 		Command npcCommand = PollAI();
 		MediatorHandleCommand(data->npcMediator, npcCommand, deltaTime);
 
-		// If the NPC is attacking, update its target to the player's position
-		// This makes the NPC chase the player
-		if (data->npc->base.currentState == STATE_ATTACKING)
-		{
-			data->npc->target = data->player->base.position;
+		// The NPC's target is always the player: it chases it while Walking
+		data->npc->target = data->player->base.position;
 
-			data->npc->aggression += NPC_AGGRESSION_BUILD * deltaTime; // Increase aggression over time while attacking
+		// Aggression builds while the NPC is chasing or attacking (it gets faster)
+		if (data->npc->base.currentState == STATE_WALKING ||
+			data->npc->base.currentState == STATE_ATTACKING)
+		{
+			data->npc->aggression += NPC_AGGRESSION_BUILD * deltaTime; // Increase aggression over time while chasing
 			if (data->npc->aggression > NPC_MAX_AGGRESSION)
 				data->npc->aggression = NPC_MAX_AGGRESSION;
 		}
 		else
 		{
-			// Reduce agression when not attacking
+			// Reduce agression when not chasing or attacking
 			data->npc->aggression -= NPC_AGGRESSION_DECAY * deltaTime;
 			if (data->npc->aggression < NPC_MIN_AGGRESSION)
 				data->npc->aggression = NPC_MIN_AGGRESSION; // Minimum agression
@@ -201,6 +202,10 @@ void UpdateGame(GameData *data, float deltaTime)
 		// Update isColliding for GameObjects
 		data->player->base.isColliding = isColliding;
 		data->npc->base.isColliding = isColliding;
+
+		// Sword swipes: damage lands once per swipe, on the hit frame (see collision.c)
+		AttackHit(&data->player->base, &data->npc->base);
+		AttackHit(&data->npc->base, &data->player->base);
 
 		// Game Over Check
 		if (data->player->base.health <= 0 || data->npc->base.health <= 0)

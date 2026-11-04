@@ -47,10 +47,12 @@ void InitGameObject(GameObject *object,
 	object->animation.frameTimer = 0.0f;
 	object->animation.active = false;
 	object->animation.loop = true;
+	object->animation.finished = false;
 
 	// Initialise Other Data
 	object->timer = 0.0f;
 	object->isColliding = false;
+	object->attackHit = false;
 	object->stateConfigs = NULL;
 	object->inputAxis = (Vector2){0.0f, 0.0f};
 	object->currentDirection = DOWN;
@@ -99,6 +101,28 @@ void InitGameObjectAnimation(GameObject *object, Rectangle *frames, int frameCou
 
 	// Initialize a new animation
 	InitAnimation(&object->animation, object->keyframes, frames, frameCount, speed, true);
+}
+
+/**
+ * InitGameObjectAnimationOnce - Gives the GameObject an animation that plays once.
+ *
+ * Same as InitGameObjectAnimation, except it stops on the last frame and
+ * sets animation.finished, instead of going round again like a lad stuck
+ * on the Carlow ring road. Just the job for a sword swipe.
+ *
+ * @object:     The object that's getting animated.
+ * @frames:     Rectangles describing each frame on the sprite sheet.
+ * @frameCount: How many frames to play through.
+ * @speed:      How fast the animation moves (seconds per frame).
+ */
+
+void InitGameObjectAnimationOnce(GameObject *object, Rectangle *frames, int frameCount, float speed)
+{
+	// Free any existing animation resources
+	FreeAnimation(&object->animation);
+
+	// Initialize a new animation that doesn't loop
+	InitAnimation(&object->animation, object->keyframes, frames, frameCount, speed, false);
 }
 
 /**

@@ -53,13 +53,14 @@ Command PollAI()
 		return command;
 
 	// Pick a random command
+	// No ATTACK here: the NPC swings when it catches the player (EVENT_COLLISION_START)
+	// Any MOVE means "chase" (EVENT_MOVE); the NPC works out the direction itself
 	static Command commands[] = {
 		NONE,
 		MOVE_UP,
 		MOVE_DOWN,
 		MOVE_LEFT,
 		MOVE_RIGHT,
-		ATTACK,
 		DEFEND};
 
 	int count = sizeof(commands) / sizeof(commands[0]);

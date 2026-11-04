@@ -53,7 +53,8 @@ struct GameObject
 	Texture2D keyframes;	 // Sprite Sheet Texture
 
 	// Gameplay Components
-	int health;	 // The health of the game object
+	int health;		// The health of the game object
+	bool attackHit; // Has the current sword swipe already landed (one hit per swipe)
 	float timer; // Can be used during updates
 
 };
@@ -68,8 +69,11 @@ void InitGameObject(GameObject *object,
 					Texture2D keyframes,
 					int health);
 
-// Helper function to initialize animation
+// Helper function to initialize an animation that loops (idle, walk)
 void InitGameObjectAnimation(GameObject *object, Rectangle *frames, int frameCount, float speed);
+
+// Helper function to initialize an animation that plays once (sword swipe)
+void InitGameObjectAnimationOnce(GameObject *object, Rectangle *frames, int frameCount, float speed);
 
 // Keep on screen
 void ClampGameObjectOnScreen(GameObject *object);

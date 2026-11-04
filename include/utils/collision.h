@@ -13,4 +13,7 @@ void HandleCollision(GameObject *lhs, GameObject *rhs);
 void CollisionEntry(GameObject *lhs, GameObject *rhs);
 void CollisionExit(GameObject *lhs, GameObject *rhs);
 
+// Sword swipe damage: checked every frame, lands once per swipe on the hit frame
+void AttackHit(GameObject *attacker, GameObject *target);
+
 #endif // COLLISION_H

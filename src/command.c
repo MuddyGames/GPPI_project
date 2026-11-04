@@ -11,8 +11,9 @@
  * events at the FSM. The FSM's transition tables decide what actually
  * happens next .... this fella just delivers the message.
  *
- * inputAxis and the direction are set every frame, even while attacking,
- * so nobody slides off across the field on last week's input.
+ * inputAxis is set every frame (zero when nothing is pressed), so nobody
+ * slides off across the field on last week's input. The facing direction
+ * is set when moving, but not in the middle of a sword swipe.
  *
  * @command:   The command flags the player (or the AI) has mashed together.
  * @object:    The GameObject getting the events.
@@ -42,16 +43,17 @@ void ExecuteCommand(Command command, GameObject *object, float deltaTime)
 	bool defending = IsCommandActive(command, DEFEND);
 
 	// Always set the input axis: zero when not moving
-	// (so states that move with inputAxis, like Attacking, stop when the keys are released)
 	if (moving)
-	{
 		axis = Vector2Normalize(axis);
+	object->inputAxis = axis;
 
-		// Direction is updated while attacking too, so the attack animation can turn
+	// Update the facing direction, except in the middle of a sword swipe:
+	// a swipe keeps the direction it started in (direction keys are ignored until it finishes)
+	if (moving && object->currentState != STATE_ATTACKING)
+	{
 		object->previousDirection = object->currentDirection;
 		object->currentDirection = DirectionAxis(axis);
 	}
-	object->inputAxis = axis;
 
 	// EVENT_MOVE only if not EVENT_ATTACK
 	if (!attacking && moving)

@@ -23,6 +23,12 @@
 // Default Player Damage
 #define DAMAGE_DEFAULT 15
 
+// Sword swipe: the frame the blade lands on (counting from 0, so 3 = Frame 4 of 6)
+#define ATTACK_HIT_FRAME 3
+
+// Sword swipe: how far past the edge of the attacker's collider the blade reaches
+#define ATTACK_REACH 20.0f
+
 // Buffer zone to avoid stuck states in collision detection
 #define COLLISION_BUFFER 2.0f
 #define COLLISION_PUSH_BACK 2.0f
