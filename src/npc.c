@@ -1,6 +1,16 @@
 #include "gameobjects/npc.h"
 #include "utils/utils.h"
 
+/*
+ * Sprite sheet layout (resources/npc_sprite_sheet.png)
+ *
+ * Grid is 64 x 64: Row n starts at Pixel Y = (n - 1) x 64, Column c at Pixel X = (c - 1) x 64
+ * Sword swipes are 192 x 192 (3 x 3 grid cells) at the bottom of the sheet, Rows 47-58:
+ *     Pixel Y = (first row - 1) x 64, Pixel X = (Column - 1) x 192
+ *
+ * Each Rectangle below is {Pixel X, Pixel Y, width, height}
+ */
+
 /**
  * InitNPC - Sets up a brand-new NPC and gets them ready for mischief.
  *
@@ -162,18 +172,20 @@ void NPCEnterIdle(GameObject *object, float deltaTime)
 	if (npc->base.previousState != npc->base.currentState && npc->base.currentState == STATE_IDLE)
 	{
 		// Setup Idle Animations
+		// IDLE (Row 3, Pixel : Y = 2 x 64 = 128)
+		// Each frame is 64 x 64, so Pixel X = (Column - 1) x 64
 		Rectangle idle[7] = {
-			{0, 128, 64, 64},	// Frame 1: Row 3, Column 1
-			{64, 128, 64, 64},	// Frame 2: Row 3, Column 2
-			{128, 128, 64, 64}, // Frame 3: Row 3, Column 3
-			{192, 128, 64, 64}, // Frame 4: Row 3, Column 4
-			{256, 128, 64, 64}, // Frame 5: Row 3, Column 5
-			{320, 128, 64, 64}, // Frame 6: Row 3, Column 6
-			{384, 128, 64, 64}	// Frame 7: Row 3, Column 7
+			{0, 128, 64, 64},     // Frame 1: Column 1 (Pixel : X 0)
+			{64, 128, 64, 64},    // Frame 2: Column 2 (Pixel : X 64)
+			{128, 128, 64, 64},   // Frame 3: Column 3 (Pixel : X 128)
+			{192, 128, 64, 64},   // Frame 4: Column 4 (Pixel : X 192)
+			{256, 128, 64, 64},   // Frame 5: Column 5 (Pixel : X 256)
+			{320, 128, 64, 64},   // Frame 6: Column 6 (Pixel : X 320)
+			{384, 128, 64, 64}    // Frame 7: Column 7 (Pixel : X 384)
 		};
 
 		// Initialize the idle animation frames and play it
-		InitGameObjectAnimation(&npc->base, idle, 6, 0.1f);
+		InitGameObjectAnimation(&npc->base, idle, 7, 0.1f);
 	}
 }
 
@@ -206,44 +218,48 @@ void NPCExitIdle(GameObject *object, float deltaTime)
 
 static void InitAttackAnimation(GameObject *object)
 {
-	// ATTACK UP (Row 48)
+	// ATTACK UP (Rows 47-49, Pixel : Y = 46 x 64 = 2944)
+	// Each frame is 192 x 192, so Pixel X = (Column - 1) x 192
 	static Rectangle sword_attack_UP[6] = {
-		{0, 2952, 192, 192},   // Frame 1: Row 44, Column 1
-		{192, 2952, 192, 192}, // Frame 2: Row 44, Column 2
-		{384, 2952, 192, 192}, // Frame 3: Row 44, Column 3
-		{576, 2952, 192, 192}, // Frame 4: Row 44, Column 4
-		{768, 2952, 192, 192}, // Frame 5: Row 44, Column 5
-		{960, 2952, 192, 192}  // Frame 6: Row 44, Column 6
+		{0, 2944, 192, 192},    // Frame 1: Column 1 (Pixel : X 0)
+		{192, 2944, 192, 192},  // Frame 2: Column 2 (Pixel : X 192)
+		{384, 2944, 192, 192},  // Frame 3: Column 3 (Pixel : X 384)
+		{576, 2944, 192, 192},  // Frame 4: Column 4 (Pixel : X 576)
+		{768, 2944, 192, 192},  // Frame 5: Column 5 (Pixel : X 768)
+		{960, 2944, 192, 192}   // Frame 6: Column 6 (Pixel : X 960)
 	};
 
-	// ATTACK LEFT (Row 51)
+	// ATTACK LEFT (Rows 50-52, Pixel : Y = 49 x 64 = 3136)
+	// Each frame is 192 x 192, so Pixel X = (Column - 1) x 192
 	static Rectangle sword_attack_LEFT[6] = {
-		{0, 3144, 192, 192},   // Frame 1: Row 51, Column 1
-		{192, 3144, 192, 192}, // Frame 2: Row 51, Column 2
-		{384, 3144, 192, 192}, // Frame 3: Row 51, Column 3
-		{576, 3144, 192, 192}, // Frame 4: Row 51, Column 4
-		{768, 3144, 192, 192}, // Frame 5: Row 51, Column 5
-		{960, 3144, 192, 192}  // Frame 6: Row 51, Column 6
+		{0, 3136, 192, 192},    // Frame 1: Column 1 (Pixel : X 0)
+		{192, 3136, 192, 192},  // Frame 2: Column 2 (Pixel : X 192)
+		{384, 3136, 192, 192},  // Frame 3: Column 3 (Pixel : X 384)
+		{576, 3136, 192, 192},  // Frame 4: Column 4 (Pixel : X 576)
+		{768, 3136, 192, 192},  // Frame 5: Column 5 (Pixel : X 768)
+		{960, 3136, 192, 192}   // Frame 6: Column 6 (Pixel : X 960)
 	};
 
-	// ATTACK DOWN (Row 54)
+	// ATTACK DOWN (Rows 53-55, Pixel : Y = 52 x 64 = 3328)
+	// Each frame is 192 x 192, so Pixel X = (Column - 1) x 192
 	static Rectangle sword_attack_DOWN[6] = {
-		{0, 3336, 192, 192},   // Frame 1: Row 54, Column 1
-		{192, 3336, 192, 192}, // Frame 2: Row 54, Column 2
-		{384, 3336, 192, 192}, // Frame 3: Row 54, Column 3
-		{576, 3336, 192, 192}, // Frame 4: Row 54, Column 4
-		{768, 3336, 192, 192}, // Frame 5: Row 54, Column 5
-		{960, 3336, 192, 192}  // Frame 6: Row 54, Column 6
+		{0, 3328, 192, 192},    // Frame 1: Column 1 (Pixel : X 0)
+		{192, 3328, 192, 192},  // Frame 2: Column 2 (Pixel : X 192)
+		{384, 3328, 192, 192},  // Frame 3: Column 3 (Pixel : X 384)
+		{576, 3328, 192, 192},  // Frame 4: Column 4 (Pixel : X 576)
+		{768, 3328, 192, 192},  // Frame 5: Column 5 (Pixel : X 768)
+		{960, 3328, 192, 192}   // Frame 6: Column 6 (Pixel : X 960)
 	};
 
-	// ATTACK RIGHT (Row 57)
+	// ATTACK RIGHT (Rows 56-58, Pixel : Y = 55 x 64 = 3520)
+	// Each frame is 192 x 192, so Pixel X = (Column - 1) x 192
 	static Rectangle sword_attack_RIGHT[6] = {
-		{0, 3528, 192, 192},   // Frame 1: Row 57, Column 1
-		{192, 3528, 192, 192}, // Frame 2: Row 57, Column 2
-		{384, 3528, 192, 192}, // Frame 3: Row 57, Column 3
-		{576, 3528, 192, 192}, // Frame 4: Row 57, Column 4
-		{768, 3528, 192, 192}, // Frame 5: Row 57, Column 5
-		{960, 3528, 192, 192}  // Frame 6: Row 57, Column 6
+		{0, 3520, 192, 192},    // Frame 1: Column 1 (Pixel : X 0)
+		{192, 3520, 192, 192},  // Frame 2: Column 2 (Pixel : X 192)
+		{384, 3520, 192, 192},  // Frame 3: Column 3 (Pixel : X 384)
+		{576, 3520, 192, 192},  // Frame 4: Column 4 (Pixel : X 576)
+		{768, 3520, 192, 192},  // Frame 5: Column 5 (Pixel : X 768)
+		{960, 3520, 192, 192}   // Frame 6: Column 6 (Pixel : X 960)
 	};
 
 	switch (object->currentDirection)
@@ -356,19 +372,21 @@ void NPCEnterShielding(GameObject *object, float deltaTime)
 	printf("Aggression: %f\n\n", npc->aggression);
 	// Initialization code for entering Shielding state, such as enabling shield effects.
 
+	// SHIELDING (Row 7, Pixel : Y = 6 x 64 = 384)
+	// Each frame is 64 x 64, so Pixel X = (Column - 1) x 64
 	Rectangle sheilding[8] = {
-		{0, 384, 64, 64},	// Frame 1: Row 7, Column 1
-		{64, 384, 64, 64},	// Frame 2: Row 7, Column 2
-		{128, 384, 64, 64}, // Frame 3: Row 7, Column 3
-		{192, 384, 64, 64}, // Frame 4: Row 7, Column 4
-		{256, 384, 64, 64}, // Frame 5: Row 7, Column 5
-		{320, 384, 64, 64}, // Frame 6: Row 7, Column 6
-		{384, 384, 64, 64}, // Frame 7: Row 7, Column 7
-		{448, 384, 64, 64}	// Frame 8: Row 7, Column 8
+		{0, 384, 64, 64},     // Frame 1: Column 1 (Pixel : X 0)
+		{64, 384, 64, 64},    // Frame 2: Column 2 (Pixel : X 64)
+		{128, 384, 64, 64},   // Frame 3: Column 3 (Pixel : X 128)
+		{192, 384, 64, 64},   // Frame 4: Column 4 (Pixel : X 192)
+		{256, 384, 64, 64},   // Frame 5: Column 5 (Pixel : X 256)
+		{320, 384, 64, 64},   // Frame 6: Column 6 (Pixel : X 320)
+		{384, 384, 64, 64},   // Frame 7: Column 7 (Pixel : X 384)
+		{448, 384, 64, 64}    // Frame 8: Column 8 (Pixel : X 448)
 	};
 
-	// Initialize attack animation
-	InitGameObjectAnimation(&npc->base, sheilding, 6, 0.08f);
+	// Initialize shielding animation
+	InitGameObjectAnimation(&npc->base, sheilding, 8, 0.08f);
 }
 
 // Update function for Shielding state, called repeatedly during game ticks while in Shielding
@@ -397,13 +415,15 @@ void NPCEnterDead(GameObject *object, float deltaTime)
 	printf("%s -> ENTER -> Dead\n", object->name);
 	printf("Aggression: %f\n\n", npc->aggression);
 	// Initialization code for entering Dead state, such as playing death animation or disabling further actions.
+	// DEAD (Row 21, Pixel : Y = 20 x 64 = 1280)
+	// Each frame is 64 x 64, so Pixel X = (Column - 1) x 64
 	Rectangle dead[6] = {
-		{0, 1280, 64, 64},	 // Frame 1: Row 21, Column 1
-		{64, 1280, 64, 64},	 // Frame 1: Row 21, Column 2
-		{128, 1280, 64, 64}, // Frame 1: Row 21, Column 3
-		{192, 1280, 64, 64}, // Frame 1: Row 21, Column 4
-		{256, 1280, 64, 64}, // Frame 1: Row 21, Column 5
-		{320, 1280, 64, 64}	 // Frame 1: Row 21, Column 6
+		{0, 1280, 64, 64},    // Frame 1: Column 1 (Pixel : X 0)
+		{64, 1280, 64, 64},   // Frame 2: Column 2 (Pixel : X 64)
+		{128, 1280, 64, 64},  // Frame 3: Column 3 (Pixel : X 128)
+		{192, 1280, 64, 64},  // Frame 4: Column 4 (Pixel : X 192)
+		{256, 1280, 64, 64},  // Frame 5: Column 5 (Pixel : X 256)
+		{320, 1280, 64, 64}   // Frame 6: Column 6 (Pixel : X 320)
 	};
 	// Initialize dead animation
 	InitGameObjectAnimation(&npc->base, dead, 6, 0.2f);
