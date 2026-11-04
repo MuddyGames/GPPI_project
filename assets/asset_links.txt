@@ -1,0 +1,16 @@
+Sheet is
+
+1152 x 3712
+
+Each tile is 64 x 64
+
+18 tiles wide
+58 tiles high
+
+production folder contains a marked out grid
+
+Player
+https://sanderfrenken.github.io/Universal-LPC-Spritesheet-Character-Generator/#?body=Body_color_dark_green&head=Human_male_dark_green&animation=any&sex=muscular&shadow=Shadow_shadow&wound_arm=Arm_arm&wings_edge=none&wings=none&shield=Two_engrailed_shield_two_engrailed&wound_brain=none&wound_ribs=none&wound_eye=none&wound_mouth=none&beard=none&horns=none&arms=Armour_steel&bracers=Bracers_silver&cape=Solid_teal&weapon=Rapier_rapier&mustache=French_Mustache_dark_gray&quiver=none&shield_paint=Revised_Heater_Shield_Paint_dove
+
+NPC
+https://sanderfrenken.github.io/Universal-LPC-Spritesheet-Character-Generator/#?body=Body_color_fur_black&head=Minotaur_fur_black&animation=any&sex=muscular&shadow=Shadow_shadow&wound_arm=Arm_arm&wings_edge=none&wings=none&shield=Shield_kite_gray_orange&wound_brain=none&wound_ribs=Ribs_ribs&wound_eye=Eye_eye&wound_mouth=Mouth_mouth&beard=Winter_Beard_dark_brown&horns=Backwards_Horns_horns&arms=Armour_steel&bracers=Bracers_steel&cape=none&weapon=Rapier_rapier

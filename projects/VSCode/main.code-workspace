@@ -1,0 +1,224 @@
+{
+	"folders": [
+		{
+			"name": "project",
+			"path": "../../."
+		},
+		{
+			"name": "include",
+			"path": "../../include"
+		},
+		{
+			"name": "src",
+			"path": "../../src"
+		},
+		{
+			"name": "resources",
+			"path": "../../resources"
+		},
+		{
+			"name": "build",
+			"path": "../../build"
+		}
+	],
+	"settings": {
+		"files.exclude": {
+			"include": true,
+			"src": true,
+			"build": true,
+			"resources": true
+		},
+		"files.associations": {
+			"raylib.h": "c",
+			"math.h": "c",
+			"stdio.h": "c",
+			"*.m": "c"
+		},
+		// IntelliSense for every workspace folder (src has no c_cpp_properties.json)
+		"C_Cpp.default.compilerPath": "C:/raylib/w64devkit/bin/gcc.exe",
+		"C_Cpp.default.cStandard": "c99",
+		"C_Cpp.default.cppStandard": "c++14",
+		"C_Cpp.default.intelliSenseMode": "windows-gcc-x64",
+		"C_Cpp.default.includePath": [
+			"${workspaceFolder:src}",
+			"${workspaceFolder:src}/external",
+			"${workspaceFolder:include}",
+			"C:/raylib/raylib/src",
+			"C:/raylib/raylib/src/external",
+			// Linux / macOS (ignored on Windows)
+			"${env:HOME}/raylib/src",
+			"${env:HOME}/raylib/src/external"
+		],
+		"C_Cpp.default.defines": [
+			"_DEBUG",
+			"UNICODE",
+			"_UNICODE",
+			"PLATFORM_DESKTOP",
+			"GRAPHICS_API_OPENGL_33"
+		],
+		// Stop the CMake extension asking about a CMakeLists.txt we don't use
+		"cmake.ignoreCMakeListsMissing": true,
+		"cmake.configureOnOpen": false,
+		// Terminal opens root (Makefile)
+		"terminal.integrated.cwd": "${workspaceFolder:project}",
+		// ---------- Windows ----------
+		"terminal.integrated.profiles.windows": {
+			// Real bash (Git Bash) with the w64devkit compiler on PATH
+			"raylib bash": {
+				"path": "C:\\Program Files\\Git\\bin\\bash.exe",
+				"args": [
+					"--login",
+					"-i"
+				],
+				"icon": "terminal-bash",
+				"env": {
+					"PATH": "C:\\raylib\\w64devkit\\bin;${env:PATH}",
+					"CHERE_INVOKING": "1",
+					// git ignores the campus proxy (same as git -c http.proxy=)
+					"GIT_CONFIG_PARAMETERS": "'http.proxy='",
+					"HTTP_PROXY": null,
+					"HTTPS_PROXY": null
+				}
+			},
+			// w64devkit's own BusyBox shell, with git on PATH
+			"w64devkit": {
+				"path": "C:\\raylib\\w64devkit\\bin\\busybox.exe",
+				"args": [
+					"sh",
+					"-l",
+					"-d",
+					"${workspaceFolder:project}"
+				],
+				"icon": "terminal",
+				"env": {
+					"W64DEVKIT_HOME": "C:\\raylib\\w64devkit",
+					"PATH": "C:\\raylib\\w64devkit\\bin;C:\\Program Files\\Git\\cmd;${env:PATH}",
+					"HOME": "${env:USERPROFILE}",
+					"GIT_CONFIG_PARAMETERS": "'http.proxy='",
+					"HTTP_PROXY": null,
+					"HTTPS_PROXY": null
+				}
+			}
+		},
+		"terminal.integrated.defaultProfile.windows": "w64devkit",
+		// ---------- Linux / macOS ----------
+		"terminal.integrated.defaultProfile.linux": "bash",
+		"terminal.integrated.defaultProfile.osx": "bash"
+	},
+	// Tasks live here (not in a folder's .vscode) so they work whichever folder is active.
+	// "process" tasks run make directly with an argument list: no shell in between,
+	// so arguments like BUILD_MODE=DEBUG can't be split off or lost.
+	"tasks": {
+		"version": "2.0.0",
+		"options": {
+			"cwd": "${workspaceFolder:project}"
+		},
+		"windows": {
+			"options": {
+				"cwd": "${workspaceFolder:project}",
+				// make's recipes need w64devkit's gcc, sh, rm and mkdir on PATH
+				"env": {
+					"PATH": "C:\\raylib\\w64devkit\\bin;C:\\Program Files\\Git\\cmd;${env:PATH}",
+					"HOME": "${env:USERPROFILE}"
+				}
+			}
+		},
+		"tasks": [
+			{
+				"label": "Build (Debug)",
+				"type": "process",
+				"command": "make",
+				"args": ["BUILD_MODE=DEBUG"],
+				"windows": { "command": "C:/raylib/w64devkit/bin/make.exe" },
+				"group": { "kind": "build", "isDefault": true },
+				"problemMatcher": ["$gcc"],
+				"detail": "Build with debug symbols, for F5 debugging"
+			},
+			{
+				"label": "Build (Release)",
+				"type": "process",
+				"command": "make",
+				"windows": { "command": "C:/raylib/w64devkit/bin/make.exe" },
+				"group": "build",
+				"problemMatcher": ["$gcc"],
+				"detail": "Optimised build"
+			},
+			{
+				"label": "Run",
+				"type": "process",
+				"command": "make",
+				"args": ["run"],
+				"windows": { "command": "C:/raylib/w64devkit/bin/make.exe" },
+				"problemMatcher": ["$gcc"],
+				"detail": "Build and run the desktop game"
+			},
+			{
+				"label": "Run Web",
+				"type": "process",
+				"command": "make",
+				"args": ["run_web"],
+				"windows": { "command": "C:/raylib/w64devkit/bin/make.exe" },
+				"problemMatcher": [],
+				"detail": "Build for web, serve on 127.0.0.1:8000 and open the browser"
+			},
+			{
+				"label": "Stop Web Server",
+				"type": "process",
+				"command": "make",
+				"args": ["stop_web"],
+				"windows": { "command": "C:/raylib/w64devkit/bin/make.exe" },
+				"problemMatcher": [],
+				"detail": "Stop a web server left running on port 8000"
+			},
+			{
+				"label": "Clean",
+				"type": "process",
+				"command": "make",
+				"args": ["clean"],
+				"windows": { "command": "C:/raylib/w64devkit/bin/make.exe" },
+				"problemMatcher": [],
+				"detail": "Remove the build folder"
+			}
+		]
+	},
+
+	// F5: build with debug info, then start the debugger from the project folder
+	"launch": {
+		"version": "0.2.0",
+		"configurations": [
+			{
+				"name": "Debug",
+				"type": "cppdbg",
+				"request": "launch",
+				"program": "${workspaceFolder:project}/build/desktop-debug/GPPI_project",
+				"cwd": "${workspaceFolder:project}",
+				"args": [],
+				"stopAtEntry": false,
+				"externalConsole": false,
+				"MIMode": "gdb",
+				"miDebuggerPath": "gdb",
+				"preLaunchTask": "Build (Debug)",
+				"setupCommands": [
+					{
+						"description": "Enable pretty-printing for gdb",
+						"text": "-enable-pretty-printing",
+						"ignoreFailures": true
+					}
+				],
+				"windows": {
+					"program": "${workspaceFolder:project}/build/desktop-debug/GPPI_project.exe",
+					"miDebuggerPath": "C:/raylib/w64devkit/bin/gdb.exe"
+				},
+				"osx": {
+					"MIMode": "lldb",
+					"miDebuggerPath": "lldb"
+				}
+			}
+		]
+	},
+	"extensions": {
+		"recommendations": [
+			"ms-vscode.cpptools"
+		]
+	}
+}

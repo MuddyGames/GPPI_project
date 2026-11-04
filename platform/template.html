@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Gameplay Programming I</title>
+    <style>
+        body {
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            overflow: hidden;   /* Prevent scrollbars */
+        }
+
+        canvas {
+            display: block;     /* No gap under the canvas */
+            margin: 0 auto;     /* Centre the game in the page */
+            outline: none;      /* No focus outline when clicked */
+        }
+    </style>
+</head>
+
+<body>
+    <!-- raylib draws into this canvas. Its size comes from InitWindow(). -->
+    <canvas id="canvas" tabindex="-1" oncontextmenu="event.preventDefault()"></canvas>
+
+    <!-- Module must exist BEFORE Emscripten's script loads -->
+    <script>
+        var Module = {
+            canvas: document.getElementById('canvas'),
+            print: function (text) { console.log(text); },
+            onRuntimeInitialized: function () {
+                console.log("Raylib Template is ready!");
+            }
+        };
+    </script>
+
+    <!-- Emscripten injects the game script here -->
+    {{{ SCRIPT }}}
+</body>
+
+</html>
