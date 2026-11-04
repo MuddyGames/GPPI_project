@@ -1,9 +1,9 @@
 #ifndef COLLISION_H
 #define COLLISION_H
 
-#include "cute_c2.h"
+#include "utils/cute_c2.h"
 
-#include "./gameobjects/gameobject.h"
+#include "gameobjects/gameobject.h"
 
 // Collision Methods
 bool CheckCollision(GameObject *lhs, GameObject *rhs);

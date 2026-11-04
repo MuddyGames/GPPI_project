@@ -1,5 +1,5 @@
-#include "./fsm/fsm.h"
-#include "./gameobjects/gameobject.h"
+#include "fsm/fsm.h"
+#include "gameobjects/gameobject.h"
 
 /**
  * AllocAndInitStateConfigs : Allocates and initializes state configurations.
@@ -36,15 +36,15 @@ StateConfig *AllocateStateConfigs(int stateCount)
 /**
  * InitStateConfig : Sets up a state's callbacks and name.
  *
- * Gives the state its proper bits and pieces, a name, the event
- * handler, and whatever functions pointers it needs.
+ * Gives the state its proper bits and pieces, a name and whatever
+ * function pointers it needs. Which event leads where is set separately,
+ * in its EventStateTransition table (see StateTransitions).
  *
  * Basically handing the state its toolkit so it can behave properly.
  *
  * @object: Poor divil whose state is getting set up, hope its not STATE_DEAD.
  * @state:  Which state is being configuring (STATE_IDLE, STATE_WALKING, STATE_BOOZED (actually BOOZED not allowed LOL etc.)
  * @name:   Grand little STATE label
- * @HandleEvent: Function to deal with any events fired at this state
  * @Entry:  Runs when the object enters the state ... a sort of "Dia duit".
  * @Update: Runs each frame while in the state ... "is she buring in Oil?", "she would if she got it!"
  * @Exit:   Runs when hopping out out out out out of a state ... a polite "Slan leat".
@@ -87,7 +87,7 @@ void HandleEvent(GameObject *object, Event event, float deltaTime)
 		}
 	}
 	// Stay in current state if no match
-	object->previousState = object->currentState;
+	// (previousState only changes in ChangeState(), so it always means "the state before this one")
 }
 
 /**
@@ -159,9 +159,11 @@ bool ChangeState(GameObject *object, State newState, float deltaTime)
 	if (!CanEnterState(object, newState))
 	{
 		// If the transition is not valid, print an error and return false
+		const char *from = object->stateConfigs[object->currentState].name;
+		const char *to = object->stateConfigs[newState].name;
 		printf("Invalid state transition from %s to %s\n",
-			   object->stateConfigs[object->currentState].name,
-			   object->stateConfigs[newState].name);
+			   from ? from : "(unimplemented state)",
+			   to ? to : "(unimplemented state)");
 		return false; // Transition failed
 	}
 

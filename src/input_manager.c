@@ -3,8 +3,8 @@
 
 #include <raylib.h>
 
-#include "./utils/input_manager.h"
-#include "./utils/constants.h"
+#include "utils/input_manager.h"
+#include "utils/constants.h"
 
 /**
  * InitInputManager - Gives the input system a once-over before play begins.
@@ -97,30 +97,34 @@ Command PollInput()
 	if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT))
 		command |= MOVE_RIGHT;
 
-	if (IsKeyPressed(KEY_SPACE) || IsKeyDown(KEY_SPACE))
+	if (IsKeyDown(KEY_SPACE))
 		command |= ATTACK;
 
-	if (command != NONE)
-	{
-		// Debug trace
-		char buffer[COMMAND_COUNT + 1]; // COUNT bits + null
-		GetCommandBits(command, buffer);
+	// DEFEND is not bound to a key or button yet: that's one for you
 
-		TraceLog(LOG_INFO, "Combined Command bits: %s", buffer);
+	// Log the command only when it changes (a key or button pressed or released),
+	// not every frame, so the console stays readable
+	static Command previousCommand = NONE;
+	if (command != previousCommand)
+	{
+		char bits[COMMAND_COUNT + 1]; // COMMAND_COUNT bits + null
+		GetCommandBits(command, bits);
+		TraceLog(LOG_INFO, "Command Bits: %s (%d)", bits, command);
+		previousCommand = command;
 	}
 
 	return command; // NONE if nothing was set
 }
 
 /**
- * ExitInputManager - Gives the input system a polite send-off.
+ * DeleteInputManager - Gives the input system a polite send-off.
  *
  * Currently does nothing, but here's where you'd unplug whatever needs unplugging
  * or sweep up after yourself if you added anything fancy like a neural mind reader or the
  * new Valve headset yoke.
  */
 
-void ExitInputManager()
+void DeleteInputManager()
 {
 	// Cleanup resources if needed
 }

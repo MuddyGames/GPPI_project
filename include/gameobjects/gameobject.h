@@ -7,13 +7,13 @@
 #include <raylib.h>
 #include <raymath.h>
 
-#include "../utils/cute_c2.h"
+#include "utils/cute_c2.h"
 
-#include "./utils/constants.h"
+#include "utils/constants.h"
 
-#include "./events/events.h"
-#include "./fsm/fsm.h"
-#include "./animation/animation.h"
+#include "events/events.h"
+#include "fsm/fsm.h"
+#include "animation/animation.h"
 
 // GameObjects Direction
 // This is used to set the animation directions
@@ -26,7 +26,8 @@ typedef enum Direction
 } Direction;
 
 // Base structure for a game object
-typedef struct GameObject
+// (typedef GameObject is already declared in fsm.h, so only the struct is defined here)
+struct GameObject
 {
 	const char *name; // The name of the game object (e.g., "Player", "Enemy")
 
@@ -55,7 +56,7 @@ typedef struct GameObject
 	int health;	 // The health of the game object
 	float timer; // Can be used during updates
 
-} GameObject;
+};
 
 // Initialize a new game object with the given name and default values
 void InitGameObject(GameObject *object,
@@ -72,12 +73,6 @@ void InitGameObjectAnimation(GameObject *object, Rectangle *frames, int frameCou
 
 // Keep on screen
 void ClampGameObjectOnScreen(GameObject *object);
-
-// Check collision
-bool CheckCollision(GameObject *lhs, GameObject *rhs);
-
-// Handle Collision
-void HandleCollision(GameObject *lhs, GameObject *rhs);
 
 // Delete a game object and free associated memory/resources
 void DeleteGameObject(GameObject *object);

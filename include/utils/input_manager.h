@@ -1,10 +1,15 @@
 #ifndef INPUT_MANAGER_H
 #define INPUT_MANAGER_H
 
-#include "./command/command.h"
+#include "command/command.h"
 
+// Init Input Manager
 void InitInputManager();
+
+// Poll Input
 Command PollInput();
-void ExitInputManager();
+
+// Cleanup
+void DeleteInputManager();
 
 #endif // INPUT_MANAGER_H

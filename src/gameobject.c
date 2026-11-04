@@ -1,5 +1,5 @@
-#include "./gameobjects/gameobject.h"
-#include "./utils/constants.h"
+#include "gameobjects/gameobject.h"
+#include "utils/constants.h"
 /**
  * InitGameObject : Sets up a fresh GameObject with all the basics.
  *

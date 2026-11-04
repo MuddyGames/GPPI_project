@@ -7,7 +7,7 @@
 #include <string.h>
 
 // Include the header for the base game object
-#include "gameobject.h"
+#include "gameobjects/gameobject.h"
 
 // Define the Player structure that extends GameObject with additional properties like stamina and mana
 typedef struct

@@ -1,5 +1,5 @@
-#include "./gameobjects/player.h"
-#include "./utils/utils.h"
+#include "gameobjects/player.h"
+#include "utils/utils.h"
 
 /**
  * InitPlayer - Spins up a fresh Player.
@@ -23,7 +23,7 @@ Player *InitPlayer(const char *name, Vector2 position, int radius)
 	}
 
 	// Load player texture
-	Texture2D texture = LoadTexture("./assets/player_sprite_sheet.png");
+	Texture2D texture = LoadTexture("resources/player_sprite_sheet.png");
 
 	// Setup Collider
 	c2Circle collider = (c2Circle){.p = {position.x, position.y}, .r = radius};
@@ -315,13 +315,12 @@ void PlayerEnterIdle(GameObject *object, float deltaTime)
 void PlayerUpdateIdle(GameObject *object, float deltaTime)
 {
 	// Player *player = (Player *)object;
-	// printf("\n%s -> UPDATE -> Idle\n", object->name);
-	// printf("Stamina: %.1f, Mana: %.1f\n\n", player->stamina, player->mana);
 	//  Complete the remainder of the method
+	int frameBefore = object->animation.currentFrame;
 	UpdateAnimation(&object->animation, deltaTime);
 
-	// Check if the animation has finished
-	if (object->animation.currentFrame == object->animation.frameCount - 1)
+	// Check if the animation has finished: the last frame has been shown and it looped back to the start
+	if (frameBefore == object->animation.frameCount - 1 && object->animation.currentFrame == 0)
 	{
 		// Transition to a another idle animation
 		SelectRandomIdleAnimation(object, deltaTime); // Trigger idle animation
@@ -428,9 +427,6 @@ void PlayerEnterWalking(GameObject *object, float deltaTime)
 
 void PlayerUpdateWalking(GameObject *object, float deltaTime)
 {
-	Player *player = (Player *)object;
-	printf("\n%s -> UPDATE -> Walking\n", object->name);
-	printf("Stamina: %.1f, Mana: %.1f\n\n", player->stamina, player->mana);
 	// Complete the remainder of the method
 
 	// Move according to inputAxis
@@ -535,9 +531,6 @@ void PlayerEnterAttacking(GameObject *object, float deltaTime)
 
 void PlayerUpdateAttacking(GameObject *object, float deltaTime)
 {
-	Player *player = (Player *)object;
-	printf("\n%s -> UPDATE -> Attacking\n", object->name);
-	printf("Stamina: %.1f, Mana: %.1f\n\n", player->stamina, player->mana);
 	// Complete the remainder of the method
 	// Check if the attack should end or be interrupted (e.g., stamina depletion)
 
@@ -578,9 +571,6 @@ void PlayerEnterShielding(GameObject *object, float deltaTime)
 }
 void PlayerUpdateShielding(GameObject *object, float deltaTime)
 {
-	Player *player = (Player *)object;
-	printf("\n%s -> UPDATE -> Sheilding\n", object->name);
-	printf("Stamina: %.1f, Mana: %.1f\n\n", player->stamina, player->mana);
 	// Complete the remainder of the method
 	// Example: Check if the shielding duration is over or if stamina is depleted
 	UpdateAnimation(&object->animation, deltaTime);
@@ -607,7 +597,6 @@ void PlayerEnterDie(GameObject *object, float deltaTime)
 void PlayerUpdateDie(GameObject *object, float deltaTime)
 {
 	(void)deltaTime;
-	printf("\n%s -> UPDATE -> Die\n", object->name);
 	ChangeState(object, STATE_RESPAWN, deltaTime);
 	// Complete the remainder of the method
 	UpdateAnimation(&object->animation, deltaTime);
@@ -631,7 +620,6 @@ void PlayerEnterRespawn(GameObject *object, float deltaTime)
 void PlayerUpdateRespawn(GameObject *object, float deltaTime)
 {
 	(void)deltaTime;
-	printf("\n%s -> UPDATE -> Respawn\n", object->name);
 	ChangeState(object, STATE_IDLE, deltaTime);
 	// Complete the remainder of the method
 	UpdateAnimation(&object->animation, deltaTime);

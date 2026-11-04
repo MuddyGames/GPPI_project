@@ -3,8 +3,8 @@
 
 #include <stdbool.h>
 
-#include "./command/command.h"
-#include "./gameobjects/gameobject.h"
+#include "command/command.h"
+#include "gameobjects/gameobject.h"
 
 // Define the Mediator structure
 typedef struct Mediator
@@ -15,16 +15,10 @@ typedef struct Mediator
 // Function to create a mediator instance
 Mediator *CreateMediator(GameObject *object);
 
-// void MediatorExecuteCommand(Command command, Mediator *mediator);
+// Handle Command: passes the command on to the game object
 void MediatorHandleCommand(Mediator *mediator, Command command, float deltaTime);
 
-// Called from Game PollsInput
-void MediatorUpdatePlayer(Mediator *mediator, float deltaTime);
-
-// PollsAI
-void MediatorUpdateNPC(Mediator *mediator, float deltaTime);
-
-// Mediator Cleanup
+// Mediator Cleanup: frees what CreateMediator() allocated
 void DeleteMediator(Mediator *mediator);
 
 #endif

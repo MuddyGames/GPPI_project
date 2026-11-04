@@ -1,10 +1,10 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "./utils/mediator.h"
-#include "./gameobjects/player.h"
-#include "./gameobjects/npc.h"
-#include "./utils/collision.h"
+#include "utils/mediator.h"
+#include "gameobjects/player.h"
+#include "gameobjects/npc.h"
+#include "utils/collision.h"
 
 typedef enum
 {

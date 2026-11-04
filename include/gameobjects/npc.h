@@ -7,7 +7,7 @@
 #include <string.h>
 
 // Include the header for the base game object
-#include "gameobject.h"
+#include "gameobjects/gameobject.h"
 
 // Define the NPC structure that extends GameObject with an additional aggression property
 typedef struct

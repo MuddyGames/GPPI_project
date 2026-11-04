@@ -1,8 +1,76 @@
 #include <stdbool.h>
 
-#include "./command/command.h"
-#include "./fsm/fsm.h"
-#include "./utils/mediator.h"
+#include "command/command.h"
+#include "fsm/fsm.h"
+#include "utils/utils.h"
+
+/**
+ * ExecuteCommand : Turns the command bits into events for the FSM.
+ *
+ * Works out which way the poor lad wants to go, then fires the right
+ * events at the FSM. The FSM's transition tables decide what actually
+ * happens next .... this fella just delivers the message.
+ *
+ * inputAxis and the direction are set every frame, even while attacking,
+ * so nobody slides off across the field on last week's input.
+ *
+ * @command:   The command flags the player (or the AI) has mashed together.
+ * @object:    The GameObject getting the events.
+ * @deltaTime: Time since last frame, for anything needing it.
+ */
+
+void ExecuteCommand(Command command, GameObject *object, float deltaTime)
+{
+	// Movement (multiple keys)
+	Vector2 axis = (Vector2){0.0f, 0.0f};
+
+	if (IsCommandActive(command, MOVE_UP))
+		axis = Vector2Add(axis, (Vector2){0.0f, -1.0f});
+
+	if (IsCommandActive(command, MOVE_DOWN))
+		axis = Vector2Add(axis, (Vector2){0.0f, 1.0f});
+
+	if (IsCommandActive(command, MOVE_LEFT))
+		axis = Vector2Add(axis, (Vector2){-1.0f, 0.0f});
+
+	if (IsCommandActive(command, MOVE_RIGHT))
+		axis = Vector2Add(axis, (Vector2){1.0f, 0.0f});
+
+	// Check if we are moving
+	bool moving = Vector2Length(axis) > 0.0f;
+	bool attacking = IsCommandActive(command, ATTACK);
+	bool defending = IsCommandActive(command, DEFEND);
+
+	// Always set the input axis: zero when not moving
+	// (so states that move with inputAxis, like Attacking, stop when the keys are released)
+	if (moving)
+	{
+		axis = Vector2Normalize(axis);
+
+		// Direction is updated while attacking too, so the attack animation can turn
+		object->previousDirection = object->currentDirection;
+		object->currentDirection = DirectionAxis(axis);
+	}
+	object->inputAxis = axis;
+
+	// EVENT_MOVE only if not EVENT_ATTACK
+	if (!attacking && moving)
+	{
+		HandleEvent(object, EVENT_MOVE, deltaTime);
+	}
+	// Send none if not MOVING or Performing an ACTION
+	else if (!moving && !attacking && !defending)
+	{
+		HandleEvent(object, EVENT_NONE, deltaTime);
+	}
+
+	// ATTACK / DEFEND Send last
+	if (attacking)
+		HandleEvent(object, EVENT_ATTACK, deltaTime);
+
+	if (defending)
+		HandleEvent(object, EVENT_DEFEND, deltaTime);
+}
 
 /**
  * IsCommandActive : Checks if a particular command flag is set.
@@ -38,13 +106,15 @@ bool IsCommandActive(Command command, Command filter)
  * Example:
  *     MOVE_UP | ATTACK  ->  "010001"
  *
+ * Bits are printed from the highest (COMMAND_COUNT - 1) down to bit 0.
+ *
  * @command: The command flags to inspect.
  * @buffer:  Where the binary craic ends up.
  */
 
 void GetCommandBits(Command command, char *buffer)
 {
-	for (int i = COMMAND_COUNT; i >= 0; i--)
+	for (int i = COMMAND_COUNT - 1; i >= 0; i--)
 	{
 		buffer[COMMAND_COUNT - 1 - i] = (command & (1 << i)) ? '1' : '0';
 	}

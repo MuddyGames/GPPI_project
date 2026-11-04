@@ -3,9 +3,9 @@
 #include <stdio.h>
 #include <raylib.h>
 
-#include "./utils/constants.h"
-#include "./gameobjects/gameobject.h"
-#include "./game/game.h"
+#include "utils/constants.h"
+#include "gameobjects/gameobject.h"
+#include "game/game.h"
 
 // Function Prototypes
 // Game Loop Function

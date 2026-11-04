@@ -1,10 +1,13 @@
 #include <stdio.h>
 #include <raylib.h>
 
-#include "./game/game.h"
+#include "game/game.h"
 
-#include "./utils/input_manager.h"
-#include "./utils/ai_manager.h"
+#include "utils/input_manager.h"
+#include "utils/ai_manager.h"
+
+// Frees everything InitGame() created, but not the GameData itself (see below)
+static void UnloadGameData(GameData *data);
 
 /**
  * InitGame : Sets everything up before the madness begins.
@@ -32,7 +35,7 @@ void InitGame(GameData *data)
 	data->npc = InitNPC("The Villan", npcPosition, DEFAULT_GAMEOBJECT_RADIUS);
 
 	// Create a mediator to facilitate communication between
-	// Command and FSM, ultimately updating the playes state
+	// Command and FSM, ultimately updating the players state
 	// Create Mediators
 	data->playerMediator = CreateMediator((GameObject *)data->player);
 	data->npcMediator = CreateMediator((GameObject *)data->npc);
@@ -136,13 +139,15 @@ void UpdateGame(GameData *data, float deltaTime)
 	if (data->gsm == STATE_PLAY)
 	{
 		// Poll input from the player and execute the corresponding command
-		MediatorUpdatePlayer(data->playerMediator, deltaTime); // Execute the command via the mediator
+		Command command = PollInput();
+		MediatorHandleCommand(data->playerMediator, command, deltaTime); // Execute the command via the mediator
 
 		// Update the player's state based on its current configuration
 		UpdateState(&data->player->base, deltaTime);
 
-		// Update NPC
-		MediatorUpdateNPC(data->npcMediator, deltaTime);
+		// Update NPC: the AI makes up its mind once a second (see ai_manager.c)
+		Command npcCommand = PollAI();
+		MediatorHandleCommand(data->npcMediator, npcCommand, deltaTime);
 
 		// If the NPC is attacking, update its target to the player's position
 		// This makes the NPC chase the player
@@ -201,25 +206,30 @@ void UpdateGame(GameData *data, float deltaTime)
 		if (data->player->base.health <= 0 || data->npc->base.health <= 0)
 		{
 			data->gsm = STATE_GAMEOVER;
+
+			// Print the result once, when the game ends (not every frame after)
+			// Did the player lose
+			if (data->player->base.health <= 0)
+			{
+				printf("Game over %s won\n", data->npc->base.name);
+			}
+			else
+			{
+				// NPC Lost
+				printf("Congratulations %s defeated %s\n", data->player->base.name, data->npc->base.name);
+			}
 		}
 	}
 	// Game Over State Logic handled here
 	else if (data->gsm == STATE_GAMEOVER)
 	{
-		// Did the player loose
-		if (data->player->base.health <= 0)
-		{
-			printf("Game over %s won\n", data->npc->base.name);
-		}
-		else if (data->npc->base.health <= 0)
-		{
-			// NPC Lost
-			printf("Congratulations %s defeated %s\n", data->player->base.name, data->npc->base.name);
-		}
-		// Rstart Game (R key)
+		// Restart Game (R key)
 		// Put in input manager so you can handle Keyboard/Controller
 		if (IsKeyPressed(KEY_R))
 		{
+			// Free the old game first, or every restart leaks the player, the NPC,
+			// the mediators and three textures
+			UnloadGameData(data);
 			InitGame(data);
 		}
 	}
@@ -377,9 +387,49 @@ void CloseGame(GameData *data)
 }
 
 /**
+ * UnloadGameData - Frees everything InitGame() created.
+ *
+ * Deletes player, NPC, mediators and the background, but leaves the
+ * GameData itself alone, so InitGame() can fill it in again on a restart.
+ * Pointers are set to NULL after, so nothing points at freed memory.
+ *
+ * @data: The structure to empty out.
+ */
+
+static void UnloadGameData(GameData *data)
+{
+	if (data == NULL)
+		return;
+
+	// Delete the player and NPC objects if they are not null
+	if (data->player != NULL)
+	{
+		DeletePlayer(&data->player->base);
+		data->player = NULL;
+	}
+
+	if (data->npc != NULL)
+	{
+		DeleteNPC(&data->npc->base);
+		data->npc = NULL;
+	}
+
+	// Free the mediators (free(NULL) is safe)
+	DeleteMediator(data->playerMediator);
+	data->playerMediator = NULL;
+
+	DeleteMediator(data->npcMediator);
+	data->npcMediator = NULL;
+
+	// Free the background
+	UnloadTexture(data->background);
+	data->background = (Texture2D){0};
+}
+
+/**
  * DeleteGameData - Frees every object in the game's data.
  *
- * Deletes player, NPC, mediators, and finally frees the GameData
+ * Unloads player, NPC, mediators and background, and finally frees the GameData
  * itself. No memory leaks here, thank you very much.
  *
  * @data: The structure to purge (I've watched a few)
@@ -388,32 +438,7 @@ void CloseGame(GameData *data)
 
 void DeleteGameData(GameData *data)
 {
-	if (data != NULL)
-	{
-		// Delete the player and NPC objects if they are not null
-		if (data->player != NULL)
-		{
-			DeletePlayer(&data->player->base);
-		}
-
-		if (data->npc != NULL)
-		{
-			DeleteNPC(&data->npc->base);
-		}
-
-		if (data->playerMediator != NULL)
-		{
-			DeleteMediator(data->playerMediator);
-		}
-
-		if (data->npcMediator != NULL)
-		{
-			DeleteMediator(data->npcMediator);
-		}
-
-		// Free the background
-		UnloadTexture(data->background);
-	}
+	UnloadGameData(data);
 
 	// Free GameData
 	free(data); // Free game data memory

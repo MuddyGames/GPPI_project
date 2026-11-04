@@ -1,7 +1,7 @@
 #include <raylib.h>
 #include <stdio.h>
 
-#include "./utils/collision.h"
+#include "utils/collision.h"
 
 /**
  * CheckCollision : Checks if two game objects have bumped into each other.

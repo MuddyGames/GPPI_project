@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "./animation/animation.h"
+#include "animation/animation.h"
 
 /**
  * InitAnimation : Sets up an animation and gets it ready for the road.

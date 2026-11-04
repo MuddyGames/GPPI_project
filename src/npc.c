@@ -1,5 +1,5 @@
-#include "./gameobjects/npc.h"
-#include "./utils/utils.h"
+#include "gameobjects/npc.h"
+#include "utils/utils.h"
 
 /**
  * InitNPC - Sets up a brand-new NPC and gets them ready for mischief.
@@ -29,7 +29,7 @@ NPC *InitNPC(const char *name, Vector2 position, int radius)
 	}
 
 	// Load player texture
-	Texture2D npcTexture = LoadTexture("./assets/npc_sprite_sheet.png");
+	Texture2D npcTexture = LoadTexture("resources/npc_sprite_sheet.png");
 
 	// Setup Collider
 	c2Circle collider = (c2Circle){.p = {position.x, position.y}, .r = radius};
@@ -47,6 +47,9 @@ NPC *InitNPC(const char *name, Vector2 position, int radius)
 
 	// Set the default aggression level for the NPC
 	npc->aggression = NPC_MIN_AGGRESSION; // Mild agression
+
+	// Nothing to chase yet: game.c sets the target to the player while attacking
+	npc->target = position;
 
 	// Initialize the NPC's finite state machine (FSM) with state configurations
 	InitNPCFSM(&npc->base);
@@ -180,8 +183,6 @@ void NPCUpdateIdle(GameObject *object, float deltaTime)
 	(void)deltaTime;
 	NPC *npc = (NPC *)object;
 	(void)npc;
-	// printf("%s -> UPDATE -> Idle\n", object->name);
-	// printf("Aggression: %d\n\n", npc->aggression);
 	// During game loop and game ticks, execute Idle state behavior here, such as patrolling or observing.
 	UpdateAnimation(&object->animation, deltaTime);
 }
@@ -279,8 +280,6 @@ void NPCUpdateAttacking(GameObject *object, float deltaTime)
 	// Cast GameObject to NPC to access NPC-specific data
 	NPC *npc = (NPC *)object;
 
-	printf("%s -> UPDATE -> Attacking\n", object->name);
-	printf("Aggression: %f\n\n", npc->aggression);
 
 	// Direction from NPC to target (player)
 	Vector2 direction;
@@ -309,11 +308,11 @@ void NPCUpdateAttacking(GameObject *object, float deltaTime)
 
 	// Move towards target
 	// Use aggression to affect movement speed example below
-	// Aggression factor scales between min and max based on npc->aggression (min to max)
-	float aggression_factor = NPC_MIN_AGGRESSION + (NPC_MAX_AGGRESSION - NPC_MIN_AGGRESSION) * npc->aggression;
+	// aggression already runs from NPC_MIN_AGGRESSION to NPC_MAX_AGGRESSION (see game.c),
+	// so it's used directly as a speed factor: 0.3 = 30% speed, 0.8 = 80% speed
 
 	// Make sure aggression factor is clamped between min and max agression
-	aggression_factor = Clamp(aggression_factor, NPC_MIN_AGGRESSION, NPC_MAX_AGGRESSION);
+	float aggression_factor = Clamp(npc->aggression, NPC_MIN_AGGRESSION, NPC_MAX_AGGRESSION);
 
 	float movement = DEFAULT_MOVEMENT_SPEED * aggression_factor * deltaTime;
 
@@ -346,7 +345,6 @@ void NPCExitAttacking(GameObject *object, float deltaTime)
 	printf("%s <- EXIT <- Attacking\n", object->name);
 	printf("Aggression: %f\n\n", npc->aggression);
 	// Cleanup code for leaving Attacking state, such as resetting attack cooldown.
-	UpdateAnimation(&object->animation, deltaTime);
 }
 
 // Enter function for Shielding state, executed once upon entering Shielding
@@ -377,9 +375,6 @@ void NPCEnterShielding(GameObject *object, float deltaTime)
 void NPCUpdateShielding(GameObject *object, float deltaTime)
 {
 	(void)deltaTime;
-	NPC *npc = (NPC *)object;
-	printf("%s -> UPDATE -> Shielding\n", object->name);
-	printf("Aggression: %f\n\n", npc->aggression);
 	// During game loop and game ticks, execute Shielding state behavior here, such as reducing incoming damage.
 	UpdateAnimation(&object->animation, deltaTime);
 }
@@ -417,9 +412,6 @@ void NPCEnterDead(GameObject *object, float deltaTime)
 // Update function for Dead state, called repeatedly during game ticks while in Dead
 void NPCUpdateDead(GameObject *object, float deltaTime)
 {
-	NPC *npc = (NPC *)object;
-	printf("%s -> UPDATE -> Dead\n", object->name);
-	printf("Aggression: %f\n\n", npc->aggression);
 	// During game loop and game ticks, execute Dead state behavior here, such as preventing any actions.
 	// This could be a place to check if the NPC should be removed or respawned.
 	UpdateAnimation(&object->animation, deltaTime);

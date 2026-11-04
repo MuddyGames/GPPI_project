@@ -26,7 +26,7 @@
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
 #endif
-#include "./utils/cute_c2.h"
+#include "utils/cute_c2.h"
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
 #endif

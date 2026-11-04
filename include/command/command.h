@@ -3,6 +3,8 @@
 
 #include <stdbool.h>
 
+#include "gameobjects/gameobject.h"
+
 // Define the Command enum
 typedef enum
 {
@@ -15,6 +17,9 @@ typedef enum
 	DEFEND				= 1 << 5,	// Binary: 100000 Command to perform an defend action (e.g., defend with sheild)
 	COMMAND_COUNT 		= 6			// Total number of commands, useful for looping or limits
 } Command;
+
+// Function to execute a command: turns the command bits into FSM events for the game object
+void ExecuteCommand(Command command, GameObject *object, float deltaTime);
 
 // Function to show active command bits (for debugging)
 void GetCommandBits(Command cmd, char *buffer);

@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 // Include the events header file that defines the 'Event' enum
-#include "../include/events/events.h"
+#include "events/events.h"
 
 // Forward declaration of the GameObject structure
 typedef struct GameObject GameObject;
