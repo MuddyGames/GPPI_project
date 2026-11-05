@@ -356,9 +356,6 @@ void DrawGame(const GameData *data)
 	// Draw Background
 	DrawTexture(data->background, 0, 0, WHITE);
 
-	// Draw some basic UI text (game title and description)
-	DrawFPS(10, 20);
-
 	//---------------------------------------------------------
 	// Drawing NPC and Position Data
 	// NPC Circle

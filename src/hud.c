@@ -34,6 +34,18 @@ void UpdateHud(Hud *hud, Command command, const char *stateName)
 	hud->stateName = stateName ? stateName : "";
 }
 
+// Helper function: draw text with a dark outline so it reads on any background
+static void DrawTextOutlined(const char *text, int x, int y, int fontSize, Color color)
+{
+	const int t = HUD_TEXT_OUTLINE;
+	for (int dx = -t; dx <= t; dx += t)
+		for (int dy = -t; dy <= t; dy += t)
+			if (dx != 0 || dy != 0)
+				DrawText(text, x + dx, y + dy, fontSize, BLACK);
+
+	DrawText(text, x, y, fontSize, color);
+}
+
 // Helper function: draw a command's name if its bit is set, then move down a line
 static void DrawActiveCommand(Command activeCommand, Command filter, const char *commandText, int *yPositionOffset, Color color)
 {
@@ -59,11 +71,39 @@ void DrawHud(const Hud *hud)
 	// Command as bits, e.g. MOVE_LEFT | ATTACK -> 010100
 	char bits[COMMAND_COUNT + 1];
 	GetCommandBits(hud->lastCommand, bits);
-	DrawText(TextFormat("Command: %s", bits), 10, y, DEFAULT_FONT_SIZE, RAYWHITE);
+	const char *commandLine = TextFormat("Command: %s", bits);
+	const char *stateLine = TextFormat("State: %s", hud->stateName); // TextFormat keeps a few buffers, so two at once is grand
+
+	// Size the panel: two lines, plus one for each active command
+	int lines = 2;
+	for (int bit = 0; bit < COMMAND_COUNT; bit++)
+		if (IsCommandActive(hud->lastCommand, (Command)(1 << bit)))
+			lines++;
+
+	int width = MeasureText(commandLine, DEFAULT_FONT_SIZE);
+	int stateWidth = MeasureText(stateLine, DEFAULT_FONT_SIZE);
+	if (stateWidth > width)
+		width = stateWidth;
+
+	Rectangle panel = {
+		10 - HUD_PADDING,
+		(float)(y - HUD_PADDING),
+		(float)(width + 2 * HUD_PADDING),
+		(float)((lines - 1) * DEFAULT_TEXT_Y_OFFSET + DEFAULT_FONT_SIZE + 2 * HUD_PADDING)};
+
+	// Panel first, so the text is drawn on top of it
+	DrawRectangleRounded(panel, 0.15f, 8, Fade(BLACK, HUD_PANEL_ALPHA));
+	DrawRectangleRoundedLinesEx(panel, 0.15f, 8, 2.0f, Fade(RAYWHITE, 0.6f));
+
+	// Draw some basic UI text (game title and description)
+	DrawFPS(10, 20);
+
+	// Draw the command and state lines, then each active command
+	DrawTextOutlined(commandLine, 10, y, DEFAULT_FONT_SIZE, RAYWHITE);
 	y += DEFAULT_TEXT_Y_OFFSET;
 
 	// Player's current state, e.g. Player_Attacking
-	DrawText(TextFormat("State: %s", hud->stateName), 10, y, DEFAULT_FONT_SIZE, RAYWHITE);
+	DrawTextOutlined(stateLine, 10, y, DEFAULT_FONT_SIZE, RAYWHITE);
 	y += DEFAULT_TEXT_Y_OFFSET;
 
 	// Names of the active commands
