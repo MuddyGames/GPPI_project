@@ -69,6 +69,9 @@ PLATFORM_DIR          ?= platform
 BUILD_DIR             ?= build
 PROJECT_SOURCE_FILES  ?= $(wildcard $(SRC_DIR)/*.c)
 
+# Web build: optional favicon.ico for the browser tab, if present in resources/
+BUILD_WEB_ICON        ?= $(wildcard $(RESOURCES_DIR)/icon/favicon.ico)
+
 # raylib library variables
 # Windows: raylib installer location. Linux/macOS: ~/raylib (see setup_linux.sh)
 ifeq ($(HOST_OS),WINDOWS)
@@ -412,6 +415,7 @@ all:
 $(PROJECT_NAME): $(OBJS) $(PROJECT_RC_DATA)
 	mkdir -p $(PROJECT_BUILD_PATH)
 	$(CC) -o $(PROJECT_BUILD_PATH)/$(PROJECT_NAME)$(EXT) $(OBJS) $(CFLAGS) $(INCLUDE_PATHS) $(LDFLAGS) $(LDLIBS) -D$(PLATFORM)
+	$(if $(and $(filter PLATFORM_WEB,$(PLATFORM)),$(BUILD_WEB_ICON)),cp $(BUILD_WEB_ICON) $(PROJECT_BUILD_PATH)/favicon.ico)
 
 # Compile Windows resource file (icon, version info)
 $(OBJ_DIR)/$(PROJECT_NAME).rc.data: $(PLATFORM_DIR)/$(PROJECT_NAME).rc
