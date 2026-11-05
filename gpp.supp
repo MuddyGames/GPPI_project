@@ -1,0 +1,59 @@
+# NVIDIA driver: realloc(size) == 0 during loader init
+{
+   nvidia_realloc_size0
+   Memcheck:Param
+   realloc(size)
+   fun:realloc
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so*
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so*
+   fun:call_init
+   fun:_dl_init
+   fun:_dl_open
+}
+
+# NVIDIA driver: posix_memalign(size) == 0 during loader init
+{
+   nvidia_posix_memalign_size0
+   Memcheck:Param
+   posix_memalign(size)
+   fun:posix_memalign
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so*
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so*
+   fun:call_init
+   fun:_dl_init
+   fun:_dl_open
+}
+
+# X11 locale/charset allocations (reachable) via GLFW init
+{
+   x11_locale_reachable
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   fun:_glfwInitX11
+}
+
+# X11 XIM allocations (typically reachable) via GLFW init
+{
+   x11_xim_openim_reachable
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:_XimOpenIM
+   fun:XRegisterIMInstantiateCallback
+   fun:_glfwInitX11
+}
+
+# libdbus shutdown definite leak (common in some environments)
+{
+   libdbus_shutdown_definite_leak
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:calloc
+   ...
+   fun:_dbus_message_loader_queue_messages
+   ...
+   fun:dbus_pending_call_block
+   fun:dbus_connection_send_with_reply_and_block
+   fun:dbus_bus_register
+}
