@@ -191,6 +191,8 @@ Set a breakpoint in `AttackHit()` in `collision.c` and swing at The Villan. Step
 ```
 GPPI_project/
 ├── Makefile                build instructions
+├── art/
+│   └── production/         grid versions of the sprite sheets, for working out frames (not distributed in web build to reduce .data file size)
 ├── src/
 │   ├── main.c              opens the window and the audio, runs the game loop
 │   ├── game.c              sets up, updates and draws the game; background; game over
@@ -219,7 +221,6 @@ GPPI_project/
 │   └── utils/              ai_manager.h, audio_manager.h, collision.h, constants.h,
 │                           cute_c2.h, input_manager.h, mediator.h, utils.h
 ├── resources/              sprite sheets, sounds/ and icon/ (packaged into the web build)
-├── assets/production/      grid versions of the sprite sheets, for working out frames
 ├── build/                  everything make creates
 ├── platform/               icons and web page template; leave these alone
 └── setup/                  setup scripts (run once)
