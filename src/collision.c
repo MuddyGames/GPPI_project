@@ -3,6 +3,7 @@
 
 #include "utils/collision.h"
 #include "utils/utils.h"
+#include "utils/audio_manager.h"
 
 /**
  * CheckCollision : Checks if two game objects have bumped into each other.
@@ -132,6 +133,7 @@ void AttackHit(GameObject *attacker, GameObject *target)
 	if (target->currentState == STATE_SHIELD)
 	{
 		printf("%s blocked %s's sword\n", target->name, attacker->name);
+		PlayActionSound(SOUND_BLOCK);
 		return;
 	}
 
@@ -141,4 +143,5 @@ void AttackHit(GameObject *attacker, GameObject *target)
 		target->health = 0;
 
 	printf("%s hit %s: Damage [ %d ] Health [ %d ]\n", attacker->name, target->name, DAMAGE_DEFAULT, target->health);
+	PlayActionSound(SOUND_HIT);
 }

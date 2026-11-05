@@ -6,6 +6,7 @@
 #include "utils/constants.h"
 #include "gameobjects/gameobject.h"
 #include "game/game.h"
+#include "utils/audio_manager.h"
 
 // Function Prototypes
 // Game Loop Function
@@ -25,6 +26,9 @@ int main(void)
 	// Init raylib window
 	InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Raylib Command Pattern with Animated FSM Starter Kit GPP I");
 
+	// Init Audio (once, after the window: a restart reuses the same sounds)
+	InitAudioManager();
+
 	// Create GameData Pointer
 	GameData *data = (GameData *)(malloc(sizeof(GameData)));
 
@@ -43,6 +47,9 @@ int main(void)
 
 	// Free resources
 	CloseGame(data);
+
+	// Close Audio (before the window)
+	DeleteAudioManager();
 
 	// Close Raylib Window
 	CloseWindow();

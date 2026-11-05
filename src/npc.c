@@ -1,5 +1,6 @@
 #include "gameobjects/npc.h"
 #include "utils/utils.h"
+#include "utils/audio_manager.h"
 
 /*
  * Sprite sheet layout (resources/npc_sprite_sheet.png)
@@ -493,6 +494,9 @@ void NPCEnterAttacking(GameObject *object, float deltaTime)
 	if (Vector2Length(direction) > 0.0f)
 		object->currentDirection = DirectionAxis(direction);
 	InitAttackAnimation(object);
+
+	// Entry runs once per swipe, so this is the place for the swoosh
+	PlayActionSound(SOUND_SWIPE);
 }
 
 // Update function for Attacking state, called repeatedly during game ticks while in Attacking

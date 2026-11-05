@@ -1,5 +1,6 @@
 #include "gameobjects/player.h"
 #include "utils/utils.h"
+#include "utils/audio_manager.h"
 
 /*
  * Sprite sheet layout (resources/player_sprite_sheet.png)
@@ -567,6 +568,9 @@ void PlayerEnterAttacking(GameObject *object, float deltaTime)
 
 	// One swipe, facing the way the player was going
 	InitAttackAnimation(object);
+
+	// Entry runs once per swipe, so this is the place for the swoosh
+	PlayActionSound(SOUND_SWIPE);
 }
 
 void PlayerUpdateAttacking(GameObject *object, float deltaTime)

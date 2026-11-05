@@ -5,6 +5,7 @@
 
 #include "utils/input_manager.h"
 #include "utils/ai_manager.h"
+#include "utils/audio_manager.h"
 
 // Frees everything InitGame() created, but not the GameData itself (see below)
 static void UnloadGameData(GameData *data);
@@ -239,6 +240,7 @@ void UpdateGame(GameData *data, float deltaTime)
 		if (data->player->base.health <= 0 || data->npc->base.health <= 0)
 		{
 			data->gsm = STATE_GAMEOVER;
+			PlayActionSound(SOUND_GAMEOVER);
 
 			// Print the result once, when the game ends (not every frame after)
 			// Did the player lose
