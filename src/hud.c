@@ -66,7 +66,12 @@ static void DrawActiveCommand(Command activeCommand, Command filter, const char 
 
 void DrawHud(const Hud *hud)
 {
-	int y = 45; // Below DrawFPS
+	int y = 20; // Top of the HUD
+
+	// FPS: green is grand, orange is struggling, red it is in bits
+	int fps = GetFPS();
+	Color fpsColor = (fps < 15) ? RED : (fps < 30) ? ORANGE : LIME;
+	const char *fpsLine = TextFormat("%2i FPS", fps);
 
 	// Command as bits, e.g. MOVE_LEFT | ATTACK -> 010100
 	char bits[COMMAND_COUNT + 1];
@@ -95,9 +100,11 @@ void DrawHud(const Hud *hud)
 	DrawRectangleRounded(panel, 0.15f, 8, Fade(BLACK, HUD_PANEL_ALPHA));
 	DrawRectangleRoundedLinesEx(panel, 0.15f, 8, 2.0f, Fade(RAYWHITE, 0.6f));
 
-	// Draw some basic UI text (game title and description)
-	DrawFPS(10, 20);
 
+	// Frames per second
+	DrawTextOutlined(fpsLine, 10, y, DEFAULT_FONT_SIZE, fpsColor);
+	y += DEFAULT_TEXT_Y_OFFSET;
+	
 	// Draw the command and state lines, then each active command
 	DrawTextOutlined(commandLine, 10, y, DEFAULT_FONT_SIZE, RAYWHITE);
 	y += DEFAULT_TEXT_Y_OFFSET;
