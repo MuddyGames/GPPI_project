@@ -32,21 +32,21 @@
 # Project settings
 #------------------------------------------------------------------------------------
 # NOTE: Project repo name is the base path where all project data is created
-PROJECT_REPO_NAME                       "command_pattern"                   # Project repository name, used for VCS (GitHub, GitLab)
-PROJECT_INTERNAL_NAME                   "command_pattern"                   # Project intenal name, used for executable and project files
-PROJECT_COMMERCIAL_NAME                 "Drawing Primitives"                # Project commercial name, used for docs and web
-PROJECT_SHORT_NAME                      "DWGPRIM"                           # Project short name
+PROJECT_REPO_NAME                       "GPPI_project"                      # Project repository name, used for VCS (GitHub, GitLab)
+PROJECT_INTERNAL_NAME                   "GPPI_project"                      # Project intenal name, used for executable and project files
+PROJECT_COMMERCIAL_NAME                 "GPPI Project"                      # Project commercial name, used for docs and web
+PROJECT_SHORT_NAME                      "GPPI"                              # Project short name
 PROJECT_VERSION                         "1.0"                               # Project version
-PROJECT_DESCRIPTION                     "Drawing Primitives in Raylib"      # Project description
+PROJECT_DESCRIPTION                     "Animated FSM Command Pattern StarterKit in raylib" # Project description
 PROJECT_PUBLISHER_NAME                  "MuddyGames"                        # Project publisher name
 PROJECT_DEVELOPER_NAME                  "MuddyGames"                        # Project developer name
 PROJECT_DEVELOPER_URL                   "www.muddygames.com"                # Project developer webpage url
 PROJECT_DEVELOPER_EMAIL                 "make@muddygames.com"               # Project developer email
 
-PROJECT_ICON_FILE                       "src/command_pattern.ico"        # Project icon file
+PROJECT_ICON_FILE                       "platform/GPPI_project.ico"      # Project icon file
 
 PROJECT_SOURCE_PATH                     "src"                               # Project source directory, including all required code files (C/C++)
-PROJECT_ASSETS_PATH                     "src/resources"                     # Project assets directory, including all required assets
+PROJECT_ASSETS_PATH                     "resources"                         # Project assets directory, including all required assets
 
 PROJECT_ASSETS_OUTPUT_PATH              "resources"                         # Project assets destination path, relative to BUILD_OUTPUT_PATH
 #------------------------------------------------------------------------------------
@@ -90,14 +90,14 @@ PLATFORM_LINUX_CROSS_COMPILER_PATH      ""                                  # Pa
 
 # Platform: macOS
 PLATFORM_MACOS_BUNDLE_INFO_FILE         "src/Info.plist"                    # Path to macOS bundle options (Info.plist)
-PLATFORM_MACOS_BUNDLE_NAME              "Cool Project"                      # Bundle name (commercial product name)
+PLATFORM_MACOS_BUNDLE_NAME              "GPPI Project"                      # Bundle name (commercial product name)
 PLATFORM_MACOS_BUNDLE_VERSION           "1"                                 # Bundle version
 
 # Platform: Web
 PLATFORM_WEB_EMSDK_PATH                 "C:/raylib/emsdk"                   # Path to emsdk, required for Web building
-PLATFORM_WEB_SHELL_FILE                 "src/minshell.html"                 # Path to shell file to be used by emscripten
+PLATFORM_WEB_SHELL_FILE                 "platform/template.html"            # Path to shell file to be used by emscripten
 PLATFORM_WEB_HEAP_MEMORY_SIZE           128                                 # Required heap memory size in MB (required for assets loading)
-PLATFORM_WEB_FLAG_USE_ASINCIFY          0                                   # Flag: use ASINCIFY mode on building
+PLATFORM_WEB_FLAG_USE_ASINCIFY          1                                   # Flag: use ASINCIFY mode on building
 PLATFORM_WEB_FLAG_USE_WEBGL2            0                                   # Flag: use WebGL2 (OpenGL ES 3.1) instead of default WebGL1 (OpenGL ES 2.0)
 
 # Platform: Android
