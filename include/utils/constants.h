@@ -17,6 +17,11 @@
 // Default Y Offset for Text
 #define DEFAULT_TEXT_Y_OFFSET 30
 
+// HUD panel
+#define HUD_PADDING 8
+#define HUD_PANEL_ALPHA 0.55f
+#define HUD_TEXT_OUTLINE 2
+
 // Default GameObject Size
 #define DEFAULT_GAMEOBJECT_RADIUS 25
 
