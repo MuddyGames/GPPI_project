@@ -9,47 +9,33 @@
 // Frees everything InitGame() created, but not the GameData itself (see below)
 static void UnloadGameData(GameData *data);
 
+// Makes a new random background (see below)
+static Texture2D GenerateBackground(void);
+
 /**
- * InitGame : Sets everything up before the madness begins.
+ * GenerateBackground : Paints a fresh field of grass, dirt and rocks.
  *
- * Creates the player, the NPC, and the two mediators that stop them
- * shouting directly at the FSM. Also fires up the input and AI systems.
- * Oh and as Ireland is so green (from all the rain), a nice lush grass background.
+ * Three layers of Perlin noise, blended pixel by pixel. The noise offsets
+ * are random, so every game (and every restart) gets a different field ...
+ * like the Irish weather, you never get the same one twice.
  *
- * @data: The GameData structure that holds the whole operation together
+ * @return: The background texture. Unload it with UnloadTexture() when done.
  */
 
-void InitGame(GameData *data)
+static Texture2D GenerateBackground(void)
 {
-	// Initialise Game
-	data->gsm = STATE_PLAY;
-
-	printf("Game Initialised!\n");
-
-	// Initialize the player and NPC with their respective names
-	// Setup position
-	Vector2 playerPosition = (Vector2){GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
-	Vector2 npcPosition = (Vector2){GetScreenWidth() / 2.0f, 100.0f};
-
-	data->player = InitPlayer("Player Hero", playerPosition, DEFAULT_GAMEOBJECT_RADIUS);
-	data->npc = InitNPC("The Villan", npcPosition, DEFAULT_GAMEOBJECT_RADIUS);
-
-	// Create a mediator to facilitate communication between
-	// Command and FSM, ultimately updating the players state
-	// Create Mediators
-	data->playerMediator = CreateMediator((GameObject *)data->player);
-	data->npcMediator = CreateMediator((GameObject *)data->npc);
-
+	// Random offsets into the noise, so the field is different every time
+	// (raylib seeds GetRandomValue() when the window opens)
 	// Background Grass... looks better than a plain background
 	// https://github.com/raysan5/raylib/blob/master/examples/textures/textures_image_generation.c
-	Image grass = GenImagePerlinNoise(SCREEN_WIDTH, SCREEN_HEIGHT, 80, 80, 6.0f);
+	Image grass = GenImagePerlinNoise(SCREEN_WIDTH, SCREEN_HEIGHT, GetRandomValue(0, 10000), GetRandomValue(0, 10000), 6.0f);
 	ImageFormat(&grass, PIXELFORMAT_UNCOMPRESSED_R8G8B8A8);
 
 	// https://www.color-hex.com/color-palette/46612
 	Color darkGrass = (Color){20, 66, 63, 255};
 	Color lightGrass = (Color){48, 107, 64, 255};
 
-	Image dirt = GenImagePerlinNoise(SCREEN_WIDTH, SCREEN_HEIGHT, 30, 30, 4.0f);
+	Image dirt = GenImagePerlinNoise(SCREEN_WIDTH, SCREEN_HEIGHT, GetRandomValue(0, 10000), GetRandomValue(0, 10000), 4.0f);
 	ImageFormat(&dirt, PIXELFORMAT_UNCOMPRESSED_R8G8B8A8);
 
 	// https://www.color-hex.com/color-palette/46612
@@ -57,7 +43,7 @@ void InitGame(GameData *data)
 	Color lightDirt = (Color){92, 70, 62, 255};
 
 	// https://www.color-hex.com/color-palette/46612
-	Image rocks = GenImagePerlinNoise(SCREEN_WIDTH, SCREEN_HEIGHT, 20, 20, 3.0f);
+	Image rocks = GenImagePerlinNoise(SCREEN_WIDTH, SCREEN_HEIGHT, GetRandomValue(0, 10000), GetRandomValue(0, 10000), 3.0f);
 	ImageFormat(&rocks, PIXELFORMAT_UNCOMPRESSED_R8G8B8A8);
 
 	// https://www.color-hex.com/color-palette/46612
@@ -113,10 +99,52 @@ void InitGame(GameData *data)
 	}
 
 	// Blended grass set as background
-	data->background = LoadTextureFromImage(grass);
+	Texture2D background = LoadTextureFromImage(grass);
 	UnloadImage(grass); // Free up as Texture was produced
 	UnloadImage(dirt);	// Free up as Texture was produced
 	UnloadImage(rocks); // Free up as Texture was produced
+
+	return background;
+}
+
+/**
+ * InitGame : Sets everything up before the madness begins.
+ *
+ * Creates the player, the NPC, the HUD and the two mediators that stop them
+ * shouting directly at the FSM. Also fires up the input and AI systems.
+ * Oh and as Ireland is so green (from all the rain), a nice lush grass background,
+ * a new one every time.
+ *
+ * @data: The GameData structure that holds the whole operation together
+ */
+
+void InitGame(GameData *data)
+{
+	// Initialise Game
+	data->gsm = STATE_PLAY;
+
+	printf("Game Initialised!\n");
+
+	// Initialize the player and NPC with their respective names
+	// Setup position
+	Vector2 playerPosition = (Vector2){GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
+	Vector2 npcPosition = (Vector2){GetScreenWidth() / 2.0f, 100.0f};
+
+	data->player = InitPlayer("Player Hero", playerPosition, DEFAULT_GAMEOBJECT_RADIUS);
+	data->npc = InitNPC("The Villan", npcPosition, DEFAULT_GAMEOBJECT_RADIUS);
+
+	// Create a mediator to facilitate communication between
+	// Command and FSM, ultimately updating the players state
+	// Create Mediators
+	// Initialise HUD
+	InitHud(&data->hud);
+
+	// The player's mediator connects the player and the HUD; the NPC has no HUD
+	data->playerMediator = CreateMediator((GameObject *)data->player, &data->hud);
+	data->npcMediator = CreateMediator((GameObject *)data->npc, NULL);
+
+	// A new background every game (see GenerateBackground above)
+	data->background = GenerateBackground();
 
 	// Initialise Input Managers
 	InitInputManager();
@@ -358,6 +386,9 @@ void DrawGame(const GameData *data)
 
 	// Drawing Health Bar for the player
 	DrawGameObjectHealthBar(&data->player->base);
+
+	// Drawing HUD (on top of the game objects)
+	DrawHud(&data->hud);
 
 	if (data->gsm == STATE_GAMEOVER)
 	{

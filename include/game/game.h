@@ -23,6 +23,9 @@ typedef struct
 	Mediator *playerMediator; // Pointer to the Mediator object for managing interactions
 	Mediator *npcMediator;	  // Pointer to the Mediator object for managing interactions
 
+	// HUD: shows the player's command bits and state 
+	Hud hud;
+
 	// Simple Background image (Perlin noise)
 	Texture background;
 

@@ -15,19 +15,21 @@
  * who translates your drunken ramblings into something the bouncer understands.
  *
  * @object: The GameObject this mediator will look after.
+ * @hud:    The HUD to keep informed, or NULL if nobody's watching (the NPC).
  *
  * @return: Pointer to an allocated Mediator. Caller is expected to free it later.
  */
 
-Mediator *CreateMediator(GameObject *object)
+Mediator *CreateMediator(GameObject *object, Hud *hud)
 {
 	Mediator *mediator = (Mediator *)malloc(sizeof(Mediator));
 	mediator->object = object;
+	mediator->hud = hud;
 	return mediator;
 }
 
 /**
- * MediatorHandleCommand : Sends a command off to the GameObject for handling.
+ * MediatorHandleCommand : Sends a command off to the GameObject and the HUD.
  *
  * Acts as the go between for player input (or the AI) and the GameObject,
  * keeping the whole show running without descending into pure chaos.
@@ -50,8 +52,18 @@ void MediatorHandleCommand(Mediator *mediator, Command command, float deltaTime)
 		return;
 	}
 
-	// GameObject acts on the command (via the Command System, which sends FSM events)
+	// One command, two collaborators. Neither knows about the other:
+	// The mediator is the only place that knows about both.
+
+	// 1. GameObject acts on the command (via the Command System, which sends FSM events)
 	ExecuteCommand(command, mediator->object, deltaTime);
+
+	// 2. HUD shows the command, and the name of the state the object is now in
+	if (mediator->hud)
+	{
+		GameObject *object = mediator->object;
+		UpdateHud(mediator->hud, command, object->stateConfigs[object->currentState].name);
+	}
 }
 
 /**
