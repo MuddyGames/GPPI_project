@@ -77,14 +77,15 @@ void DrawHud(const Hud *hud)
 	char bits[COMMAND_COUNT + 1];
 	GetCommandBits(hud->lastCommand, bits);
 	const char *commandLine = TextFormat("Command: %s", bits);
-	const char *stateLine = TextFormat("State: %s", hud->stateName); // TextFormat keeps a few buffers, so two at once is grand
+	const char *stateLine = TextFormat("State: %s", hud->stateName); // TextFormat keeps 4 buffers, so 3 at once is grand
 
-	// Size the panel: two lines, plus one for each active command
-	int lines = 2;
+	// Size the panel: three lines, plus one for each active command
+	int lines = 3;
 	for (int bit = 0; bit < COMMAND_COUNT; bit++)
 		if (IsCommandActive(hud->lastCommand, (Command)(1 << bit)))
 			lines++;
 
+	// Widest line sets the width
 	int width = MeasureText(commandLine, DEFAULT_FONT_SIZE);
 	int stateWidth = MeasureText(stateLine, DEFAULT_FONT_SIZE);
 	if (stateWidth > width)
@@ -100,11 +101,10 @@ void DrawHud(const Hud *hud)
 	DrawRectangleRounded(panel, 0.15f, 8, Fade(BLACK, HUD_PANEL_ALPHA));
 	DrawRectangleRoundedLinesEx(panel, 0.15f, 8, 2.0f, Fade(RAYWHITE, 0.6f));
 
-
 	// Frames per second
 	DrawTextOutlined(fpsLine, 10, y, DEFAULT_FONT_SIZE, fpsColor);
 	y += DEFAULT_TEXT_Y_OFFSET;
-	
+
 	// Draw the command and state lines, then each active command
 	DrawTextOutlined(commandLine, 10, y, DEFAULT_FONT_SIZE, RAYWHITE);
 	y += DEFAULT_TEXT_Y_OFFSET;
