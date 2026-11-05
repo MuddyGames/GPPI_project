@@ -1,4 +1,4 @@
-GLFW_ICON ICON "collision_detection.ico"
+GLFW_ICON ICON "GPPI_project.ico"
 1 VERSIONINFO
 FILEVERSION     1,0,0,0
 PRODUCTVERSION  1,0,0,0
@@ -9,12 +9,12 @@ BEGIN
     BLOCK "040904E4"    // English US
     BEGIN
       VALUE "CompanyName", "MuddyGames"
-      VALUE "FileDescription", "Drawing Primitives | Drawing Primitives in Raylib"
+      VALUE "FileDescription", "GPPI Project | Animated FSM Command Pattern StarterKit in raylib"
       VALUE "FileVersion", "1.0"
-      VALUE "InternalName", "collision_detection"
+      VALUE "InternalName", "GPPI_project"
       VALUE "LegalCopyright", "(c) 2026 MuddyGames"
-      //VALUE "OriginalFilename", "collision_detection.exe"
-      VALUE "ProductName", "Drawing Primitives"
+      //VALUE "OriginalFilename", "GPPI_project.exe"
+      VALUE "ProductName", "GPPI Project"
       VALUE "ProductVersion", "1.0"
     END
   END

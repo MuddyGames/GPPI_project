@@ -36,11 +36,11 @@
 // Firing Cooldown (0.1 seconds)
 #define COMMAND_FIRE_COOLDOWN 0.1f
 
-// Firing Trigger Treshold
-#define FIRING_TRIGGER_TRESHOLD 0.1f
+// Firing Trigger Threshold
+#define FIRING_TRIGGER_THRESHOLD 0.1f
 
-// Tumbstick deadzone
-#define TUMBSTICK_DEADZONE_THRESHOLD 0.2f
+// Thumbstick deadzone
+#define THUMBSTICK_DEADZONE_THRESHOLD 0.2f
 
 // Thresholds for directional movement
 #define MOVE_VERTICAL_THRESHOLD 0.5f

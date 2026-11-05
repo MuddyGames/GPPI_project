@@ -5,15 +5,15 @@
     <key>CFBundleDevelopmentRegion</key>
     <string>en</string>
     <key>CFBundleExecutable</key>
-    <string>collision_detection</string>
+    <string>GPPI_project</string>
     <key>CFBundleIconFile</key>
-    <string>collision_detection.icns</string>
+    <string>GPPI_project.icns</string>
     <key>CFBundleIdentifier</key>
-    <string>com.muddy_games.collision_detection</string>
+    <string>com.muddy_games.GPPI_project</string>
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleName</key>
-    <string>Drawing Primitives</string>
+    <string>GPPI Project</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleVersion</key>

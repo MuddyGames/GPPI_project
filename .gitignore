@@ -42,19 +42,10 @@
 *.idb
 *.pdb
 
-# Kernel Module Compile Results
-*.mod*
-*.cmd
-.tmp_versions/
-modules.order
-Module.symvers
-Mkfile.old
-dkms.conf
-
 # Visual Studio files
 [Dd]ebug/
 [Dd]ebug.DLL/
-[R]elease/
+[Rr]elease/
 [Rr]elease.DLL/
 *.user
 *.aps
@@ -70,6 +61,3 @@ compile_commands.json
 # Android files
 *apk*
 android.*
-
-# WebAssembly release files
-build/

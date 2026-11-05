@@ -46,9 +46,9 @@ Command PollInput()
 		float rightTrigger = GetGamepadAxisMovement(0, GAMEPAD_AXIS_RIGHT_TRIGGER);
 
 		// Determine if any gamepad input exceeds threshold levels
-		bool gamepadActive = (fabs(leftStickX) > TUMBSTICK_DEADZONE_THRESHOLD ||
-							  fabs(leftStickY) > TUMBSTICK_DEADZONE_THRESHOLD ||
-							  rightTrigger > FIRING_TRIGGER_TRESHOLD ||
+		bool gamepadActive = (fabs(leftStickX) > THUMBSTICK_DEADZONE_THRESHOLD ||
+							  fabs(leftStickY) > THUMBSTICK_DEADZONE_THRESHOLD ||
+							  rightTrigger > FIRING_TRIGGER_THRESHOLD ||
 							  IsGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_UP) ||
 							  IsGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_DOWN) ||
 							  IsGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_LEFT) ||
@@ -68,8 +68,8 @@ Command PollInput()
 				command |= MOVE_RIGHT;
 
 			// Check thumbstick for directional input, prioritising vertical movement
-			if (fabsf(leftStickY) > TUMBSTICK_DEADZONE_THRESHOLD ||
-				fabsf(leftStickX) > TUMBSTICK_DEADZONE_THRESHOLD)
+			if (fabsf(leftStickY) > THUMBSTICK_DEADZONE_THRESHOLD ||
+				fabsf(leftStickX) > THUMBSTICK_DEADZONE_THRESHOLD)
 			{
 				if (leftStickY < -MOVE_VERTICAL_THRESHOLD)
 					command |= MOVE_UP;
@@ -82,7 +82,7 @@ Command PollInput()
 			}
 
 			// Check right trigger for firing command
-			if (rightTrigger > FIRING_TRIGGER_TRESHOLD)
+			if (rightTrigger > FIRING_TRIGGER_THRESHOLD)
 				command |= ATTACK;
 		}
 	}
@@ -97,7 +97,8 @@ Command PollInput()
 	if (IsKeyDown(KEY_RIGHT))
 		command |= MOVE_RIGHT;
 
-	if (IsKeyDown(KEY_SPACE))
+	// Sword: S, Z, J or SPACE (held down: one swipe after another)
+	if (IsKeyDown(KEY_S) || IsKeyDown(KEY_Z) || IsKeyDown(KEY_J) || IsKeyDown(KEY_SPACE))
 		command |= ATTACK;
 
 	// DEFEND is not bound to a key or button yet: that's one for you
