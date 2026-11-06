@@ -122,3 +122,43 @@ void GetCommandBits(Command command, char *buffer)
 	}
 	buffer[COMMAND_COUNT] = '\0'; // null terminator
 }
+
+/**
+ * GetCommandName : Returns the name of a command as a string.
+ *
+ * Useful for debugging when you want to see what command is currently active.
+ *
+ * @command: The command flag to inspect.
+ * @buffer:  Where the command name ends up.
+ */
+
+void GetCommandName(Command command, char *buffer)
+{
+	switch (command)
+	{
+	case NONE:
+		snprintf(buffer, 32, "NONE");
+		break;
+	case MOVE_UP:
+		snprintf(buffer, 32, "MOVE_UP");
+		break;
+	case MOVE_DOWN:
+		snprintf(buffer, 32, "MOVE_DOWN");
+		break;
+	case MOVE_LEFT:
+		snprintf(buffer, 32, "MOVE_LEFT");
+		break;
+	case MOVE_RIGHT:
+		snprintf(buffer, 32, "MOVE_RIGHT");
+		break;
+	case ATTACK:
+		snprintf(buffer, 32, "ATTACK");
+		break;
+	case DEFEND:
+		snprintf(buffer, 32, "DEFEND");
+		break;
+	default:
+		snprintf(buffer, 32, "UNKNOWN_COMMAND");
+		break;
+	}
+}

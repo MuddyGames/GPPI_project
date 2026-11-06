@@ -22,7 +22,10 @@ typedef enum
 void ExecuteCommand(Command command, GameObject *object, float deltaTime);
 
 // Function to show active command bits (for debugging)
-void GetCommandBits(Command cmd, char *buffer);
+void GetCommandBits(Command command, char *buffer);
+
+// Function to show the name of a command (for debugging)
+void GetCommandName(Command command, char *buffer);
 
 // Check if a specific command is active
 bool IsCommandActive(Command command, Command filter);
