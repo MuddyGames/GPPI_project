@@ -29,7 +29,7 @@ int main(void)
 	SetTraceLogLevel(LOG_INFO);
 
 	// Init raylib window
-	InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Raylib Command Pattern with Animated FSM Starter Kit GPP I");
+	InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "GPP I Project Starter Kit");
 
 	// Init Audio (once, after the window: a restart reuses the same sounds)
 	InitAudioManager();

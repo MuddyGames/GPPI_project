@@ -19,9 +19,9 @@ typedef struct
 	Player *player;			  // Pointer to the Player object
 	NPC *npc;				  // Pointer to the NPC object
 
-	// Mediator between command and FSM
-	Mediator *playerMediator; // Pointer to the Mediator object for managing interactions
-	Mediator *npcMediator;	  // Pointer to the Mediator object for managing interactions
+	// Game mediator: knows the player, the NPC and the HUD
+	// The do not know about each other, they only know the mediator
+	Mediator *mediator;
 
 	// HUD: shows the player's command bits and state 
 	Hud hud;

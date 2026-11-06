@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "hud/hud.h"
 #include "utils/constants.h"
 
@@ -143,7 +145,7 @@ void DrawHud(const Hud *hud)
 	DrawActiveCommand(hud->lastCommand, ATTACK, "ATTACK", &y, ORANGE);
 	DrawActiveCommand(hud->lastCommand, DEFEND, "DEFEND", &y, YELLOW);
 
-		// Game over banner, in the middle of the screen
+	// Game over banner, in the middle of the screen
 	if (hud->gameOver)
 	{
 		const int titleSize = DEFAULT_FONT_SIZE * 3;
@@ -152,22 +154,22 @@ void DrawHud(const Hud *hud)
 		const char *restart = "Press R to restart";
 
 		// Panel wide enough for the widest line, tall enough for all three
-		int width = MeasureText(title, titleSize);
+		int bannerWidth = MeasureText(title, titleSize);
 		int resultWidth = MeasureText(result, DEFAULT_FONT_SIZE);
-		if (resultWidth > width)
-			width = resultWidth;
+		if (resultWidth > bannerWidth)
+			bannerWidth = resultWidth;
 
-		int height = titleSize + 2 * DEFAULT_TEXT_Y_OFFSET;
-		int top = SCREEN_HEIGHT / 2 - height / 2;
+		int bannerHeight = titleSize + 2 * DEFAULT_TEXT_Y_OFFSET;
+		int top = SCREEN_HEIGHT / 2 - bannerHeight / 2;
 
-		Rectangle panel = {
-			(float)(SCREEN_WIDTH / 2 - width / 2 - 2 * HUD_PADDING),
+		Rectangle banner = {
+			(float)(SCREEN_WIDTH / 2 - bannerWidth / 2 - 2 * HUD_PADDING),
 			(float)(top - 2 * HUD_PADDING),
-			(float)(width + 4 * HUD_PADDING),
-			(float)(height + 4 * HUD_PADDING)};
+			(float)(bannerWidth + 4 * HUD_PADDING),
+			(float)(bannerHeight + 4 * HUD_PADDING)};
 
-		DrawRectangleRounded(panel, 0.15f, 8, Fade(BLACK, HUD_PANEL_ALPHA));
-		DrawRectangleRoundedLinesEx(panel, 0.15f, 8, 2.0f, Fade(RAYWHITE, 0.6f));
+		DrawRectangleRounded(banner, 0.15f, 8, Fade(BLACK, HUD_PANEL_ALPHA));
+		DrawRectangleRoundedLinesEx(banner, 0.15f, 8, 2.0f, Fade(RAYWHITE, 0.6f));
 
 		DrawTextCentred(title, top, titleSize, RED);
 		DrawTextCentred(result, top + titleSize + 8, DEFAULT_FONT_SIZE, GOLD);

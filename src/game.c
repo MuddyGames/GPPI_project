@@ -111,7 +111,7 @@ static Texture2D GenerateBackground(void)
 /**
  * InitGame : Sets everything up before the madness begins.
  *
- * Creates the player, the NPC, the HUD and the two mediators that stop them
+ * Creates the player, the NPC, the HUD and the mediator that stops them
  * shouting directly at the FSM. Also fires up the input and AI systems.
  * Oh and as Ireland is so green (from all the rain), a nice lush grass background,
  * a new one every time.
@@ -134,15 +134,12 @@ void InitGame(GameData *data)
 	data->player = InitPlayer("Player Hero", playerPosition, DEFAULT_GAMEOBJECT_RADIUS);
 	data->npc = InitNPC("The Villan", npcPosition, DEFAULT_GAMEOBJECT_RADIUS);
 
-	// Create a mediator to facilitate communication between
-	// Command and FSM, ultimately updating the players state
-	// Create Mediators
 	// Initialise HUD
 	InitHud(&data->hud);
 
-	// The player's mediator connects the player and the HUD; the NPC has no HUD
-	data->playerMediator = CreateMediator((GameObject *)data->player, &data->hud);
-	data->npcMediator = CreateMediator((GameObject *)data->npc, NULL);
+	// One mediator for the game: it knows the player, the NPC and the HUD,
+	// so they never need to know about each other
+	data->mediator = CreateMediator(&data->player->base, &data->npc->base, &data->hud);
 
 	// A new background every game (see GenerateBackground above)
 	data->background = GenerateBackground();
@@ -171,14 +168,14 @@ void UpdateGame(GameData *data, float deltaTime)
 	{
 		// Poll input from the player and execute the corresponding command
 		Command command = PollInput();
-		MediatorHandleCommand(data->playerMediator, command, deltaTime); // Execute the command via the mediator
+		MediatorReceiveCommand(data->mediator, &data->player->base, command, deltaTime);
 
 		// Update the player's state based on its current configuration
 		UpdateState(&data->player->base, deltaTime);
 
 		// Update NPC: the AI makes up its mind once a second (see ai_manager.c)
 		Command npcCommand = PollAI();
-		MediatorHandleCommand(data->npcMediator, npcCommand, deltaTime);
+		MediatorReceiveCommand(data->mediator, &data->npc->base, npcCommand, deltaTime);
 
 		// The NPC's target is always the player: it chases it while Walking
 		data->npc->target = data->player->base.position;
@@ -193,10 +190,10 @@ void UpdateGame(GameData *data, float deltaTime)
 		}
 		else
 		{
-			// Reduce agression when not chasing or attacking
+			// Reduce aggression when not chasing or attacking
 			data->npc->aggression -= NPC_AGGRESSION_DECAY * deltaTime;
 			if (data->npc->aggression < NPC_MIN_AGGRESSION)
-				data->npc->aggression = NPC_MIN_AGGRESSION; // Minimum agression
+				data->npc->aggression = NPC_MIN_AGGRESSION; // Minimum aggression
 		}
 
 		// Update the NPC's state after handling the event
@@ -267,7 +264,7 @@ void UpdateGame(GameData *data, float deltaTime)
 		if (IsKeyPressed(KEY_R))
 		{
 			// Free the old game first, or every restart leaks the player, the NPC,
-			// the mediators and three textures
+			// the mediator and three textures
 			UnloadGameData(data);
 			InitGame(data);
 		}
@@ -417,7 +414,7 @@ void CloseGame(GameData *data)
 /**
  * UnloadGameData - Frees everything InitGame() created.
  *
- * Deletes player, NPC, mediators and the background, but leaves the
+ * Deletes player, NPC, mediator and the background, but leaves the
  * GameData itself alone, so InitGame() can fill it in again on a restart.
  * Pointers are set to NULL after, so nothing points at freed memory.
  *
@@ -442,12 +439,9 @@ static void UnloadGameData(GameData *data)
 		data->npc = NULL;
 	}
 
-	// Free the mediators (free(NULL) is safe)
-	DeleteMediator(data->playerMediator);
-	data->playerMediator = NULL;
-
-	DeleteMediator(data->npcMediator);
-	data->npcMediator = NULL;
+	// Free the mediator (free(NULL) is safe)
+	DeleteMediator(data->mediator);
+	data->mediator = NULL;
 
 	// Free the background
 	UnloadTexture(data->background);
@@ -457,7 +451,7 @@ static void UnloadGameData(GameData *data)
 /**
  * DeleteGameData - Frees every object in the game's data.
  *
- * Unloads player, NPC, mediators and background, and finally frees the GameData
+ * Unloads player, NPC, mediator and background, and finally frees the GameData
  * itself. No memory leaks here, thank you very much.
  *
  * @data: The structure to purge (I've watched a few)
