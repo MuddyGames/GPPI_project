@@ -14,6 +14,8 @@ void InitHud(Hud *hud)
 {
 	hud->lastCommand = NONE;
 	hud->stateName = "";
+	hud->gameOver = false;
+	hud->winner[0] = '\0';
 }
 
 /**
@@ -46,6 +48,12 @@ static void DrawTextOutlined(const char *text, int x, int y, int fontSize, Color
 	DrawText(text, x, y, fontSize, color);
 }
 
+// Helper: centred, outlined text
+static void DrawTextCentred(const char *text, int y, int fontSize, Color color)
+{
+	DrawTextOutlined(text, SCREEN_WIDTH / 2 - MeasureText(text, fontSize) / 2, y, fontSize, color);
+}
+
 // Helper function: draw a command's name if its bit is set, then move down a line
 static void DrawActiveCommand(Command activeCommand, Command filter, const char *commandText, int *yPositionOffset, Color color)
 {
@@ -54,6 +62,19 @@ static void DrawActiveCommand(Command activeCommand, Command filter, const char 
 		DrawText(commandText, 10, *yPositionOffset, DEFAULT_FONT_SIZE, color);
 		*yPositionOffset += DEFAULT_TEXT_Y_OFFSET;
 	}
+}
+
+/**
+ * HudGameOver : Sets the HUD to show the game is over and who won.
+ *
+ * @hud:    The HUD to update.
+ * @winner: The name of the winner, or NULL if nobody won.
+ */
+
+void HudGameOver(Hud *hud, const char *winner)
+{
+	hud->gameOver = true;
+	snprintf(hud->winner, sizeof(hud->winner), "%s", winner ? winner : "Nobody");
 }
 
 /**
@@ -121,4 +142,35 @@ void DrawHud(const Hud *hud)
 	DrawActiveCommand(hud->lastCommand, MOVE_RIGHT, "MOVE_RIGHT", &y, SKYBLUE);
 	DrawActiveCommand(hud->lastCommand, ATTACK, "ATTACK", &y, ORANGE);
 	DrawActiveCommand(hud->lastCommand, DEFEND, "DEFEND", &y, YELLOW);
+
+		// Game over banner, in the middle of the screen
+	if (hud->gameOver)
+	{
+		const int titleSize = DEFAULT_FONT_SIZE * 3;
+		const char *title = "GAME OVER";
+		const char *result = TextFormat("%s wins!", hud->winner);
+		const char *restart = "Press R to restart";
+
+		// Panel wide enough for the widest line, tall enough for all three
+		int width = MeasureText(title, titleSize);
+		int resultWidth = MeasureText(result, DEFAULT_FONT_SIZE);
+		if (resultWidth > width)
+			width = resultWidth;
+
+		int height = titleSize + 2 * DEFAULT_TEXT_Y_OFFSET;
+		int top = SCREEN_HEIGHT / 2 - height / 2;
+
+		Rectangle panel = {
+			(float)(SCREEN_WIDTH / 2 - width / 2 - 2 * HUD_PADDING),
+			(float)(top - 2 * HUD_PADDING),
+			(float)(width + 4 * HUD_PADDING),
+			(float)(height + 4 * HUD_PADDING)};
+
+		DrawRectangleRounded(panel, 0.15f, 8, Fade(BLACK, HUD_PANEL_ALPHA));
+		DrawRectangleRoundedLinesEx(panel, 0.15f, 8, 2.0f, Fade(RAYWHITE, 0.6f));
+
+		DrawTextCentred(title, top, titleSize, RED);
+		DrawTextCentred(result, top + titleSize + 8, DEFAULT_FONT_SIZE, GOLD);
+		DrawTextCentred(restart, top + titleSize + 8 + DEFAULT_TEXT_Y_OFFSET, DEFAULT_FONT_SIZE, RAYWHITE);
+	}
 }

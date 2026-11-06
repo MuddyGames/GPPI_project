@@ -249,11 +249,13 @@ void UpdateGame(GameData *data, float deltaTime)
 			if (data->player->base.health <= 0)
 			{
 				TraceLog(LOG_INFO, "[Game] over: [%s] won", data->npc->base.name);
+				HudGameOver(&data->hud, data->npc->base.name); // the player lost
 			}
 			else
 			{
 				// NPC Lost
 				TraceLog(LOG_INFO, "[Game] Congratulations [%s] defeated [%s]", data->player->base.name, data->npc->base.name);
+				HudGameOver(&data->hud, data->player->base.name); // the player won
 			}
 		}
 	}
@@ -390,17 +392,6 @@ void DrawGame(const GameData *data)
 
 	// Drawing HUD (on top of the game objects)
 	DrawHud(&data->hud);
-
-	if (data->gsm == STATE_GAMEOVER)
-	{
-		// Game Over Text
-		const char *gameOverText = "GAME OVER (R to Restart)";
-		DrawText(
-			gameOverText,
-			SCREEN_WIDTH / 2 - (MeasureText(gameOverText, DEFAULT_FONT_SIZE) / 2), // Measure the text with with MeasureText
-			SCREEN_HEIGHT / 2,
-			DEFAULT_FONT_SIZE, RED);
-	}
 }
 
 /**
