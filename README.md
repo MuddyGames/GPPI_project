@@ -1011,6 +1011,44 @@ valgrind -s \
 
 The suppression file hides leaks reported inside the graphics and audio drivers, which aren't yours. Play for a bit, restart with R a few times, then close the game: the starter kit frees everything it creates, so anything valgrind reports as "definitely lost" is from your code.
 
+### Running the game and filtering the log
+
+Every line the game logs starts with : `[Game]`, `[FSM]` ,`[Input]`, `[AI]`, `[Player Hero]` or `[The Villan]`. Pipe output through `grep` to filter.
+
+Only the player:
+
+```bash
+make run | grep "\[Player Hero\]"
+```
+
+The player and the game (`-E` lets you use `|` to mean "or"):
+
+```bash
+make run | grep -E "\[(Player Hero|Game)\]"
+```
+
+Everything about the fight, without the input and AI chatter:
+
+```bash
+make run | grep -v -E "\[(Input|AI)\]"
+```
+
+Only state changes:
+
+```bash
+make run | grep -- "\[(FSM\]"
+```
+
+Keep a copy of the full log to read afterwards, as well as seeing it on screen:
+
+```bash
+make run | tee game.log
+grep "\[The Villan\]" game.log
+```
+
+> Square brackets need a backslash (`\[`) because `[` means something special to `grep`.
+
+
 ---
 
 ## Further reading

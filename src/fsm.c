@@ -203,7 +203,7 @@ bool ChangeState(GameObject *object, State newState, float deltaTime)
 	}
 
 	// One line per state change: who, from and to
-	TraceLog(LOG_INFO, "[%s] %s -> %s", object->name, StateName(currentState), StateName(newState));
+	TraceLog(LOG_INFO, "[FSM] [%s] %s -> %s", object->name, StateName(currentState), StateName(newState));
 
 	// Get the configuration of the current state and the new state
 	StateConfig *currentConfig = &object->stateConfigs[currentState];
@@ -276,7 +276,7 @@ void StateTransitions(StateConfig *stateConfig, EventStateTransition *transition
 
 		// Print the state name and availability of its handler functions
 		char line[256];
-		int used = snprintf(line, sizeof(line), "FSM %-18s [%s %s %s] ",
+		int used = snprintf(line, sizeof(line), "[FSM] %-18s [%s %s %s] ",
 							config->name,
 							config->Entry ? "Entry" : "Unconfigured",
 							config->Update ? "Update" : "Unconfigured",
