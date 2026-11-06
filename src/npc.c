@@ -66,6 +66,8 @@ NPC *InitNPC(const char *name, Vector2 position, int radius)
 	// Initialize the NPC's finite state machine (FSM) with state configurations
 	InitNPCFSM(&npc->base);
 
+	TraceLog(LOG_INFO, "[%s] starts in %s", npc->base.name, StateName(npc->base.currentState));
+
 	if (npc->base.currentState == STATE_IDLE)
 	{
 		// Initialize the idle animation immediately

@@ -56,6 +56,8 @@ Player *InitPlayer(const char *name, Vector2 position, int radius)
 	// Init the Player FSM
 	InitPlayerFSM(&player->base);
 
+	TraceLog(LOG_INFO, "[%s] starts in %s", player->base.name, StateName(player->base.currentState));
+
 	if (player->base.currentState == STATE_IDLE)
 	{
 		// Initialize the idle animation immediately
@@ -331,7 +333,6 @@ void PlayerEnterIdle(GameObject *object, float deltaTime)
 {
 	// Player *player = (Player *)object;
 
-
 	if (object->previousState != object->currentState && object->currentState == STATE_IDLE)
 	{
 		SelectRandomIdleAnimation(object, deltaTime);
@@ -358,7 +359,6 @@ void PlayerExitIdle(GameObject *object, float deltaTime)
 	(void)deltaTime;
 	Player *player = (Player *)object;
 	(void)player;
-
 
 	// Complete the remainder of the method
 }
@@ -450,7 +450,6 @@ void PlayerEnterWalking(GameObject *object, float deltaTime)
 	(void)deltaTime;
 	Player *player = (Player *)object;
 	(void)player;
-
 
 	// Complete the remainder of the method
 	InitWalkAnimation(object);
@@ -560,7 +559,6 @@ void PlayerEnterAttacking(GameObject *object, float deltaTime)
 	Player *player = (Player *)object;
 	(void)player;
 
-
 	// Complete the remainder of the method
 	// Example: Deduct some stamina when attacking
 
@@ -609,7 +607,6 @@ void PlayerEnterShielding(GameObject *object, float deltaTime)
 	Player *player = (Player *)object;
 	(void)player;
 
-
 	// Complete the remainder of the method
 	// Example: Deduct some stamina for shielding
 }
@@ -626,7 +623,6 @@ void PlayerExitShielding(GameObject *object, float deltaTime)
 	Player *player = (Player *)object;
 	(void)player;
 
-
 	// Complete the remainder of the method
 	// Reset any temporary shielding effects if necessary
 }
@@ -635,7 +631,6 @@ void PlayerEnterDie(GameObject *object, float deltaTime)
 {
 	// TODO : Not Currently Implemented
 	(void)deltaTime;
-
 
 	// Complete the remainder of the method
 }
@@ -652,7 +647,6 @@ void PlayerExitDie(GameObject *object, float deltaTime)
 {
 	(void)deltaTime;
 
-
 	// Complete the remainder of the method
 }
 
@@ -660,7 +654,6 @@ void PlayerEnterRespawn(GameObject *object, float deltaTime)
 {
 	// TODO : Not Currently Implemented
 	(void)deltaTime;
-
 
 	// Complete the remainder of the method
 }
@@ -676,7 +669,6 @@ void PlayerUpdateRespawn(GameObject *object, float deltaTime)
 void PlayerExitRespawn(GameObject *object, float deltaTime)
 {
 	(void)deltaTime;
-
 
 	// Complete the remainder of the method
 }
