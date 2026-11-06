@@ -1,6 +1,14 @@
 #include "fsm/fsm.h"
 #include "gameobjects/gameobject.h"
 
+// These are name lookups for the Event and State enums, allowing for easy conversion from enum values to string representations.
+// The arrays are indexed by the enum values, so the string at index 0 corresponds to the first enum value, and so on.
+// These are not the events, they are string representations of the events, used for debugging and logging purposes.
+// If you add new events, make sure to update the EVENT_NAMES array accordingly.
+static const char *EVENT_NAMES[EVENT_COUNT] = {
+	"NONE", "MOVE", "ATTACK", "DEFEND", "DIE", "RESPAWN",
+	"COLLISION_START", "COLLISION_END", "ANIMATION_END"};
+
 /**
  * AllocAndInitStateConfigs : Allocates and initializes state configurations.
  *

@@ -1,14 +1,6 @@
 #ifndef EVENTS_H
 #define EVENTS_H
 
-// These are name lookups for the Event and State enums, allowing for easy conversion from enum values to string representations.
-// The arrays are indexed by the enum values, so the string at index 0 corresponds to the first enum value, and so on.
-// These are not the events, they are string representations of the events, used for debugging and logging purposes.
-// If you add new events, make sure to update the EVENT_NAMES array accordingly.
-static const char *EVENT_NAMES[EVENT_COUNT] = {
-	"NONE", "MOVE", "ATTACK", "DEFEND", "DIE", "RESPAWN",
-	"COLLISION_START", "COLLISION_END", "ANIMATION_END"};
-
 // Define an enumeration for different event types
 typedef enum
 {
@@ -54,5 +46,10 @@ typedef enum
 
 	EVENT_COUNT // Represents the total number of events (for counting purposes, typically used for array size).
 } Event;		// Define 'Event' as the type of the enum
+
+
+// Name of an event as text, e.g. EventName(EVENT_MOVE) -> "MOVE"
+// Handy for logging. The names live in fsm.c: add one there when you add an event.
+const char *EventName(Event event);
 
 #endif // EVENTS_H

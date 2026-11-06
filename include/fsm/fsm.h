@@ -15,12 +15,6 @@ typedef void (*EventFunction)(GameObject *, Event, float); // Function type for 
 typedef void (*StateFunction)(GameObject *, float);		   // Function type for state entry, update, and exit handlers
 
 
-// These are name lookups for the State enum, allowing for easy conversion from enum values to string representations.
-// The arrays are indexed by the enum values, so the string at index 0 corresponds to the first enum value, and so on.
-// These are not the states, they are string representations of the states, used for debugging and logging purposes.
-// If you add new states, make sure to update the STATE_NAMES array accordingly.
-static const char *STATE_NAMES[STATE_COUNT] = {
-	"Idle", "Walking", "Attacking", "Shield", "Dead", "Respawn", "Collision"};
 
 // Define an enumeration for different states of the game object
 typedef enum
@@ -34,6 +28,10 @@ typedef enum
 	STATE_COLLISION, // Represents the state when a collision is detected (e.g., with an enemy or obstacle)
 	STATE_COUNT		 // Represents the total number of states (for counting purposes)
 } State;			 // Define 'State' as the type of the enum
+
+// Name of a state as text, e.g. StateName(STATE_WALKING) -> "Walking"
+// Handy for logging. The names live in fsm.c: add one there when you add a state.
+const char *StateName(State state);
 
 /**
 STATES TO BE IMPLEMENTED
