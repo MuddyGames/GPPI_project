@@ -133,7 +133,7 @@ void AttackHit(GameObject *attacker, GameObject *target)
 	// Blocked by a shield?
 	if (target->currentState == STATE_SHIELD)
 	{
-		TraceLog(LOG_INFO, "%s blocked %s's sword", target->name, attacker->name);
+		TraceLog(LOG_INFO, "[%s] blocked [%s]'s sword", target->name, attacker->name);
 		PlayActionSound(SOUND_BLOCK);
 		return;
 	}
@@ -145,7 +145,5 @@ void AttackHit(GameObject *attacker, GameObject *target)
 
 	// Play the hit sound effect
 	PlayActionSound(SOUND_HIT);
-
-	TraceLog(LOG_INFO, "%s hit %s: Damage [ %d ] Health [ %d ]", attacker->name, target->name, DAMAGE_DEFAULT, target->health);
-	
+	TraceLog(LOG_INFO, "[%s] hit [%s] damage %d, [%s] health %d", attacker->name, target->name, DAMAGE_DEFAULT, target->name, target->health);
 }
