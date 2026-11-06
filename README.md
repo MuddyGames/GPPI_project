@@ -176,11 +176,11 @@ Everything in `resources/` (sprite sheets and sounds) is packaged into the web b
 
 ### In VS Code
 
-Open `projects/VSCode/main.code-workspace` (**File → Open Workspace from File…**).
+Open `projects/VSCode/main.code-workspace` (**File -> Open Workspace from File…**).
 
 - **Ctrl+Shift+B** builds.
 - **F5** builds and starts the debugger. The first time, choose **Debug** in the Run and Debug drop-down.
-- **Terminal → Run Task** lists Run, Run Web, Stop Web Server and Clean.
+- **Terminal -> Run Task** lists Run, Run Web, Stop Web Server and Clean.
 
 Set a breakpoint in `AttackHit()` in `collision.c` and swing at The Villan. Step through and watch which check lets the hit through: reach, facing, or shield.
 
@@ -262,17 +262,17 @@ _StarterKit_ is built from several design patterns and systems working together.
 
 **Each frame, in `UpdateGame()` and `GameLoop()`:**
 
-1. **PollInput()**: read the keyboard and gamepad
-2. **MediatorHandleCommand()**: pass the command to the player and the HUD
-3. **ExecuteCommand()**: turn the command into events
-4. **HandleEvent()**: look the event up in the current state's transition table
+1. **PollInput()**: read keyboard and gamepad
+2. **MediatorReceiveCommand()**: pass command to player and HUD
+3. **ExecuteCommand()**: turn command into events
+4. **HandleEvent()**: look event up in current state's transition table
 5. **ChangeState()**: if there's a match, `Exit()` the old state, then `Entry()` the new one
-6. **UpdateState()**: run the current state's `Update()`, which also calls `UpdateAnimation()`
-7. **PollAI()** and the same steps for the NPC
+6. **UpdateState()**: run current state's `Update()`, which also calls `UpdateAnimation()`
+7. **PollAI()** and same steps for NPC
 8. **Collision detection**: collision start, ongoing or end, with pushback and events
 9. **AttackHit()**: does either sword swipe land this frame?
 10. **Game over check**
-11. **DrawGame()**: background, characters, health bars and the HUD
+11. **DrawGame()**: background, characters, health bars and HUD
 
 ### Key Components
 
@@ -280,9 +280,9 @@ _StarterKit_ is built from several design patterns and systems working together.
 2. **Command Pattern**: input as bit flags, so several commands (and diagonal movement) work at once
 3. **Animation System**: sprite-sheet animations, started by each state's `Entry()`
 4. **Collision Detection**: circle colliders with cute_c2, plus hit-frame sword damage
-5. **Mediator Pattern**: commands go to the game object and the HUD, which never know about each other
+5. **Mediator Pattern**: commands go to game object and HUD, which never know about each other
 6. **Event System**: events drive every state change, including collisions and finished animations
-7. **Cross-Platform Support**: Linux, Windows (w64devkit), WSL and the browser
+7. **Cross-Platform Support**: Linux, Windows (w64devkit), WSL and browser
 
 ---
 
@@ -890,7 +890,7 @@ Already working: health bars for both, damage on the hit frame of a sword swipe,
    - Shield and magic cast sounds (add to `ActionSound` in `audio_manager.h` and to `soundFiles[]`)
    - Background music (raylib's `LoadMusicStream()`, updated every frame with `UpdateMusicStream()`)
 
-   Play one-off sounds from a state's `Entry()`, like the swipe sound, so they play once per action.
+   Play one-off sounds from a state's `Entry()`, like swipe sound, so they play once per action.
 
 ### Task 5: Implement Combat Mode
 
@@ -901,18 +901,18 @@ Already working: health bars for both, damage on the hit frame of a sword swipe,
 1. Implement a turn system:
 
    - Player turn: wait for input (S / D / M)
-   - Execute the player's action with its animation
+   - Execute player's action with its animation
    - Enemy turn: AI decides its action
-   - Execute the enemy's action with its animation
+   - Execute enemy's action with its animation
    - Repeat until game over
 
 2. Add turn indicators and UI
 
 **Option B: Real-Time Melee Combat**
 
-1. Build on the real-time loop that's already there:
+1. Build on real-time loop that's already there:
 
-   - Both the player and NPC can act at the same time
+   - Both player and NPC can act at the same time
    - Add cooldowns for actions
    - Implement timing-based combat
    - Add dodge / movement mechanics
@@ -923,7 +923,7 @@ Already working: health bars for both, damage on the hit frame of a sword swipe,
 
 [![](https://mermaid.ink/img/pako:eNqNlN9LwzAQx_-VkEdZX3zsgyCrysAp2IGg9SFrrm00P0qaTMbY_26SrjYb6zQP5XL55PK95K47XCoKOMWdIQYyRmpNRLK5LiRy4_3qAyXJDVpQDihFC8kMIxzlnu2J_hs2owci4Hn9CaVBu97vR9jrg7wS_sVk7eIs1QbQ3QakOYPdGkPKA9jbk2jeMODUcRlUIOkpN1rD0VEuTyrIEEc7Yu5vHTH9bylj2EjMIf5ciZaDATqFn1xhZrWf9cy5ww6qjtNeNRqIOQvFOc-VlQb0hei_75ABCakzuHRF09RxktNcpHQaGq3AePgFupZ8S8cP1smewR1d1OAa3qSH93HVS-WKXrO6MUhVUfVHgkNfrDSRnescJTsXThqtOAeK1tt0JBM0t1o7UXFz9QsLWSrhLyeI7uKl-3yJHlXNyt7pC8-LwjMsQAvCqGvs0IoFNo2r9QKnzqRQEctNgQu5dyixRuVbWeLUaAszrJWtG5xWhHduZls6_hgGpCXyTSlxgPY_DLtCBw?type=png)](https://mermaid.live/edit#pako:eNqNlN9LwzAQx_-VkEdZX3zsgyCrysAp2IGg9SFrrm00P0qaTMbY_26SrjYb6zQP5XL55PK95K47XCoKOMWdIQYyRmpNRLK5LiRy4_3qAyXJDVpQDihFC8kMIxzlnu2J_hs2owci4Hn9CaVBu97vR9jrg7wS_sVk7eIs1QbQ3QakOYPdGkPKA9jbk2jeMODUcRlUIOkpN1rD0VEuTyrIEEc7Yu5vHTH9bylj2EjMIf5ciZaDATqFn1xhZrWf9cy5ww6qjtNeNRqIOQvFOc-VlQb0hei_75ABCakzuHRF09RxktNcpHQaGq3AePgFupZ8S8cP1smewR1d1OAa3qSH93HVS-WKXrO6MUhVUfVHgkNfrDSRnescJTsXThqtOAeK1tt0JBM0t1o7UXFz9QsLWSrhLyeI7uKl-3yJHlXNyt7pC8-LwjMsQAvCqGvs0IoFNo2r9QKnzqRQEctNgQu5dyixRuVbWeLUaAszrJWtG5xWhHduZls6_hgGpCXyTSlxgPY_DLtCBw)
 
-Click the diagram to open it in the Mermaid Live Editor, then change it to match your game.
+Click diagram to open it in Mermaid Live Editor, then change it to match your game.
 
 ---
 
@@ -931,9 +931,9 @@ Click the diagram to open it in the Mermaid Live Editor, then change it to match
 
 ```c
 // The FSM functions (fsm.c)
-HandleEvent(obj, EVENT_ATTACK, deltaTime);   // send an event: the current state's table decides
-ChangeState(obj, STATE_IDLE, deltaTime);     // change state directly (must still be in the table)
-UpdateState(obj, deltaTime);                 // run the current state's Update
+HandleEvent(obj, EVENT_ATTACK, deltaTime);   // send an event: current state's table decides
+ChangeState(obj, STATE_IDLE, deltaTime);     // change state directly (must still be in table)
+UpdateState(obj, deltaTime);                 // run current state's Update
 PrintStateConfigs(obj->stateConfigs, STATE_COUNT);   // print every state and its table
 
 // Where am I?
@@ -957,8 +957,8 @@ UpdateAnimation(&object->animation, deltaTime);
 PlayActionSound(SOUND_SWIPE);                // SOUND_HIT, SOUND_BLOCK, SOUND_GAMEOVER
 
 // Input
-IsKeyDown(KEY_UP);                           // true every frame the key is held (walking, shield)
-IsKeyPressed(KEY_M);                         // true once, on the frame it goes down (one-off actions)
+IsKeyDown(KEY_UP);                           // true every frame key is held (walking, shield)
+IsKeyPressed(KEY_M);                         // true once, on frame it goes down (one-off actions)
 ```
 
 ---
@@ -969,18 +969,18 @@ Don't panic. Nine times out of ten it's one of these:
 
 | You see… | What's going on | Fix |
 |---|---|---|
-| `raylib.h: No such file or directory` | make can't find raylib | Run the setup script again (Step 2) |
+| `raylib.h: No such file or directory` | make can't find raylib | Run setup script again (Step 2) |
 | `gameobjects/player.h: No such file or directory` | An include is missing its folder, or the file is in the wrong folder | Headers go in `include/<folder>/`, included as `"folder/file.h"` |
-| A state never starts | Its event isn't in the current state's transition table | Add the `{EVENT, STATE}` pair to the table |
+| A state never starts | Its event isn't in current state's transition table | Add the `{EVENT, STATE}` pair to the table |
 | `Invalid state transition from A to B` | `ChangeState()` was called for a state not in A's table | Add B to A's table, or send an event instead |
 | A state never ends | Nothing in its `Update()` sends an event or changes state | End it on a timer, or on `EVENT_ANIMATION_END` |
-| The character slides | The state moves the character, but the animation has no walking legs | Don't move in that state (see Attacking) |
-| Animation stuck on one frame | `UpdateAnimation()` isn't called in the state's `Update()`, or the animation is set up again every frame | Set it up once in `Entry()`, update it in `Update()` |
+| The character slides | The state moves the character, but animation has no walking legs | Don't move in that state (see Attacking) |
+| Animation stuck on one frame | `UpdateAnimation()` isn't called in state's `Update()`, or the animation is set up again every frame | Set it up once in `Entry()`, update it in `Update()` |
 | Something happens 60 times a second | One-off code (a sound, damage) in `Update()` | Move it to `Entry()`, or use a flag like `attackHit` |
 | A new key does two things | It's already used by another command | Check `PollInput()`: movement is on the arrows, and each letter in the key table does one thing |
-| No sound | No audio device (WSL, some lab machines), or the browser is waiting for a key press | The game still works; press a key first in the browser |
-| Sprites don't show in the browser | The sprite sheet isn't in `resources/` | Everything the game loads must be in `resources/` |
-| Wrong frames or a frame "jumps" | A rectangle is off the grid | Check it with the formulas in [Coordinate Calculation Rules](#coordinate-calculation-rules) |
+| No sound | No audio device (WSL, some lab machines), or browser is waiting for a key press | The game still works; press a key first in the browser |
+| Sprites don't show in browser | The sprite sheet isn't in `resources/` | Everything the game loads must be in `resources/` |
+| Wrong frames or a frame "jumps" | A rectangle is off grid | Check it with the formulas in [Coordinate Calculation Rules](#coordinate-calculation-rules) |
 | `Emscripten not found in …` (Linux) | Emscripten isn't in `~/emsdk` | Run the setup script (Step 2) |
 | `emcc: No such file or directory` (Windows) | Emscripten isn't loaded in this terminal | Close w64devkit and open it again |
 | `Address already in use` | A web server from earlier is still running | `make stop_web`, or use another port: `make run_web WEB_PORT=8080` |
@@ -997,7 +997,7 @@ Every `malloc` needs a `free`, and every `Load…` needs an `Unload…`. Check f
 # Build with debug info
 make BUILD_MODE=DEBUG
 
-# Run the game and check for leaks
+# Run game and check for leaks
 valgrind ./build/desktop-debug/GPPI_project
 
 # Valgrind with suppression file
@@ -1009,25 +1009,25 @@ valgrind -s \
   ./build/desktop-debug/GPPI_project
 ```
 
-The suppression file hides leaks reported inside the graphics and audio drivers, which aren't yours. Play for a bit, restart with R a few times, then close the game: the starter kit frees everything it creates, so anything valgrind reports as "definitely lost" is from your code.
+The suppression file hides leaks reported inside graphics and audio drivers, which aren't yours. Play for a bit, restart with R a few times, then close game: starter kit frees everything it creates, so anything valgrind reports as "definitely lost" is from your code.
 
-### Running the game and filtering the log
+### Running game and filtering log
 
-Every line the game logs starts with : `[Game]`, `[FSM]` ,`[Input]`, `[AI]`, `[Player Hero]` or `[The Villan]`. Pipe output through `grep` to filter.
+Every line game logs starts with : `[Game]`, `[FSM]` ,`[Input]`, `[AI]`, `[Player Hero]` or `[The Villan]`. Pipe output through `grep` to filter.
 
-Only the player:
+Only player:
 
 ```bash
 make run | grep "\[Player Hero\]"
 ```
 
-The player and the game (`-E` lets you use `|` to mean "or"):
+The player and game (`-E` lets you use `|` to mean "or"):
 
 ```bash
 make run | grep -E "\[(Player Hero|Game)\]"
 ```
 
-Everything about the fight, without the input and AI chatter:
+Everything about fight, without input and AI chatter:
 
 ```bash
 make run | grep -v -E "\[(Input|AI)\]"
@@ -1039,7 +1039,7 @@ Only state changes:
 make run | grep -- "\[(FSM\]"
 ```
 
-Keep a copy of the full log to read afterwards, as well as seeing it on screen:
+Keep a copy of full log to read afterwards, as well as seeing it on screen:
 
 ```bash
 make run | tee game.log
@@ -1053,7 +1053,7 @@ grep "\[The Villan\]" game.log
 
 ## Further reading
 
-- [raylib](https://www.raylib.com): the [cheatsheet](https://www.raylib.com/cheatsheet/cheatsheet.html) and [examples](https://www.raylib.com/examples.html)
+- [raylib](https://www.raylib.com): [cheatsheet](https://www.raylib.com/cheatsheet/cheatsheet.html) and [examples](https://www.raylib.com/examples.html)
 - [cute_headers](https://github.com/RandyGaul/cute_headers) by Randy Gaul: cute_c2 and friends
 - [Game Programming Patterns](http://gameprogrammingpatterns.com) by Robert Nystrom: especially [State](https://gameprogrammingpatterns.com/state.html) and [Command](https://gameprogrammingpatterns.com/command.html)
 - [rFXGen](https://raylibtech.itch.io/rfxgen) by raysan5: make your own sound effects
@@ -1067,7 +1067,7 @@ Who do I talk to? **muddygames**
 - [ ] It compiles and runs with no errors or warnings
 - [ ] Your player has its new combat actions, each with its own state, animation and command
 - [ ] Your NPC makes decisions, not just random choices
-- [ ] Death works: health at 0 plays the Dead state before game over
+- [ ] Death works: health at 0 plays Dead state before game over
 - [ ] Your actions have visual and audio feedback
 - [ ] Your state diagram matches your transition tables
 - [ ] valgrind reports nothing "definitely lost" from your code
@@ -1075,6 +1075,6 @@ Who do I talk to? **muddygames**
 
 *This _StarterKit_ was created to help students understand game development patterns and create their own projects.*
 
-Commit early and commit often. Your deadline, like the sword swipe, always plays to the end.
+Commit early and commit often. Your deadline, like sword swipe, always plays to end.
 
 Best of luck. Now go make something worth fighting for.
