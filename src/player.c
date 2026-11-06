@@ -449,6 +449,7 @@ void PlayerEnterWalking(GameObject *object, float deltaTime)
 {
 	(void)deltaTime;
 	Player *player = (Player *)object;
+	(void)player;
 
 
 	// Complete the remainder of the method
@@ -478,6 +479,7 @@ void PlayerExitWalking(GameObject *object, float deltaTime)
 {
 	(void)deltaTime;
 	Player *player = (Player *)object;
+	(void)player;
 
 	// Complete the remainder of the method
 }
@@ -556,6 +558,7 @@ void PlayerEnterAttacking(GameObject *object, float deltaTime)
 {
 	(void)deltaTime;
 	Player *player = (Player *)object;
+	(void)player;
 
 
 	// Complete the remainder of the method
@@ -593,7 +596,7 @@ void PlayerExitAttacking(GameObject *object, float deltaTime)
 {
 	(void)deltaTime;
 	Player *player = (Player *)object;
-
+	(void)player;
 
 	// Complete the remainder of the method
 	// Reset or adjust any temporary changes during attack, if needed
@@ -604,6 +607,7 @@ void PlayerEnterShielding(GameObject *object, float deltaTime)
 	// TODO : Not Currently Implemented
 	(void)deltaTime;
 	Player *player = (Player *)object;
+	(void)player;
 
 
 	// Complete the remainder of the method
@@ -620,6 +624,7 @@ void PlayerExitShielding(GameObject *object, float deltaTime)
 {
 	(void)deltaTime;
 	Player *player = (Player *)object;
+	(void)player;
 
 
 	// Complete the remainder of the method

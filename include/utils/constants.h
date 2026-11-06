@@ -63,4 +63,7 @@
 #define NPC_AGGRESSION_BUILD 0.2f
 #define NPC_AGGRESSION_DECAY 0.3f
 
+// Command Names buffer size for Debugging
+#define COMMAND_NAMES_SIZE 64
+
 #endif // CONSTANTS_H

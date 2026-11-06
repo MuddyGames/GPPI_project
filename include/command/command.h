@@ -25,7 +25,7 @@ void ExecuteCommand(Command command, GameObject *object, float deltaTime);
 void GetCommandBits(Command command, char *buffer);
 
 // Function to show the name of a command (for debugging)
-void GetCommandName(Command command, char *buffer);
+void GetCommandName(Command command, char *buffer, int size);
 
 // Check if a specific command is active
 bool IsCommandActive(Command command, Command filter);

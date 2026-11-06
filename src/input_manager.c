@@ -104,13 +104,17 @@ Command PollInput()
 	// DEFEND is not bound to a key or button yet: that's one for you
 
 	// Log the command only when it changes (a key or button pressed or released),
-	// not every frame, so the console stays readable
+	// not every frame, so the console stays readable.
+	// LOG_DEBUG: the HUD already shows this on screen. To see it in the console
+	// too, add SetTraceLogLevel(LOG_DEBUG) in main.c
 	static Command previousCommand = NONE;
 	if (command != previousCommand)
 	{
 		char bits[COMMAND_COUNT + 1]; // COMMAND_COUNT bits + null
+		char commandNames[COMMAND_NAMES_SIZE];
 		GetCommandBits(command, bits);
-		TraceLog(LOG_INFO, "Command Bits: %s (%d)", bits, command);
+		GetCommandName(command, commandNames, sizeof(commandNames));
+		TraceLog(LOG_DEBUG, "[Input] %s  %s", bits, commandNames);
 		previousCommand = command;
 	}
 

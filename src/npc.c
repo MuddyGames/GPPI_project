@@ -399,6 +399,7 @@ void NPCExitWalking(GameObject *object, float deltaTime)
 {
 	(void)deltaTime;
 	NPC *npc = (NPC *)object;
+	(void)npc;
 
 }
 
@@ -516,7 +517,7 @@ void NPCExitAttacking(GameObject *object, float deltaTime)
 	// Cleanup code for leaving Attacking state, such as resetting attack cooldown.
 	(void)deltaTime;
 	NPC *npc = (NPC *)object;
-
+	(void)npc;
 }
 
 // Enter function for Shielding state, executed once upon entering Shielding
@@ -558,6 +559,7 @@ void NPCExitShielding(GameObject *object, float deltaTime)
 	// Cleanup code for leaving Shielding state, if any.
 	(void)deltaTime;
 	NPC *npc = (NPC *)object;
+	(void)npc;
 }
 
 // Enter function for Dead state, executed once upon entering Dead
@@ -566,6 +568,7 @@ void NPCEnterDead(GameObject *object, float deltaTime)
 	// Initialization code for entering Dead state, such as playing death animation or disabling further actions.
 	(void)deltaTime;
 	NPC *npc = (NPC *)object;
+	(void)npc;
 
 	// DEAD (Row 21, Pixel : Y = 20 x 64 = 1280)
 	// Each frame is 64 x 64, so Pixel X = (Column - 1) x 64
@@ -596,5 +599,6 @@ void NPCExitDead(GameObject *object, float deltaTime)
 	// Cleanup code for leaving Dead state, such as removing NPC from the active world, playing respawn animations, etc.
 	(void)deltaTime;
 	NPC *npc = (NPC *)object;
+	(void)npc;
 
 }

@@ -4,6 +4,12 @@
 #include "fsm/fsm.h"
 #include "utils/utils.h"
 
+
+// Add command names to the buffer, separated by " | " if multiple commands are active
+	// Add command names if new commands are added to the Command enum, update this array accordingly
+	static const char *COMMAND_NAMES[COMMAND_COUNT] = {
+		"MOVE_UP", "MOVE_DOWN", "MOVE_LEFT", "MOVE_RIGHT", "ATTACK", "DEFEND"};
+
 /**
  * ExecuteCommand : Turns the command bits into events for the FSM.
  *
@@ -130,35 +136,16 @@ void GetCommandBits(Command command, char *buffer)
  *
  * @command: The command flag to inspect.
  * @buffer:  Where the command name ends up.
+ * @size:    The size of the buffer to avoid overflow.
  */
 
-void GetCommandName(Command command, char *buffer)
+void GetCommandName(Command command, char *buffer, int size)
 {
-	switch (command)
+	int used = snprintf(buffer, size, "%s", command == NONE ? "NONE" : "");
+
+	for (int i = 0; i < COMMAND_COUNT && used < size; i++)
 	{
-	case NONE:
-		snprintf(buffer, 32, "NONE");
-		break;
-	case MOVE_UP:
-		snprintf(buffer, 32, "MOVE_UP");
-		break;
-	case MOVE_DOWN:
-		snprintf(buffer, 32, "MOVE_DOWN");
-		break;
-	case MOVE_LEFT:
-		snprintf(buffer, 32, "MOVE_LEFT");
-		break;
-	case MOVE_RIGHT:
-		snprintf(buffer, 32, "MOVE_RIGHT");
-		break;
-	case ATTACK:
-		snprintf(buffer, 32, "ATTACK");
-		break;
-	case DEFEND:
-		snprintf(buffer, 32, "DEFEND");
-		break;
-	default:
-		snprintf(buffer, 32, "UNKNOWN_COMMAND");
-		break;
+		if (IsCommandActive(command, (Command)(1 << i)))
+			used += snprintf(buffer + used, size - used, "%s%s", used > 0 ? " | " : "", COMMAND_NAMES[i]);
 	}
 }
