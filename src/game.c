@@ -111,10 +111,10 @@ static Texture2D GenerateBackground(void)
 /**
  * InitGame : Sets everything up before the madness begins.
  *
- * Creates the player, the NPC, the HUD and the mediator that stops them
+ * Creates player, NPC, HUD and mediator that stops them
  * shouting directly at the FSM. Also fires up the input and AI systems.
  * Oh and as Ireland is so green (from all the rain), a nice lush grass background,
- * a new one every time.
+ * a new field of grass every time. Remember how hot it was in 2026? no green fields then!
  *
  * @data: The GameData structure that holds the whole operation together
  */
@@ -137,6 +137,8 @@ void InitGame(GameData *data)
 	// Initialise HUD
 	InitHud(&data->hud);
 
+	// Create a mediator to facilitate communication between
+	// Player, Hud, Command and FSM, ultimately updating the players state
 	// One mediator for the game: it knows the player, the NPC and the HUD,
 	// so they never need to know about each other
 	data->mediator = CreateMediator(&data->player->base, &data->npc->base, &data->hud);

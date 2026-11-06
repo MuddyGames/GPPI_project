@@ -24,10 +24,10 @@ typedef struct Mediator
 //
 // Not the same as the FSM's Event (EVENT_MOVE, EVENT_DIE ...). Those drive ONE
 // object's state machine. These are things that happened in the game that
-// several other parts might care about: the HUD, the audio, effects, ...
+// several other parts might care about: HUD, audio, effects, ...
 //
-//   A command is "please do this": it goes IN, and the FSM can refuse it.
-//   A game event is "this happened": it goes OUT, and it's already happened.
+//   Command is "please do this": it goes IN, and the FSM can refuse it.
+//   Game event is "this happened": it goes OUT, and it's already happened.
 // ---------------------------------------------------------------------------
 typedef enum
 {
