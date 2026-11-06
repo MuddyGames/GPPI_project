@@ -185,8 +185,6 @@ void NPCEnterIdle(GameObject *object, float deltaTime)
 	(void)deltaTime;
 	NPC *npc = (NPC *)object;
 
-	TraceLog(LOG_INFO, "%s -> ENTER -> Idle", object->name);
-	TraceLog(LOG_INFO, "Aggression: %f", npc->aggression);
 
 	if (npc->base.previousState != npc->base.currentState && npc->base.currentState == STATE_IDLE)
 	{
@@ -224,8 +222,6 @@ void NPCExitIdle(GameObject *object, float deltaTime)
 	(void)deltaTime;
 	NPC *npc = (NPC *)object;
 	(void)npc;
-	TraceLog(LOG_INFO, "%s <- EXIT <- Idle", object->name);
-	TraceLog(LOG_INFO, "Aggression: %f", npc->aggression);
 	// Cleanup code for leaving Idle state, if any.
 }
 
@@ -331,8 +327,6 @@ void NPCEnterWalking(GameObject *object, float deltaTime)
 	(void)deltaTime;
 	NPC *npc = (NPC *)object;
 
-	TraceLog(LOG_INFO, "%s -> ENTER -> Walking", object->name);
-	TraceLog(LOG_INFO, "Aggression: %f", npc->aggression);
 
 	// Face the target and start walking
 	Vector2 direction = DirectionToTarget(npc);
@@ -406,8 +400,6 @@ void NPCExitWalking(GameObject *object, float deltaTime)
 	(void)deltaTime;
 	NPC *npc = (NPC *)object;
 
-	TraceLog(LOG_INFO, "%s <- EXIT <- Walking", object->name);
-	TraceLog(LOG_INFO, "Aggression: %f", npc->aggression);
 }
 
 /**
@@ -491,8 +483,6 @@ void NPCEnterAttacking(GameObject *object, float deltaTime)
 	// Entry runs once per swipe, so this is the place for the swoosh
 	PlayActionSound(SOUND_SWIPE);
 
-	TraceLog(LOG_INFO, "%s -> ENTER -> Attacking", object->name);
-	TraceLog(LOG_INFO, "Aggression: %f", npc->aggression);
 
 	// A fresh swipe hasn't landed yet (see AttackHit in collision.c)
 	object->attackHit = false;
@@ -527,8 +517,6 @@ void NPCExitAttacking(GameObject *object, float deltaTime)
 	(void)deltaTime;
 	NPC *npc = (NPC *)object;
 
-	TraceLog(LOG_INFO, "%s <- EXIT <- Attacking", object->name);
-	TraceLog(LOG_INFO, "Aggression: %f", npc->aggression);
 }
 
 // Enter function for Shielding state, executed once upon entering Shielding
@@ -536,8 +524,6 @@ void NPCEnterShielding(GameObject *object, float deltaTime)
 {
 	(void)deltaTime;
 	NPC *npc = (NPC *)object;
-	TraceLog(LOG_INFO, "%s -> ENTER -> Shielding", object->name);
-	TraceLog(LOG_INFO, "Aggression: %f", npc->aggression);
 	// Initialization code for entering Shielding state, such as enabling shield effects.
 
 	// SHIELDING (Row 7, Pixel : Y = 6 x 64 = 384)
@@ -572,8 +558,6 @@ void NPCExitShielding(GameObject *object, float deltaTime)
 	// Cleanup code for leaving Shielding state, if any.
 	(void)deltaTime;
 	NPC *npc = (NPC *)object;
-	TraceLog(LOG_INFO, "%s <- EXIT <- Shielding", object->name);
-	TraceLog(LOG_INFO, "Aggression: %f", npc->aggression);
 }
 
 // Enter function for Dead state, executed once upon entering Dead
@@ -582,8 +566,6 @@ void NPCEnterDead(GameObject *object, float deltaTime)
 	// Initialization code for entering Dead state, such as playing death animation or disabling further actions.
 	(void)deltaTime;
 	NPC *npc = (NPC *)object;
-	TraceLog(LOG_INFO, "%s -> ENTER -> Dead", object->name);
-	TraceLog(LOG_INFO, "Aggression: %f", npc->aggression);
 
 	// DEAD (Row 21, Pixel : Y = 20 x 64 = 1280)
 	// Each frame is 64 x 64, so Pixel X = (Column - 1) x 64
@@ -615,6 +597,4 @@ void NPCExitDead(GameObject *object, float deltaTime)
 	(void)deltaTime;
 	NPC *npc = (NPC *)object;
 
-	TraceLog(LOG_INFO, "%s <- EXIT <- Dead", object->name);
-	TraceLog(LOG_INFO, "Aggression: %f", npc->aggression);
 }

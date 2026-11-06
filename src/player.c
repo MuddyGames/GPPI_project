@@ -331,7 +331,6 @@ void PlayerEnterIdle(GameObject *object, float deltaTime)
 {
 	// Player *player = (Player *)object;
 
-	TraceLog(LOG_INFO, "\n%s -> ENTER -> Idle\n", object->name);
 
 	if (object->previousState != object->currentState && object->currentState == STATE_IDLE)
 	{
@@ -360,8 +359,6 @@ void PlayerExitIdle(GameObject *object, float deltaTime)
 	Player *player = (Player *)object;
 	(void)player;
 
-	TraceLog(LOG_INFO, "\n%s <- EXIT <- Idle\n", object->name);
-	TraceLog(LOG_INFO, "Stamina: %.1f, Mana: %.1f\n\n", player->stamina, player->mana);
 
 	// Complete the remainder of the method
 }
@@ -453,8 +450,6 @@ void PlayerEnterWalking(GameObject *object, float deltaTime)
 	(void)deltaTime;
 	Player *player = (Player *)object;
 
-	TraceLog(LOG_INFO, "\n%s -> ENTER -> Walking\n", object->name);
-	TraceLog(LOG_INFO, "Stamina: %.1f, Mana: %.1f\n\n", player->stamina, player->mana);
 
 	// Complete the remainder of the method
 	InitWalkAnimation(object);
@@ -484,8 +479,6 @@ void PlayerExitWalking(GameObject *object, float deltaTime)
 	(void)deltaTime;
 	Player *player = (Player *)object;
 
-	TraceLog(LOG_INFO, "\n%s <- EXIT <- Walking\n", object->name);
-	TraceLog(LOG_INFO, "Stamina: %.1f, Mana: %.1f\n\n", player->stamina, player->mana);
 	// Complete the remainder of the method
 }
 
@@ -564,8 +557,6 @@ void PlayerEnterAttacking(GameObject *object, float deltaTime)
 	(void)deltaTime;
 	Player *player = (Player *)object;
 
-	TraceLog(LOG_INFO, "\n%s -> ENTER -> Attacking\n", object->name);
-	TraceLog(LOG_INFO, "Stamina: %.1f, Mana: %.1f\n\n", player->stamina, player->mana);
 
 	// Complete the remainder of the method
 	// Example: Deduct some stamina when attacking
@@ -603,8 +594,6 @@ void PlayerExitAttacking(GameObject *object, float deltaTime)
 	(void)deltaTime;
 	Player *player = (Player *)object;
 
-	TraceLog(LOG_INFO, "\n%s <- EXIT <- Attacking\n", object->name);
-	TraceLog(LOG_INFO, "Stamina: %.1f, Mana: %.1f\n\n", player->stamina, player->mana);
 
 	// Complete the remainder of the method
 	// Reset or adjust any temporary changes during attack, if needed
@@ -616,8 +605,6 @@ void PlayerEnterShielding(GameObject *object, float deltaTime)
 	(void)deltaTime;
 	Player *player = (Player *)object;
 
-	TraceLog(LOG_INFO, "\n%s -> ENTER -> Sheilding\n", object->name);
-	TraceLog(LOG_INFO, "Stamina: %.1f, Mana: %.1f\n\n", player->stamina, player->mana);
 
 	// Complete the remainder of the method
 	// Example: Deduct some stamina for shielding
@@ -634,8 +621,6 @@ void PlayerExitShielding(GameObject *object, float deltaTime)
 	(void)deltaTime;
 	Player *player = (Player *)object;
 
-	TraceLog(LOG_INFO, "\n%s <- EXIT <- Sheilding\n", object->name);
-	TraceLog(LOG_INFO, "Stamina: %.1f, Mana: %.1f\n\n", player->stamina, player->mana);
 
 	// Complete the remainder of the method
 	// Reset any temporary shielding effects if necessary
@@ -646,7 +631,6 @@ void PlayerEnterDie(GameObject *object, float deltaTime)
 	// TODO : Not Currently Implemented
 	(void)deltaTime;
 
-	TraceLog(LOG_INFO, "\n%s -> ENTER -> Die\n", object->name);
 
 	// Complete the remainder of the method
 }
@@ -663,7 +647,6 @@ void PlayerExitDie(GameObject *object, float deltaTime)
 {
 	(void)deltaTime;
 
-	TraceLog(LOG_INFO, "\n%s <- EXIT <- Die\n", object->name);
 
 	// Complete the remainder of the method
 }
@@ -673,7 +656,6 @@ void PlayerEnterRespawn(GameObject *object, float deltaTime)
 	// TODO : Not Currently Implemented
 	(void)deltaTime;
 
-	TraceLog(LOG_INFO, "\n%s -> ENTER -> Respawn\n", object->name);
 
 	// Complete the remainder of the method
 }
@@ -690,7 +672,6 @@ void PlayerExitRespawn(GameObject *object, float deltaTime)
 {
 	(void)deltaTime;
 
-	TraceLog(LOG_INFO, "\n%s <- EXIT <- Respawn\n", object->name);
 
 	// Complete the remainder of the method
 }

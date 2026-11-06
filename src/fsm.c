@@ -1,13 +1,42 @@
 #include "fsm/fsm.h"
 #include "gameobjects/gameobject.h"
 
-// These are name lookups for the Event and State enums, allowing for easy conversion from enum values to string representations.
-// The arrays are indexed by the enum values, so the string at index 0 corresponds to the first enum value, and so on.
-// These are not the events, they are string representations of the events, used for debugging and logging purposes.
-// If you add new events, make sure to update the EVENT_NAMES array accordingly.
+// These are name lookups for the Event and State enums, 
+// If you add new Events or States, make sure to update the EVENT_NAMES and STATE_NAMES arrays.
+
 static const char *EVENT_NAMES[EVENT_COUNT] = {
-	"NONE", "MOVE", "ATTACK", "DEFEND", "DIE", "RESPAWN",
-	"COLLISION_START", "COLLISION_END", "ANIMATION_END"};
+	[EVENT_NONE] = "NONE",
+	[EVENT_MOVE] = "MOVE",
+	[EVENT_ATTACK] = "ATTACK",
+	[EVENT_DEFEND] = "DEFEND",
+	[EVENT_DIE] = "DIE",
+	[EVENT_RESPAWN] = "RESPAWN",
+	[EVENT_COLLISION_START] = "COLLISION_START",
+	[EVENT_COLLISION_END] = "COLLISION_END",
+	[EVENT_ANIMATION_END] = "ANIMATION_END"};
+
+static const char *STATE_NAMES[STATE_COUNT] = {
+	[STATE_IDLE] = "Idle",
+	[STATE_WALKING] = "Walking",
+	[STATE_ATTACKING] = "Attacking",
+	[STATE_SHIELD] = "Shield",
+	[STATE_DEAD] = "Dead",
+	[STATE_RESPAWN] = "Respawn",
+	[STATE_COLLISION] = "Collision"};
+
+const char *EventName(Event event)
+{
+	if (event < 0 || event >= EVENT_COUNT || EVENT_NAMES[event] == NULL)
+		return "?";
+	return EVENT_NAMES[event];
+}
+
+const char *StateName(State state)
+{
+	if (state < 0 || state >= STATE_COUNT || STATE_NAMES[state] == NULL)
+		return "?";
+	return STATE_NAMES[state];
+}
 
 /**
  * AllocAndInitStateConfigs : Allocates and initializes state configurations.
@@ -163,20 +192,21 @@ bool CanEnterState(GameObject *object, State newState)
 
 bool ChangeState(GameObject *object, State newState, float deltaTime)
 {
+	State currentState = object->currentState;
+
 	// Check if the state transition is valid
 	if (!CanEnterState(object, newState))
 	{
-		// If the transition is not valid, print an error and return false
-		const char *from = object->stateConfigs[object->currentState].name;
-		const char *to = object->stateConfigs[newState].name;
-		TraceLog(LOG_ERROR, "Invalid state transition from %s to %s",
-				 from ? from : "(unimplemented state)",
-				 to ? to : "(unimplemented state)");
+		TraceLog(LOG_WARNING, "[%s] %s -> %s is not allowed: add it to %s's transition table",
+				 object->name, StateName(currentState), StateName(newState), StateName(currentState));
 		return false; // Transition failed
 	}
 
+	// One line per state change: who, from and to
+	TraceLog(LOG_INFO, "[%s] %s -> %s", object->name, StateName(currentState), StateName(newState));
+
 	// Get the configuration of the current state and the new state
-	StateConfig *currentConfig = &object->stateConfigs[object->currentState];
+	StateConfig *currentConfig = &object->stateConfigs[currentState];
 	StateConfig *newConfig = &object->stateConfigs[newState];
 
 	// If the current state has an exit function defined, call it
@@ -184,7 +214,7 @@ bool ChangeState(GameObject *object, State newState, float deltaTime)
 		currentConfig->Exit(object, deltaTime);
 
 	// Update the object's previous and current state
-	object->previousState = object->currentState;
+	object->previousState = currentState;
 	object->currentState = newState;
 
 	// If the new state has an entry function defined, call it
@@ -233,7 +263,7 @@ void StateTransitions(StateConfig *stateConfig, EventStateTransition *transition
  * @stateCount:   Number of states in the system.
  */
 
-void PrintStateConfigs(StateConfig *stateConfigs, int stateCount)
+ void PrintStateConfigs(StateConfig *stateConfigs, int stateCount)
 {
 	// Loop through each state configuration and print its details
 	for (int i = 0; i < stateCount; i++)
@@ -242,38 +272,30 @@ void PrintStateConfigs(StateConfig *stateConfigs, int stateCount)
 
 		// Only print if the state is properly configured (i.e., has a name and event handler)
 		if (config->name == NULL)
-		{
 			continue; // Skip printing incomplete or improperly configured states
-		}
 
 		// Print the state name and availability of its handler functions
-		TraceLog(LOG_INFO, "State: %s", config->name);
-		TraceLog(LOG_INFO, "\tEntry: %s", config->Entry ? "Defined" : "NULL");
-		TraceLog(LOG_INFO, "\tUpdate: %s", config->Update ? "Defined" : "NULL");
-		TraceLog(LOG_INFO, "\tExit: %s", config->Exit ? "Defined" : "NULL");
+		char line[256];
+		int used = snprintf(line, sizeof(line), "FSM %-18s [%s %s %s] ",
+							config->name,
+							config->Entry ? "Entry" : "Unconfigured",
+							config->Update ? "Update" : "Unconfigured",
+							config->Exit ? "Exit" : "Unconfigured");
 
 		// Check if there are any valid next states
 		// Skip if there are none
 		if (config->nextStatesCount <= 0 || config->eventStateTransitions == NULL)
-		{
-			TraceLog(LOG_INFO, "\tNext States: []");
-			TraceLog(LOG_INFO, "\tNext States Count: 0");
-			continue;
-		}
+			snprintf(line + used, sizeof(line) - used, " (no way out)");
 
 		// Print the list of valid next states
-		TraceLog(LOG_INFO, "\tNext States: [");
-		for (int j = 0; j < config->nextStatesCount; j++)
+		for (int j = 0; j < config->nextStatesCount && used < (int)sizeof(line); j++)
 		{
-			if (j > 0)
-			{
-				TraceLog(LOG_INFO, ", ");
-			}
-			TraceLog(LOG_INFO, "Event : %d State : %d",
-					 config->eventStateTransitions[j].event,
-					 config->eventStateTransitions[j].state);
+			used += snprintf(line + used, sizeof(line) - used, "%s %s -> %s",
+							 j > 0 ? "," : "",
+							 EventName(config->eventStateTransitions[j].event),
+							 StateName(config->eventStateTransitions[j].state));
 		}
-		TraceLog(LOG_INFO, "]\n");
-		TraceLog(LOG_INFO, "\tNext States Count: %d\n", config->nextStatesCount);
+
+		TraceLog(LOG_INFO, "%s", line);
 	}
 }
