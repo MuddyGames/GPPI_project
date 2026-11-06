@@ -76,7 +76,7 @@ Command PollAI()
 	char names[COMMAND_NAMES_SIZE];
 	GetCommandBits(command, bits);
 	GetCommandNames(command, names, sizeof(names));
-	TraceLog(LOG_DEBUG, "[AI] %s  %s", bits, names);
+	TraceLog(LOG_INFO, "[AI] %s  %s", bits, names);
 
 	return command;
 }

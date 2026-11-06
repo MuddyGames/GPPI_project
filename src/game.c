@@ -124,7 +124,7 @@ void InitGame(GameData *data)
 	// Initialise Game
 	data->gsm = STATE_PLAY;
 
-	TraceLog(LOG_INFO, "Game Initialising ...");
+	TraceLog(LOG_INFO, "[Game] Initialising ...");
 
 	// Initialize the player and NPC with their respective names
 	// Setup position
@@ -151,7 +151,7 @@ void InitGame(GameData *data)
 	InitInputManager();
 	InitAIManager();
 
-	TraceLog(LOG_INFO, "Game Initialised!");
+	TraceLog(LOG_INFO, "[Game] Game Initialised!");
 }
 
 /**
@@ -248,12 +248,12 @@ void UpdateGame(GameData *data, float deltaTime)
 			// Did the player lose
 			if (data->player->base.health <= 0)
 			{
-				TraceLog(LOG_INFO, "Game over %s won", data->npc->base.name);
+				TraceLog(LOG_INFO, "Game over [%s] won", data->npc->base.name);
 			}
 			else
 			{
 				// NPC Lost
-				TraceLog(LOG_INFO, "Congratulations %s defeated %s", data->player->base.name, data->npc->base.name);
+				TraceLog(LOG_INFO, "Congratulations [%s] defeated [%s]", data->player->base.name, data->npc->base.name);
 			}
 		}
 	}
