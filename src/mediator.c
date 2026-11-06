@@ -48,7 +48,7 @@ void MediatorHandleCommand(Mediator *mediator, Command command, float deltaTime)
 {
 	if (!mediator || !mediator->object)
 	{
-		printf("Error: Mediator or Mediator's object is NULL\n");
+		TraceLog(LOG_ERROR, "Error: Mediator or Mediator's object is NULL");
 		return;
 	}
 

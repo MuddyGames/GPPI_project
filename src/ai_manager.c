@@ -11,7 +11,7 @@
  * InitAIManager : Sets up the AI manager....or at least pretends to. All it
  * does at the moment is shake the dice, so the NPC isn't the same eejit every run.
  *
- * Here for when you eventually give your NPCs a few more brain cells 
+ * Here for when you eventually give your NPCs a few more brain cells
  * to rub together.
  *
  * Add proper setup later if the AI gets notions.

@@ -17,7 +17,7 @@ void GameLoop(GameData *data);
  *
  * Sets up the Raylib window, fires up the game systems, and kicks off
  * the main loop. When the player finally closes the window, everything
- * gets cleaned up properly ..... none of this "sure it's grand" memory 
+ * gets cleaned up properly ..... none of this "sure it's grand" memory
  * leaking is no problem I've loads after shelling out for another 64 GB of DDR5.
  */
 

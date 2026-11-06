@@ -20,7 +20,7 @@ StateConfig *AllocateStateConfigs(int stateCount)
 	// Check if memory allocation failed
 	if (!configs)
 	{
-		fprintf(stderr, "Failed to allocate state configs\n");
+		TraceLog(LOG_ERROR, "Failed to allocate state configs");
 		exit(1);
 	}
 
@@ -161,9 +161,9 @@ bool ChangeState(GameObject *object, State newState, float deltaTime)
 		// If the transition is not valid, print an error and return false
 		const char *from = object->stateConfigs[object->currentState].name;
 		const char *to = object->stateConfigs[newState].name;
-		printf("Invalid state transition from %s to %s\n",
-			   from ? from : "(unimplemented state)",
-			   to ? to : "(unimplemented state)");
+		TraceLog(LOG_ERROR, "Invalid state transition from %s to %s",
+				 from ? from : "(unimplemented state)",
+				 to ? to : "(unimplemented state)");
 		return false; // Transition failed
 	}
 
@@ -204,7 +204,7 @@ void StateTransitions(StateConfig *stateConfig, EventStateTransition *transition
 	if (!stateConfig->eventStateTransitions)
 	{
 		// If memory allocation fails, print an error and exit
-		fprintf(stderr, "Failed to allocate state transitions\n");
+		TraceLog(LOG_ERROR, "Failed to allocate state transitions");
 		exit(1); // Exit the program if allocation fails
 	}
 
@@ -239,33 +239,33 @@ void PrintStateConfigs(StateConfig *stateConfigs, int stateCount)
 		}
 
 		// Print the state name and availability of its handler functions
-		printf("State: %s\n", config->name);
-		printf("\tEntry: %s\n", config->Entry ? "Defined" : "NULL");
-		printf("\tUpdate: %s\n", config->Update ? "Defined" : "NULL");
-		printf("\tExit: %s\n", config->Exit ? "Defined" : "NULL");
+		TraceLog(LOG_INFO, "State: %s", config->name);
+		TraceLog(LOG_INFO, "\tEntry: %s", config->Entry ? "Defined" : "NULL");
+		TraceLog(LOG_INFO, "\tUpdate: %s", config->Update ? "Defined" : "NULL");
+		TraceLog(LOG_INFO, "\tExit: %s", config->Exit ? "Defined" : "NULL");
 
 		// Check if there are any valid next states
 		// Skip if there are none
 		if (config->nextStatesCount <= 0 || config->eventStateTransitions == NULL)
-        {
-            printf("\tNext States: []\n");
-            printf("\tNext States Count: 0\n");
-            continue;
-        }
+		{
+			TraceLog(LOG_INFO, "\tNext States: []");
+			TraceLog(LOG_INFO, "\tNext States Count: 0");
+			continue;
+		}
 
 		// Print the list of valid next states
-		printf("\tNext States: [");
+		TraceLog(LOG_INFO, "\tNext States: [");
 		for (int j = 0; j < config->nextStatesCount; j++)
 		{
 			if (j > 0)
 			{
-				printf(", ");
+				TraceLog(LOG_INFO, ", ");
 			}
-			printf("Event : %d State : %d", 
-				config->eventStateTransitions[j].event, 
-				config->eventStateTransitions[j].state);
+			TraceLog(LOG_INFO, "Event : %d State : %d",
+					 config->eventStateTransitions[j].event,
+					 config->eventStateTransitions[j].state);
 		}
-		printf("]\n");
-		printf("\tNext States Count: %d\n", config->nextStatesCount);
+		TraceLog(LOG_INFO, "]\n");
+		TraceLog(LOG_INFO, "\tNext States Count: %d\n", config->nextStatesCount);
 	}
 }

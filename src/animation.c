@@ -85,7 +85,7 @@ void UpdateAnimation(AnimationData *animationData, float deltaTime)
             else
             {
                 animationData->currentFrame = animationData->frameCount - 1; // Stay on last frame if not looping
-                animationData->finished = true;                               // and say so
+                animationData->finished = true;                              // and say so
             }
         }
 

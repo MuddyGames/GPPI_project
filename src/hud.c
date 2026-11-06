@@ -70,7 +70,8 @@ void DrawHud(const Hud *hud)
 
 	// FPS: green is grand, orange is struggling, red it is in bits
 	int fps = GetFPS();
-	Color fpsColor = (fps < 15) ? RED : (fps < 30) ? ORANGE : LIME;
+	Color fpsColor = (fps < 15) ? RED : (fps < 30) ? ORANGE
+												   : LIME;
 	const char *fpsLine = TextFormat("%2i FPS", fps);
 
 	// Command as bits, e.g. MOVE_LEFT | ATTACK -> 010100

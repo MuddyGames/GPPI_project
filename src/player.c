@@ -29,7 +29,7 @@ Player *InitPlayer(const char *name, Vector2 position, int radius)
 	if (!player)
 	{
 		// Print an error message to stderr and terminate the program if allocation fails
-		fprintf(stderr, "Failed to allocate player\n");
+		TraceLog(LOG_ERROR, "Failed to allocate memory for Player structure");
 		exit(1);
 	}
 
@@ -190,112 +190,112 @@ void SelectRandomIdleAnimation(GameObject *object, float deltaTime)
 	// IDLE 1 (Row 6, Pixel : Y = 5 x 64 = 320)
 	// Each frame is 64 x 64, so Pixel X = (Column - 1) x 64
 	Rectangle idle1[8] = {
-		{0, 320, 64, 64},     // Frame 1: Column 1 (Pixel : X 0)
-		{64, 320, 64, 64},    // Frame 2: Column 2 (Pixel : X 64)
-		{128, 320, 64, 64},   // Frame 3: Column 3 (Pixel : X 128)
-		{192, 320, 64, 64},   // Frame 4: Column 4 (Pixel : X 192)
-		{256, 320, 64, 64},   // Frame 5: Column 5 (Pixel : X 256)
-		{320, 320, 64, 64},   // Frame 6: Column 6 (Pixel : X 320)
-		{384, 320, 64, 64},   // Frame 7: Column 7 (Pixel : X 384)
-		{448, 320, 64, 64}    // Frame 8: Column 8 (Pixel : X 448)
+		{0, 320, 64, 64},	// Frame 1: Column 1 (Pixel : X 0)
+		{64, 320, 64, 64},	// Frame 2: Column 2 (Pixel : X 64)
+		{128, 320, 64, 64}, // Frame 3: Column 3 (Pixel : X 128)
+		{192, 320, 64, 64}, // Frame 4: Column 4 (Pixel : X 192)
+		{256, 320, 64, 64}, // Frame 5: Column 5 (Pixel : X 256)
+		{320, 320, 64, 64}, // Frame 6: Column 6 (Pixel : X 320)
+		{384, 320, 64, 64}, // Frame 7: Column 7 (Pixel : X 384)
+		{448, 320, 64, 64}	// Frame 8: Column 8 (Pixel : X 448)
 	};
 
 	// IDLE 2 (Row 7, Pixel : Y = 6 x 64 = 384)
 	// Each frame is 64 x 64, so Pixel X = (Column - 1) x 64
 	Rectangle idle2[8] = {
-		{0, 384, 64, 64},     // Frame 1: Column 1 (Pixel : X 0)
-		{64, 384, 64, 64},    // Frame 2: Column 2 (Pixel : X 64)
-		{128, 384, 64, 64},   // Frame 3: Column 3 (Pixel : X 128)
-		{192, 384, 64, 64},   // Frame 4: Column 4 (Pixel : X 192)
-		{256, 384, 64, 64},   // Frame 5: Column 5 (Pixel : X 256)
-		{320, 384, 64, 64},   // Frame 6: Column 6 (Pixel : X 320)
-		{384, 384, 64, 64},   // Frame 7: Column 7 (Pixel : X 384)
-		{448, 384, 64, 64}    // Frame 8: Column 8 (Pixel : X 448)
+		{0, 384, 64, 64},	// Frame 1: Column 1 (Pixel : X 0)
+		{64, 384, 64, 64},	// Frame 2: Column 2 (Pixel : X 64)
+		{128, 384, 64, 64}, // Frame 3: Column 3 (Pixel : X 128)
+		{192, 384, 64, 64}, // Frame 4: Column 4 (Pixel : X 192)
+		{256, 384, 64, 64}, // Frame 5: Column 5 (Pixel : X 256)
+		{320, 384, 64, 64}, // Frame 6: Column 6 (Pixel : X 320)
+		{384, 384, 64, 64}, // Frame 7: Column 7 (Pixel : X 384)
+		{448, 384, 64, 64}	// Frame 8: Column 8 (Pixel : X 448)
 	};
 
 	// IDLE 3 (Row 8, Pixel : Y = 7 x 64 = 448)
 	// Each frame is 64 x 64, so Pixel X = (Column - 1) x 64
 	Rectangle idle3[8] = {
-		{0, 448, 64, 64},     // Frame 1: Column 1 (Pixel : X 0)
-		{64, 448, 64, 64},    // Frame 2: Column 2 (Pixel : X 64)
-		{128, 448, 64, 64},   // Frame 3: Column 3 (Pixel : X 128)
-		{192, 448, 64, 64},   // Frame 4: Column 4 (Pixel : X 192)
-		{256, 448, 64, 64},   // Frame 5: Column 5 (Pixel : X 256)
-		{320, 448, 64, 64},   // Frame 6: Column 6 (Pixel : X 320)
-		{384, 448, 64, 64},   // Frame 7: Column 7 (Pixel : X 384)
-		{448, 448, 64, 64}    // Frame 8: Column 8 (Pixel : X 448)
+		{0, 448, 64, 64},	// Frame 1: Column 1 (Pixel : X 0)
+		{64, 448, 64, 64},	// Frame 2: Column 2 (Pixel : X 64)
+		{128, 448, 64, 64}, // Frame 3: Column 3 (Pixel : X 128)
+		{192, 448, 64, 64}, // Frame 4: Column 4 (Pixel : X 192)
+		{256, 448, 64, 64}, // Frame 5: Column 5 (Pixel : X 256)
+		{320, 448, 64, 64}, // Frame 6: Column 6 (Pixel : X 320)
+		{384, 448, 64, 64}, // Frame 7: Column 7 (Pixel : X 384)
+		{448, 448, 64, 64}	// Frame 8: Column 8 (Pixel : X 448)
 	};
 
 	// IDLE 4 (Row 17, Pixel : Y = 16 x 64 = 1024)
 	// Each frame is 64 x 64, so Pixel X = (Column - 1) x 64
 	Rectangle idle4[13] = {
-		{0, 1024, 64, 64},    // Frame 1: Column 1 (Pixel : X 0)
-		{64, 1024, 64, 64},   // Frame 2: Column 2 (Pixel : X 64)
-		{128, 1024, 64, 64},  // Frame 3: Column 3 (Pixel : X 128)
-		{192, 1024, 64, 64},  // Frame 4: Column 4 (Pixel : X 192)
-		{256, 1024, 64, 64},  // Frame 5: Column 5 (Pixel : X 256)
-		{320, 1024, 64, 64},  // Frame 6: Column 6 (Pixel : X 320)
-		{384, 1024, 64, 64},  // Frame 7: Column 7 (Pixel : X 384)
-		{448, 1024, 64, 64},  // Frame 8: Column 8 (Pixel : X 448)
-		{512, 1024, 64, 64},  // Frame 9: Column 9 (Pixel : X 512)
-		{576, 1024, 64, 64},  // Frame 10: Column 10 (Pixel : X 576)
-		{640, 1024, 64, 64},  // Frame 11: Column 11 (Pixel : X 640)
-		{704, 1024, 64, 64},  // Frame 12: Column 12 (Pixel : X 704)
-		{768, 1024, 64, 64}   // Frame 13: Column 13 (Pixel : X 768)
+		{0, 1024, 64, 64},	 // Frame 1: Column 1 (Pixel : X 0)
+		{64, 1024, 64, 64},	 // Frame 2: Column 2 (Pixel : X 64)
+		{128, 1024, 64, 64}, // Frame 3: Column 3 (Pixel : X 128)
+		{192, 1024, 64, 64}, // Frame 4: Column 4 (Pixel : X 192)
+		{256, 1024, 64, 64}, // Frame 5: Column 5 (Pixel : X 256)
+		{320, 1024, 64, 64}, // Frame 6: Column 6 (Pixel : X 320)
+		{384, 1024, 64, 64}, // Frame 7: Column 7 (Pixel : X 384)
+		{448, 1024, 64, 64}, // Frame 8: Column 8 (Pixel : X 448)
+		{512, 1024, 64, 64}, // Frame 9: Column 9 (Pixel : X 512)
+		{576, 1024, 64, 64}, // Frame 10: Column 10 (Pixel : X 576)
+		{640, 1024, 64, 64}, // Frame 11: Column 11 (Pixel : X 640)
+		{704, 1024, 64, 64}, // Frame 12: Column 12 (Pixel : X 704)
+		{768, 1024, 64, 64}	 // Frame 13: Column 13 (Pixel : X 768)
 	};
 
 	// IDLE 5 (Row 18, Pixel : Y = 17 x 64 = 1088)
 	// Each frame is 64 x 64, so Pixel X = (Column - 1) x 64
 	Rectangle idle5[13] = {
-		{0, 1088, 64, 64},    // Frame 1: Column 1 (Pixel : X 0)
-		{64, 1088, 64, 64},   // Frame 2: Column 2 (Pixel : X 64)
-		{128, 1088, 64, 64},  // Frame 3: Column 3 (Pixel : X 128)
-		{192, 1088, 64, 64},  // Frame 4: Column 4 (Pixel : X 192)
-		{256, 1088, 64, 64},  // Frame 5: Column 5 (Pixel : X 256)
-		{320, 1088, 64, 64},  // Frame 6: Column 6 (Pixel : X 320)
-		{384, 1088, 64, 64},  // Frame 7: Column 7 (Pixel : X 384)
-		{448, 1088, 64, 64},  // Frame 8: Column 8 (Pixel : X 448)
-		{512, 1088, 64, 64},  // Frame 9: Column 9 (Pixel : X 512)
-		{576, 1088, 64, 64},  // Frame 10: Column 10 (Pixel : X 576)
-		{640, 1088, 64, 64},  // Frame 11: Column 11 (Pixel : X 640)
-		{704, 1088, 64, 64},  // Frame 12: Column 12 (Pixel : X 704)
-		{768, 1088, 64, 64}   // Frame 13: Column 13 (Pixel : X 768)
+		{0, 1088, 64, 64},	 // Frame 1: Column 1 (Pixel : X 0)
+		{64, 1088, 64, 64},	 // Frame 2: Column 2 (Pixel : X 64)
+		{128, 1088, 64, 64}, // Frame 3: Column 3 (Pixel : X 128)
+		{192, 1088, 64, 64}, // Frame 4: Column 4 (Pixel : X 192)
+		{256, 1088, 64, 64}, // Frame 5: Column 5 (Pixel : X 256)
+		{320, 1088, 64, 64}, // Frame 6: Column 6 (Pixel : X 320)
+		{384, 1088, 64, 64}, // Frame 7: Column 7 (Pixel : X 384)
+		{448, 1088, 64, 64}, // Frame 8: Column 8 (Pixel : X 448)
+		{512, 1088, 64, 64}, // Frame 9: Column 9 (Pixel : X 512)
+		{576, 1088, 64, 64}, // Frame 10: Column 10 (Pixel : X 576)
+		{640, 1088, 64, 64}, // Frame 11: Column 11 (Pixel : X 640)
+		{704, 1088, 64, 64}, // Frame 12: Column 12 (Pixel : X 704)
+		{768, 1088, 64, 64}	 // Frame 13: Column 13 (Pixel : X 768)
 	};
 
 	// IDLE 6 (Row 19, Pixel : Y = 18 x 64 = 1152)
 	// Each frame is 64 x 64, so Pixel X = (Column - 1) x 64
 	Rectangle idle6[13] = {
-		{0, 1152, 64, 64},    // Frame 1: Column 1 (Pixel : X 0)
-		{64, 1152, 64, 64},   // Frame 2: Column 2 (Pixel : X 64)
-		{128, 1152, 64, 64},  // Frame 3: Column 3 (Pixel : X 128)
-		{192, 1152, 64, 64},  // Frame 4: Column 4 (Pixel : X 192)
-		{256, 1152, 64, 64},  // Frame 5: Column 5 (Pixel : X 256)
-		{320, 1152, 64, 64},  // Frame 6: Column 6 (Pixel : X 320)
-		{384, 1152, 64, 64},  // Frame 7: Column 7 (Pixel : X 384)
-		{448, 1152, 64, 64},  // Frame 8: Column 8 (Pixel : X 448)
-		{512, 1152, 64, 64},  // Frame 9: Column 9 (Pixel : X 512)
-		{576, 1152, 64, 64},  // Frame 10: Column 10 (Pixel : X 576)
-		{640, 1152, 64, 64},  // Frame 11: Column 11 (Pixel : X 640)
-		{704, 1152, 64, 64},  // Frame 12: Column 12 (Pixel : X 704)
-		{768, 1152, 64, 64}   // Frame 13: Column 13 (Pixel : X 768)
+		{0, 1152, 64, 64},	 // Frame 1: Column 1 (Pixel : X 0)
+		{64, 1152, 64, 64},	 // Frame 2: Column 2 (Pixel : X 64)
+		{128, 1152, 64, 64}, // Frame 3: Column 3 (Pixel : X 128)
+		{192, 1152, 64, 64}, // Frame 4: Column 4 (Pixel : X 192)
+		{256, 1152, 64, 64}, // Frame 5: Column 5 (Pixel : X 256)
+		{320, 1152, 64, 64}, // Frame 6: Column 6 (Pixel : X 320)
+		{384, 1152, 64, 64}, // Frame 7: Column 7 (Pixel : X 384)
+		{448, 1152, 64, 64}, // Frame 8: Column 8 (Pixel : X 448)
+		{512, 1152, 64, 64}, // Frame 9: Column 9 (Pixel : X 512)
+		{576, 1152, 64, 64}, // Frame 10: Column 10 (Pixel : X 576)
+		{640, 1152, 64, 64}, // Frame 11: Column 11 (Pixel : X 640)
+		{704, 1152, 64, 64}, // Frame 12: Column 12 (Pixel : X 704)
+		{768, 1152, 64, 64}	 // Frame 13: Column 13 (Pixel : X 768)
 	};
 
 	// IDLE 7 (Row 20, Pixel : Y = 19 x 64 = 1216)
 	// Each frame is 64 x 64, so Pixel X = (Column - 1) x 64
 	Rectangle idle7[13] = {
-		{0, 1216, 64, 64},    // Frame 1: Column 1 (Pixel : X 0)
-		{64, 1216, 64, 64},   // Frame 2: Column 2 (Pixel : X 64)
-		{128, 1216, 64, 64},  // Frame 3: Column 3 (Pixel : X 128)
-		{192, 1216, 64, 64},  // Frame 4: Column 4 (Pixel : X 192)
-		{256, 1216, 64, 64},  // Frame 5: Column 5 (Pixel : X 256)
-		{320, 1216, 64, 64},  // Frame 6: Column 6 (Pixel : X 320)
-		{384, 1216, 64, 64},  // Frame 7: Column 7 (Pixel : X 384)
-		{448, 1216, 64, 64},  // Frame 8: Column 8 (Pixel : X 448)
-		{512, 1216, 64, 64},  // Frame 9: Column 9 (Pixel : X 512)
-		{576, 1216, 64, 64},  // Frame 10: Column 10 (Pixel : X 576)
-		{640, 1216, 64, 64},  // Frame 11: Column 11 (Pixel : X 640)
-		{704, 1216, 64, 64},  // Frame 12: Column 12 (Pixel : X 704)
-		{768, 1216, 64, 64}   // Frame 13: Column 13 (Pixel : X 768)
+		{0, 1216, 64, 64},	 // Frame 1: Column 1 (Pixel : X 0)
+		{64, 1216, 64, 64},	 // Frame 2: Column 2 (Pixel : X 64)
+		{128, 1216, 64, 64}, // Frame 3: Column 3 (Pixel : X 128)
+		{192, 1216, 64, 64}, // Frame 4: Column 4 (Pixel : X 192)
+		{256, 1216, 64, 64}, // Frame 5: Column 5 (Pixel : X 256)
+		{320, 1216, 64, 64}, // Frame 6: Column 6 (Pixel : X 320)
+		{384, 1216, 64, 64}, // Frame 7: Column 7 (Pixel : X 384)
+		{448, 1216, 64, 64}, // Frame 8: Column 8 (Pixel : X 448)
+		{512, 1216, 64, 64}, // Frame 9: Column 9 (Pixel : X 512)
+		{576, 1216, 64, 64}, // Frame 10: Column 10 (Pixel : X 576)
+		{640, 1216, 64, 64}, // Frame 11: Column 11 (Pixel : X 640)
+		{704, 1216, 64, 64}, // Frame 12: Column 12 (Pixel : X 704)
+		{768, 1216, 64, 64}	 // Frame 13: Column 13 (Pixel : X 768)
 	};
 
 	switch (randomChoice)
@@ -330,8 +330,8 @@ void SelectRandomIdleAnimation(GameObject *object, float deltaTime)
 void PlayerEnterIdle(GameObject *object, float deltaTime)
 {
 	// Player *player = (Player *)object;
-	// printf("\n%s -> ENTER -> Idle\n", object->name);
-	// printf("Stamina: %.1f, Mana: %.1f\n\n", player->stamina, player->mana);
+
+	TraceLog(LOG_INFO, "\n%s -> ENTER -> Idle\n", object->name);
 
 	if (object->previousState != object->currentState && object->currentState == STATE_IDLE)
 	{
@@ -359,8 +359,10 @@ void PlayerExitIdle(GameObject *object, float deltaTime)
 	(void)deltaTime;
 	Player *player = (Player *)object;
 	(void)player;
-	// printf("\n%s <- EXIT <- Idle\n", object->name);
-	// printf("Stamina: %.1f, Mana: %.1f\n\n", player->stamina, player->mana);
+
+	TraceLog(LOG_INFO, "\n%s <- EXIT <- Idle\n", object->name);
+	TraceLog(LOG_INFO, "Stamina: %.1f, Mana: %.1f\n\n", player->stamina, player->mana);
+
 	// Complete the remainder of the method
 }
 
@@ -376,57 +378,57 @@ static void InitWalkAnimation(GameObject *object)
 	// WALK UP (Row 9, Pixel : Y = 8 x 64 = 512)
 	// Each frame is 64 x 64, so Pixel X = (Column - 1) x 64
 	static Rectangle walk_UP[9] = {
-		{0, 512, 64, 64},     // Frame 1: Column 1 (Pixel : X 0)
-		{64, 512, 64, 64},    // Frame 2: Column 2 (Pixel : X 64)
-		{128, 512, 64, 64},   // Frame 3: Column 3 (Pixel : X 128)
-		{192, 512, 64, 64},   // Frame 4: Column 4 (Pixel : X 192)
-		{256, 512, 64, 64},   // Frame 5: Column 5 (Pixel : X 256)
-		{320, 512, 64, 64},   // Frame 6: Column 6 (Pixel : X 320)
-		{384, 512, 64, 64},   // Frame 7: Column 7 (Pixel : X 384)
-		{448, 512, 64, 64},   // Frame 8: Column 8 (Pixel : X 448)
-		{512, 512, 64, 64}    // Frame 9: Column 9 (Pixel : X 512)
+		{0, 512, 64, 64},	// Frame 1: Column 1 (Pixel : X 0)
+		{64, 512, 64, 64},	// Frame 2: Column 2 (Pixel : X 64)
+		{128, 512, 64, 64}, // Frame 3: Column 3 (Pixel : X 128)
+		{192, 512, 64, 64}, // Frame 4: Column 4 (Pixel : X 192)
+		{256, 512, 64, 64}, // Frame 5: Column 5 (Pixel : X 256)
+		{320, 512, 64, 64}, // Frame 6: Column 6 (Pixel : X 320)
+		{384, 512, 64, 64}, // Frame 7: Column 7 (Pixel : X 384)
+		{448, 512, 64, 64}, // Frame 8: Column 8 (Pixel : X 448)
+		{512, 512, 64, 64}	// Frame 9: Column 9 (Pixel : X 512)
 	};
 
 	// WALK DOWN (Row 11, Pixel : Y = 10 x 64 = 640)
 	// Each frame is 64 x 64, so Pixel X = (Column - 1) x 64
 	static Rectangle walk_DOWN[9] = {
-		{0, 640, 64, 64},     // Frame 1: Column 1 (Pixel : X 0)
-		{64, 640, 64, 64},    // Frame 2: Column 2 (Pixel : X 64)
-		{128, 640, 64, 64},   // Frame 3: Column 3 (Pixel : X 128)
-		{192, 640, 64, 64},   // Frame 4: Column 4 (Pixel : X 192)
-		{256, 640, 64, 64},   // Frame 5: Column 5 (Pixel : X 256)
-		{320, 640, 64, 64},   // Frame 6: Column 6 (Pixel : X 320)
-		{384, 640, 64, 64},   // Frame 7: Column 7 (Pixel : X 384)
-		{448, 640, 64, 64},   // Frame 8: Column 8 (Pixel : X 448)
-		{512, 640, 64, 64}    // Frame 9: Column 9 (Pixel : X 512)
+		{0, 640, 64, 64},	// Frame 1: Column 1 (Pixel : X 0)
+		{64, 640, 64, 64},	// Frame 2: Column 2 (Pixel : X 64)
+		{128, 640, 64, 64}, // Frame 3: Column 3 (Pixel : X 128)
+		{192, 640, 64, 64}, // Frame 4: Column 4 (Pixel : X 192)
+		{256, 640, 64, 64}, // Frame 5: Column 5 (Pixel : X 256)
+		{320, 640, 64, 64}, // Frame 6: Column 6 (Pixel : X 320)
+		{384, 640, 64, 64}, // Frame 7: Column 7 (Pixel : X 384)
+		{448, 640, 64, 64}, // Frame 8: Column 8 (Pixel : X 448)
+		{512, 640, 64, 64}	// Frame 9: Column 9 (Pixel : X 512)
 	};
 
 	// WALK LEFT (Row 10, Pixel : Y = 9 x 64 = 576)
 	// Each frame is 64 x 64, so Pixel X = (Column - 1) x 64
 	static Rectangle walk_LEFT[9] = {
-		{0, 576, 64, 64},     // Frame 1: Column 1 (Pixel : X 0)
-		{64, 576, 64, 64},    // Frame 2: Column 2 (Pixel : X 64)
-		{128, 576, 64, 64},   // Frame 3: Column 3 (Pixel : X 128)
-		{192, 576, 64, 64},   // Frame 4: Column 4 (Pixel : X 192)
-		{256, 576, 64, 64},   // Frame 5: Column 5 (Pixel : X 256)
-		{320, 576, 64, 64},   // Frame 6: Column 6 (Pixel : X 320)
-		{384, 576, 64, 64},   // Frame 7: Column 7 (Pixel : X 384)
-		{448, 576, 64, 64},   // Frame 8: Column 8 (Pixel : X 448)
-		{512, 576, 64, 64}    // Frame 9: Column 9 (Pixel : X 512)
+		{0, 576, 64, 64},	// Frame 1: Column 1 (Pixel : X 0)
+		{64, 576, 64, 64},	// Frame 2: Column 2 (Pixel : X 64)
+		{128, 576, 64, 64}, // Frame 3: Column 3 (Pixel : X 128)
+		{192, 576, 64, 64}, // Frame 4: Column 4 (Pixel : X 192)
+		{256, 576, 64, 64}, // Frame 5: Column 5 (Pixel : X 256)
+		{320, 576, 64, 64}, // Frame 6: Column 6 (Pixel : X 320)
+		{384, 576, 64, 64}, // Frame 7: Column 7 (Pixel : X 384)
+		{448, 576, 64, 64}, // Frame 8: Column 8 (Pixel : X 448)
+		{512, 576, 64, 64}	// Frame 9: Column 9 (Pixel : X 512)
 	};
 
 	// WALK RIGHT (Row 12, Pixel : Y = 11 x 64 = 704)
 	// Each frame is 64 x 64, so Pixel X = (Column - 1) x 64
 	static Rectangle walk_RIGHT[9] = {
-		{0, 704, 64, 64},     // Frame 1: Column 1 (Pixel : X 0)
-		{64, 704, 64, 64},    // Frame 2: Column 2 (Pixel : X 64)
-		{128, 704, 64, 64},   // Frame 3: Column 3 (Pixel : X 128)
-		{192, 704, 64, 64},   // Frame 4: Column 4 (Pixel : X 192)
-		{256, 704, 64, 64},   // Frame 5: Column 5 (Pixel : X 256)
-		{320, 704, 64, 64},   // Frame 6: Column 6 (Pixel : X 320)
-		{384, 704, 64, 64},   // Frame 7: Column 7 (Pixel : X 384)
-		{448, 704, 64, 64},   // Frame 8: Column 8 (Pixel : X 448)
-		{512, 704, 64, 64}    // Frame 9: Column 9 (Pixel : X 512)
+		{0, 704, 64, 64},	// Frame 1: Column 1 (Pixel : X 0)
+		{64, 704, 64, 64},	// Frame 2: Column 2 (Pixel : X 64)
+		{128, 704, 64, 64}, // Frame 3: Column 3 (Pixel : X 128)
+		{192, 704, 64, 64}, // Frame 4: Column 4 (Pixel : X 192)
+		{256, 704, 64, 64}, // Frame 5: Column 5 (Pixel : X 256)
+		{320, 704, 64, 64}, // Frame 6: Column 6 (Pixel : X 320)
+		{384, 704, 64, 64}, // Frame 7: Column 7 (Pixel : X 384)
+		{448, 704, 64, 64}, // Frame 8: Column 8 (Pixel : X 448)
+		{512, 704, 64, 64}	// Frame 9: Column 9 (Pixel : X 512)
 	};
 
 	switch (object->currentDirection)
@@ -450,8 +452,10 @@ void PlayerEnterWalking(GameObject *object, float deltaTime)
 {
 	(void)deltaTime;
 	Player *player = (Player *)object;
-	printf("\n%s -> ENTER -> Walking\n", object->name);
-	printf("Stamina: %.1f, Mana: %.1f\n\n", player->stamina, player->mana);
+
+	TraceLog(LOG_INFO, "\n%s -> ENTER -> Walking\n", object->name);
+	TraceLog(LOG_INFO, "Stamina: %.1f, Mana: %.1f\n\n", player->stamina, player->mana);
+
 	// Complete the remainder of the method
 	InitWalkAnimation(object);
 }
@@ -479,8 +483,9 @@ void PlayerExitWalking(GameObject *object, float deltaTime)
 {
 	(void)deltaTime;
 	Player *player = (Player *)object;
-	printf("\n%s <- EXIT <- Walking\n", object->name);
-	printf("Stamina: %.1f, Mana: %.1f\n\n", player->stamina, player->mana);
+
+	TraceLog(LOG_INFO, "\n%s <- EXIT <- Walking\n", object->name);
+	TraceLog(LOG_INFO, "Stamina: %.1f, Mana: %.1f\n\n", player->stamina, player->mana);
 	// Complete the remainder of the method
 }
 
@@ -496,45 +501,45 @@ static void InitAttackAnimation(GameObject *object)
 	// ATTACK UP (Rows 47-49, Pixel : Y = 46 x 64 = 2944)
 	// Each frame is 192 x 192, so Pixel X = (Column - 1) x 192
 	static Rectangle sword_attack_UP[6] = {
-		{0, 2944, 192, 192},    // Frame 1: Column 1 (Pixel : X 0)
-		{192, 2944, 192, 192},  // Frame 2: Column 2 (Pixel : X 192)
-		{384, 2944, 192, 192},  // Frame 3: Column 3 (Pixel : X 384)
-		{576, 2944, 192, 192},  // Frame 4: Column 4 (Pixel : X 576)
-		{768, 2944, 192, 192},  // Frame 5: Column 5 (Pixel : X 768)
-		{960, 2944, 192, 192}   // Frame 6: Column 6 (Pixel : X 960)
+		{0, 2944, 192, 192},   // Frame 1: Column 1 (Pixel : X 0)
+		{192, 2944, 192, 192}, // Frame 2: Column 2 (Pixel : X 192)
+		{384, 2944, 192, 192}, // Frame 3: Column 3 (Pixel : X 384)
+		{576, 2944, 192, 192}, // Frame 4: Column 4 (Pixel : X 576)
+		{768, 2944, 192, 192}, // Frame 5: Column 5 (Pixel : X 768)
+		{960, 2944, 192, 192}  // Frame 6: Column 6 (Pixel : X 960)
 	};
 
 	// ATTACK LEFT (Rows 50-52, Pixel : Y = 49 x 64 = 3136)
 	// Each frame is 192 x 192, so Pixel X = (Column - 1) x 192
 	static Rectangle sword_attack_LEFT[6] = {
-		{0, 3136, 192, 192},    // Frame 1: Column 1 (Pixel : X 0)
-		{192, 3136, 192, 192},  // Frame 2: Column 2 (Pixel : X 192)
-		{384, 3136, 192, 192},  // Frame 3: Column 3 (Pixel : X 384)
-		{576, 3136, 192, 192},  // Frame 4: Column 4 (Pixel : X 576)
-		{768, 3136, 192, 192},  // Frame 5: Column 5 (Pixel : X 768)
-		{960, 3136, 192, 192}   // Frame 6: Column 6 (Pixel : X 960)
+		{0, 3136, 192, 192},   // Frame 1: Column 1 (Pixel : X 0)
+		{192, 3136, 192, 192}, // Frame 2: Column 2 (Pixel : X 192)
+		{384, 3136, 192, 192}, // Frame 3: Column 3 (Pixel : X 384)
+		{576, 3136, 192, 192}, // Frame 4: Column 4 (Pixel : X 576)
+		{768, 3136, 192, 192}, // Frame 5: Column 5 (Pixel : X 768)
+		{960, 3136, 192, 192}  // Frame 6: Column 6 (Pixel : X 960)
 	};
 
 	// ATTACK DOWN (Rows 53-55, Pixel : Y = 52 x 64 = 3328)
 	// Each frame is 192 x 192, so Pixel X = (Column - 1) x 192
 	static Rectangle sword_attack_DOWN[6] = {
-		{0, 3328, 192, 192},    // Frame 1: Column 1 (Pixel : X 0)
-		{192, 3328, 192, 192},  // Frame 2: Column 2 (Pixel : X 192)
-		{384, 3328, 192, 192},  // Frame 3: Column 3 (Pixel : X 384)
-		{576, 3328, 192, 192},  // Frame 4: Column 4 (Pixel : X 576)
-		{768, 3328, 192, 192},  // Frame 5: Column 5 (Pixel : X 768)
-		{960, 3328, 192, 192}   // Frame 6: Column 6 (Pixel : X 960)
+		{0, 3328, 192, 192},   // Frame 1: Column 1 (Pixel : X 0)
+		{192, 3328, 192, 192}, // Frame 2: Column 2 (Pixel : X 192)
+		{384, 3328, 192, 192}, // Frame 3: Column 3 (Pixel : X 384)
+		{576, 3328, 192, 192}, // Frame 4: Column 4 (Pixel : X 576)
+		{768, 3328, 192, 192}, // Frame 5: Column 5 (Pixel : X 768)
+		{960, 3328, 192, 192}  // Frame 6: Column 6 (Pixel : X 960)
 	};
 
 	// ATTACK RIGHT (Rows 56-58, Pixel : Y = 55 x 64 = 3520)
 	// Each frame is 192 x 192, so Pixel X = (Column - 1) x 192
 	static Rectangle sword_attack_RIGHT[6] = {
-		{0, 3520, 192, 192},    // Frame 1: Column 1 (Pixel : X 0)
-		{192, 3520, 192, 192},  // Frame 2: Column 2 (Pixel : X 192)
-		{384, 3520, 192, 192},  // Frame 3: Column 3 (Pixel : X 384)
-		{576, 3520, 192, 192},  // Frame 4: Column 4 (Pixel : X 576)
-		{768, 3520, 192, 192},  // Frame 5: Column 5 (Pixel : X 768)
-		{960, 3520, 192, 192}   // Frame 6: Column 6 (Pixel : X 960)
+		{0, 3520, 192, 192},   // Frame 1: Column 1 (Pixel : X 0)
+		{192, 3520, 192, 192}, // Frame 2: Column 2 (Pixel : X 192)
+		{384, 3520, 192, 192}, // Frame 3: Column 3 (Pixel : X 384)
+		{576, 3520, 192, 192}, // Frame 4: Column 4 (Pixel : X 576)
+		{768, 3520, 192, 192}, // Frame 5: Column 5 (Pixel : X 768)
+		{960, 3520, 192, 192}  // Frame 6: Column 6 (Pixel : X 960)
 	};
 
 	switch (object->currentDirection)
@@ -558,8 +563,10 @@ void PlayerEnterAttacking(GameObject *object, float deltaTime)
 {
 	(void)deltaTime;
 	Player *player = (Player *)object;
-	printf("\n%s -> ENTER -> Attacking\n", object->name);
-	printf("Stamina: %.1f, Mana: %.1f\n\n", player->stamina, player->mana);
+
+	TraceLog(LOG_INFO, "\n%s -> ENTER -> Attacking\n", object->name);
+	TraceLog(LOG_INFO, "Stamina: %.1f, Mana: %.1f\n\n", player->stamina, player->mana);
+
 	// Complete the remainder of the method
 	// Example: Deduct some stamina when attacking
 
@@ -595,8 +602,10 @@ void PlayerExitAttacking(GameObject *object, float deltaTime)
 {
 	(void)deltaTime;
 	Player *player = (Player *)object;
-	printf("\n%s <- EXIT <- Attacking\n", object->name);
-	printf("Stamina: %.1f, Mana: %.1f\n\n", player->stamina, player->mana);
+
+	TraceLog(LOG_INFO, "\n%s <- EXIT <- Attacking\n", object->name);
+	TraceLog(LOG_INFO, "Stamina: %.1f, Mana: %.1f\n\n", player->stamina, player->mana);
+
 	// Complete the remainder of the method
 	// Reset or adjust any temporary changes during attack, if needed
 }
@@ -606,8 +615,10 @@ void PlayerEnterShielding(GameObject *object, float deltaTime)
 	// TODO : Not Currently Implemented
 	(void)deltaTime;
 	Player *player = (Player *)object;
-	printf("\n%s -> ENTER -> Sheilding\n", object->name);
-	printf("Stamina: %.1f, Mana: %.1f\n\n", player->stamina, player->mana);
+
+	TraceLog(LOG_INFO, "\n%s -> ENTER -> Sheilding\n", object->name);
+	TraceLog(LOG_INFO, "Stamina: %.1f, Mana: %.1f\n\n", player->stamina, player->mana);
+
 	// Complete the remainder of the method
 	// Example: Deduct some stamina for shielding
 }
@@ -622,8 +633,10 @@ void PlayerExitShielding(GameObject *object, float deltaTime)
 {
 	(void)deltaTime;
 	Player *player = (Player *)object;
-	printf("\n%s <- EXIT <- Sheilding\n", object->name);
-	printf("Stamina: %.1f, Mana: %.1f\n\n", player->stamina, player->mana);
+
+	TraceLog(LOG_INFO, "\n%s <- EXIT <- Sheilding\n", object->name);
+	TraceLog(LOG_INFO, "Stamina: %.1f, Mana: %.1f\n\n", player->stamina, player->mana);
+
 	// Complete the remainder of the method
 	// Reset any temporary shielding effects if necessary
 }
@@ -632,7 +645,9 @@ void PlayerEnterDie(GameObject *object, float deltaTime)
 {
 	// TODO : Not Currently Implemented
 	(void)deltaTime;
-	printf("\n%s -> ENTER -> Die\n", object->name);
+
+	TraceLog(LOG_INFO, "\n%s -> ENTER -> Die\n", object->name);
+
 	// Complete the remainder of the method
 }
 
@@ -647,7 +662,9 @@ void PlayerUpdateDie(GameObject *object, float deltaTime)
 void PlayerExitDie(GameObject *object, float deltaTime)
 {
 	(void)deltaTime;
-	printf("\n%s <- EXIT <- Die\n", object->name);
+
+	TraceLog(LOG_INFO, "\n%s <- EXIT <- Die\n", object->name);
+
 	// Complete the remainder of the method
 }
 
@@ -655,7 +672,9 @@ void PlayerEnterRespawn(GameObject *object, float deltaTime)
 {
 	// TODO : Not Currently Implemented
 	(void)deltaTime;
-	printf("\n%s -> ENTER -> Respawn\n", object->name);
+
+	TraceLog(LOG_INFO, "\n%s -> ENTER -> Respawn\n", object->name);
+
 	// Complete the remainder of the method
 }
 
@@ -670,6 +689,8 @@ void PlayerUpdateRespawn(GameObject *object, float deltaTime)
 void PlayerExitRespawn(GameObject *object, float deltaTime)
 {
 	(void)deltaTime;
-	printf("\n%s <- EXIT <- Respawn\n", object->name);
+
+	TraceLog(LOG_INFO, "\n%s <- EXIT <- Respawn\n", object->name);
+
 	// Complete the remainder of the method
 }

@@ -35,7 +35,7 @@ NPC *InitNPC(const char *name, Vector2 position, int radius)
 	if (!npc)
 	{
 		// Print an error message to stderr and terminate the program if allocation fails
-		fprintf(stderr, "Failed to allocate NPC\n");
+		TraceLog(LOG_ERROR, "Failed to allocate NPC");
 		exit(1);
 	}
 
@@ -181,11 +181,12 @@ void InitNPCFSM(GameObject *object)
 // Enter function for Idle state, executed once upon entering Idle
 void NPCEnterIdle(GameObject *object, float deltaTime)
 {
+	// Initialization code for entering Idle state, such as resetting timers or animation.
 	(void)deltaTime;
 	NPC *npc = (NPC *)object;
-	// printf("%s -> ENTER -> Idle\n", object->name);
-	// printf("Aggression: %d\n\n", npc->aggression);
-	// Initialization code for entering Idle state, such as resetting timers or animation.
+
+	TraceLog(LOG_INFO, "%s -> ENTER -> Idle", object->name);
+	TraceLog(LOG_INFO, "Aggression: %f", npc->aggression);
 
 	if (npc->base.previousState != npc->base.currentState && npc->base.currentState == STATE_IDLE)
 	{
@@ -193,13 +194,13 @@ void NPCEnterIdle(GameObject *object, float deltaTime)
 		// IDLE (Row 3, Pixel : Y = 2 x 64 = 128)
 		// Each frame is 64 x 64, so Pixel X = (Column - 1) x 64
 		Rectangle idle[7] = {
-			{0, 128, 64, 64},     // Frame 1: Column 1 (Pixel : X 0)
-			{64, 128, 64, 64},    // Frame 2: Column 2 (Pixel : X 64)
-			{128, 128, 64, 64},   // Frame 3: Column 3 (Pixel : X 128)
-			{192, 128, 64, 64},   // Frame 4: Column 4 (Pixel : X 192)
-			{256, 128, 64, 64},   // Frame 5: Column 5 (Pixel : X 256)
-			{320, 128, 64, 64},   // Frame 6: Column 6 (Pixel : X 320)
-			{384, 128, 64, 64}    // Frame 7: Column 7 (Pixel : X 384)
+			{0, 128, 64, 64},	// Frame 1: Column 1 (Pixel : X 0)
+			{64, 128, 64, 64},	// Frame 2: Column 2 (Pixel : X 64)
+			{128, 128, 64, 64}, // Frame 3: Column 3 (Pixel : X 128)
+			{192, 128, 64, 64}, // Frame 4: Column 4 (Pixel : X 192)
+			{256, 128, 64, 64}, // Frame 5: Column 5 (Pixel : X 256)
+			{320, 128, 64, 64}, // Frame 6: Column 6 (Pixel : X 320)
+			{384, 128, 64, 64}	// Frame 7: Column 7 (Pixel : X 384)
 		};
 
 		// Initialize the idle animation frames and play it
@@ -223,8 +224,8 @@ void NPCExitIdle(GameObject *object, float deltaTime)
 	(void)deltaTime;
 	NPC *npc = (NPC *)object;
 	(void)npc;
-	// printf("%s <- EXIT <- Idle\n", object->name);
-	// printf("Aggression: %d\n\n", npc->aggression);
+	TraceLog(LOG_INFO, "%s <- EXIT <- Idle", object->name);
+	TraceLog(LOG_INFO, "Aggression: %f", npc->aggression);
 	// Cleanup code for leaving Idle state, if any.
 }
 
@@ -240,57 +241,57 @@ static void InitWalkAnimation(GameObject *object)
 	// WALK UP (Row 9, Pixel : Y = 8 x 64 = 512)
 	// Each frame is 64 x 64, so Pixel X = (Column - 1) x 64
 	static Rectangle walk_UP[9] = {
-		{0, 512, 64, 64},     // Frame 1: Column 1 (Pixel : X 0)
-		{64, 512, 64, 64},    // Frame 2: Column 2 (Pixel : X 64)
-		{128, 512, 64, 64},   // Frame 3: Column 3 (Pixel : X 128)
-		{192, 512, 64, 64},   // Frame 4: Column 4 (Pixel : X 192)
-		{256, 512, 64, 64},   // Frame 5: Column 5 (Pixel : X 256)
-		{320, 512, 64, 64},   // Frame 6: Column 6 (Pixel : X 320)
-		{384, 512, 64, 64},   // Frame 7: Column 7 (Pixel : X 384)
-		{448, 512, 64, 64},   // Frame 8: Column 8 (Pixel : X 448)
-		{512, 512, 64, 64}    // Frame 9: Column 9 (Pixel : X 512)
+		{0, 512, 64, 64},	// Frame 1: Column 1 (Pixel : X 0)
+		{64, 512, 64, 64},	// Frame 2: Column 2 (Pixel : X 64)
+		{128, 512, 64, 64}, // Frame 3: Column 3 (Pixel : X 128)
+		{192, 512, 64, 64}, // Frame 4: Column 4 (Pixel : X 192)
+		{256, 512, 64, 64}, // Frame 5: Column 5 (Pixel : X 256)
+		{320, 512, 64, 64}, // Frame 6: Column 6 (Pixel : X 320)
+		{384, 512, 64, 64}, // Frame 7: Column 7 (Pixel : X 384)
+		{448, 512, 64, 64}, // Frame 8: Column 8 (Pixel : X 448)
+		{512, 512, 64, 64}	// Frame 9: Column 9 (Pixel : X 512)
 	};
 
 	// WALK LEFT (Row 10, Pixel : Y = 9 x 64 = 576)
 	// Each frame is 64 x 64, so Pixel X = (Column - 1) x 64
 	static Rectangle walk_LEFT[9] = {
-		{0, 576, 64, 64},     // Frame 1: Column 1 (Pixel : X 0)
-		{64, 576, 64, 64},    // Frame 2: Column 2 (Pixel : X 64)
-		{128, 576, 64, 64},   // Frame 3: Column 3 (Pixel : X 128)
-		{192, 576, 64, 64},   // Frame 4: Column 4 (Pixel : X 192)
-		{256, 576, 64, 64},   // Frame 5: Column 5 (Pixel : X 256)
-		{320, 576, 64, 64},   // Frame 6: Column 6 (Pixel : X 320)
-		{384, 576, 64, 64},   // Frame 7: Column 7 (Pixel : X 384)
-		{448, 576, 64, 64},   // Frame 8: Column 8 (Pixel : X 448)
-		{512, 576, 64, 64}    // Frame 9: Column 9 (Pixel : X 512)
+		{0, 576, 64, 64},	// Frame 1: Column 1 (Pixel : X 0)
+		{64, 576, 64, 64},	// Frame 2: Column 2 (Pixel : X 64)
+		{128, 576, 64, 64}, // Frame 3: Column 3 (Pixel : X 128)
+		{192, 576, 64, 64}, // Frame 4: Column 4 (Pixel : X 192)
+		{256, 576, 64, 64}, // Frame 5: Column 5 (Pixel : X 256)
+		{320, 576, 64, 64}, // Frame 6: Column 6 (Pixel : X 320)
+		{384, 576, 64, 64}, // Frame 7: Column 7 (Pixel : X 384)
+		{448, 576, 64, 64}, // Frame 8: Column 8 (Pixel : X 448)
+		{512, 576, 64, 64}	// Frame 9: Column 9 (Pixel : X 512)
 	};
 
 	// WALK DOWN (Row 11, Pixel : Y = 10 x 64 = 640)
 	// Each frame is 64 x 64, so Pixel X = (Column - 1) x 64
 	static Rectangle walk_DOWN[9] = {
-		{0, 640, 64, 64},     // Frame 1: Column 1 (Pixel : X 0)
-		{64, 640, 64, 64},    // Frame 2: Column 2 (Pixel : X 64)
-		{128, 640, 64, 64},   // Frame 3: Column 3 (Pixel : X 128)
-		{192, 640, 64, 64},   // Frame 4: Column 4 (Pixel : X 192)
-		{256, 640, 64, 64},   // Frame 5: Column 5 (Pixel : X 256)
-		{320, 640, 64, 64},   // Frame 6: Column 6 (Pixel : X 320)
-		{384, 640, 64, 64},   // Frame 7: Column 7 (Pixel : X 384)
-		{448, 640, 64, 64},   // Frame 8: Column 8 (Pixel : X 448)
-		{512, 640, 64, 64}    // Frame 9: Column 9 (Pixel : X 512)
+		{0, 640, 64, 64},	// Frame 1: Column 1 (Pixel : X 0)
+		{64, 640, 64, 64},	// Frame 2: Column 2 (Pixel : X 64)
+		{128, 640, 64, 64}, // Frame 3: Column 3 (Pixel : X 128)
+		{192, 640, 64, 64}, // Frame 4: Column 4 (Pixel : X 192)
+		{256, 640, 64, 64}, // Frame 5: Column 5 (Pixel : X 256)
+		{320, 640, 64, 64}, // Frame 6: Column 6 (Pixel : X 320)
+		{384, 640, 64, 64}, // Frame 7: Column 7 (Pixel : X 384)
+		{448, 640, 64, 64}, // Frame 8: Column 8 (Pixel : X 448)
+		{512, 640, 64, 64}	// Frame 9: Column 9 (Pixel : X 512)
 	};
 
 	// WALK RIGHT (Row 12, Pixel : Y = 11 x 64 = 704)
 	// Each frame is 64 x 64, so Pixel X = (Column - 1) x 64
 	static Rectangle walk_RIGHT[9] = {
-		{0, 704, 64, 64},     // Frame 1: Column 1 (Pixel : X 0)
-		{64, 704, 64, 64},    // Frame 2: Column 2 (Pixel : X 64)
-		{128, 704, 64, 64},   // Frame 3: Column 3 (Pixel : X 128)
-		{192, 704, 64, 64},   // Frame 4: Column 4 (Pixel : X 192)
-		{256, 704, 64, 64},   // Frame 5: Column 5 (Pixel : X 256)
-		{320, 704, 64, 64},   // Frame 6: Column 6 (Pixel : X 320)
-		{384, 704, 64, 64},   // Frame 7: Column 7 (Pixel : X 384)
-		{448, 704, 64, 64},   // Frame 8: Column 8 (Pixel : X 448)
-		{512, 704, 64, 64}    // Frame 9: Column 9 (Pixel : X 512)
+		{0, 704, 64, 64},	// Frame 1: Column 1 (Pixel : X 0)
+		{64, 704, 64, 64},	// Frame 2: Column 2 (Pixel : X 64)
+		{128, 704, 64, 64}, // Frame 3: Column 3 (Pixel : X 128)
+		{192, 704, 64, 64}, // Frame 4: Column 4 (Pixel : X 192)
+		{256, 704, 64, 64}, // Frame 5: Column 5 (Pixel : X 256)
+		{320, 704, 64, 64}, // Frame 6: Column 6 (Pixel : X 320)
+		{384, 704, 64, 64}, // Frame 7: Column 7 (Pixel : X 384)
+		{448, 704, 64, 64}, // Frame 8: Column 8 (Pixel : X 448)
+		{512, 704, 64, 64}	// Frame 9: Column 9 (Pixel : X 512)
 	};
 	switch (object->currentDirection)
 	{
@@ -329,8 +330,9 @@ void NPCEnterWalking(GameObject *object, float deltaTime)
 {
 	(void)deltaTime;
 	NPC *npc = (NPC *)object;
-	printf("%s -> ENTER -> Walking\n", object->name);
-	printf("Aggression: %f\n\n", npc->aggression);
+
+	TraceLog(LOG_INFO, "%s -> ENTER -> Walking", object->name);
+	TraceLog(LOG_INFO, "Aggression: %f", npc->aggression);
 
 	// Face the target and start walking
 	Vector2 direction = DirectionToTarget(npc);
@@ -403,8 +405,9 @@ void NPCExitWalking(GameObject *object, float deltaTime)
 {
 	(void)deltaTime;
 	NPC *npc = (NPC *)object;
-	printf("%s <- EXIT <- Walking\n", object->name);
-	printf("Aggression: %f\n\n", npc->aggression);
+
+	TraceLog(LOG_INFO, "%s <- EXIT <- Walking", object->name);
+	TraceLog(LOG_INFO, "Aggression: %f", npc->aggression);
 }
 
 /**
@@ -419,45 +422,45 @@ static void InitAttackAnimation(GameObject *object)
 	// ATTACK UP (Rows 47-49, Pixel : Y = 46 x 64 = 2944)
 	// Each frame is 192 x 192, so Pixel X = (Column - 1) x 192
 	static Rectangle sword_attack_UP[6] = {
-		{0, 2944, 192, 192},    // Frame 1: Column 1 (Pixel : X 0)
-		{192, 2944, 192, 192},  // Frame 2: Column 2 (Pixel : X 192)
-		{384, 2944, 192, 192},  // Frame 3: Column 3 (Pixel : X 384)
-		{576, 2944, 192, 192},  // Frame 4: Column 4 (Pixel : X 576)
-		{768, 2944, 192, 192},  // Frame 5: Column 5 (Pixel : X 768)
-		{960, 2944, 192, 192}   // Frame 6: Column 6 (Pixel : X 960)
+		{0, 2944, 192, 192},   // Frame 1: Column 1 (Pixel : X 0)
+		{192, 2944, 192, 192}, // Frame 2: Column 2 (Pixel : X 192)
+		{384, 2944, 192, 192}, // Frame 3: Column 3 (Pixel : X 384)
+		{576, 2944, 192, 192}, // Frame 4: Column 4 (Pixel : X 576)
+		{768, 2944, 192, 192}, // Frame 5: Column 5 (Pixel : X 768)
+		{960, 2944, 192, 192}  // Frame 6: Column 6 (Pixel : X 960)
 	};
 
 	// ATTACK LEFT (Rows 50-52, Pixel : Y = 49 x 64 = 3136)
 	// Each frame is 192 x 192, so Pixel X = (Column - 1) x 192
 	static Rectangle sword_attack_LEFT[6] = {
-		{0, 3136, 192, 192},    // Frame 1: Column 1 (Pixel : X 0)
-		{192, 3136, 192, 192},  // Frame 2: Column 2 (Pixel : X 192)
-		{384, 3136, 192, 192},  // Frame 3: Column 3 (Pixel : X 384)
-		{576, 3136, 192, 192},  // Frame 4: Column 4 (Pixel : X 576)
-		{768, 3136, 192, 192},  // Frame 5: Column 5 (Pixel : X 768)
-		{960, 3136, 192, 192}   // Frame 6: Column 6 (Pixel : X 960)
+		{0, 3136, 192, 192},   // Frame 1: Column 1 (Pixel : X 0)
+		{192, 3136, 192, 192}, // Frame 2: Column 2 (Pixel : X 192)
+		{384, 3136, 192, 192}, // Frame 3: Column 3 (Pixel : X 384)
+		{576, 3136, 192, 192}, // Frame 4: Column 4 (Pixel : X 576)
+		{768, 3136, 192, 192}, // Frame 5: Column 5 (Pixel : X 768)
+		{960, 3136, 192, 192}  // Frame 6: Column 6 (Pixel : X 960)
 	};
 
 	// ATTACK DOWN (Rows 53-55, Pixel : Y = 52 x 64 = 3328)
 	// Each frame is 192 x 192, so Pixel X = (Column - 1) x 192
 	static Rectangle sword_attack_DOWN[6] = {
-		{0, 3328, 192, 192},    // Frame 1: Column 1 (Pixel : X 0)
-		{192, 3328, 192, 192},  // Frame 2: Column 2 (Pixel : X 192)
-		{384, 3328, 192, 192},  // Frame 3: Column 3 (Pixel : X 384)
-		{576, 3328, 192, 192},  // Frame 4: Column 4 (Pixel : X 576)
-		{768, 3328, 192, 192},  // Frame 5: Column 5 (Pixel : X 768)
-		{960, 3328, 192, 192}   // Frame 6: Column 6 (Pixel : X 960)
+		{0, 3328, 192, 192},   // Frame 1: Column 1 (Pixel : X 0)
+		{192, 3328, 192, 192}, // Frame 2: Column 2 (Pixel : X 192)
+		{384, 3328, 192, 192}, // Frame 3: Column 3 (Pixel : X 384)
+		{576, 3328, 192, 192}, // Frame 4: Column 4 (Pixel : X 576)
+		{768, 3328, 192, 192}, // Frame 5: Column 5 (Pixel : X 768)
+		{960, 3328, 192, 192}  // Frame 6: Column 6 (Pixel : X 960)
 	};
 
 	// ATTACK RIGHT (Rows 56-58, Pixel : Y = 55 x 64 = 3520)
 	// Each frame is 192 x 192, so Pixel X = (Column - 1) x 192
 	static Rectangle sword_attack_RIGHT[6] = {
-		{0, 3520, 192, 192},    // Frame 1: Column 1 (Pixel : X 0)
-		{192, 3520, 192, 192},  // Frame 2: Column 2 (Pixel : X 192)
-		{384, 3520, 192, 192},  // Frame 3: Column 3 (Pixel : X 384)
-		{576, 3520, 192, 192},  // Frame 4: Column 4 (Pixel : X 576)
-		{768, 3520, 192, 192},  // Frame 5: Column 5 (Pixel : X 768)
-		{960, 3520, 192, 192}   // Frame 6: Column 6 (Pixel : X 960)
+		{0, 3520, 192, 192},   // Frame 1: Column 1 (Pixel : X 0)
+		{192, 3520, 192, 192}, // Frame 2: Column 2 (Pixel : X 192)
+		{384, 3520, 192, 192}, // Frame 3: Column 3 (Pixel : X 384)
+		{576, 3520, 192, 192}, // Frame 4: Column 4 (Pixel : X 576)
+		{768, 3520, 192, 192}, // Frame 5: Column 5 (Pixel : X 768)
+		{960, 3520, 192, 192}  // Frame 6: Column 6 (Pixel : X 960)
 	};
 
 	switch (object->currentDirection)
@@ -480,11 +483,16 @@ static void InitAttackAnimation(GameObject *object)
 // Enter function for Attacking state, executed once upon entering Attacking
 void NPCEnterAttacking(GameObject *object, float deltaTime)
 {
+	// Initialization code for entering Attacking state, such as setting up attack animations.
+
 	(void)deltaTime;
 	NPC *npc = (NPC *)object;
-	printf("%s -> ENTER -> Attacking\n", object->name);
-	printf("Aggression: %f\n\n", npc->aggression);
-	// Initialization code for entering Attacking state, such as setting up attack animations.
+
+	// Entry runs once per swipe, so this is the place for the swoosh
+	PlayActionSound(SOUND_SWIPE);
+
+	TraceLog(LOG_INFO, "%s -> ENTER -> Attacking", object->name);
+	TraceLog(LOG_INFO, "Aggression: %f", npc->aggression);
 
 	// A fresh swipe hasn't landed yet (see AttackHit in collision.c)
 	object->attackHit = false;
@@ -494,9 +502,6 @@ void NPCEnterAttacking(GameObject *object, float deltaTime)
 	if (Vector2Length(direction) > 0.0f)
 		object->currentDirection = DirectionAxis(direction);
 	InitAttackAnimation(object);
-
-	// Entry runs once per swipe, so this is the place for the swoosh
-	PlayActionSound(SOUND_SWIPE);
 }
 
 // Update function for Attacking state, called repeatedly during game ticks while in Attacking
@@ -518,11 +523,12 @@ void NPCUpdateAttacking(GameObject *object, float deltaTime)
 // Exit function for Attacking state, executed once upon leaving Attacking
 void NPCExitAttacking(GameObject *object, float deltaTime)
 {
+	// Cleanup code for leaving Attacking state, such as resetting attack cooldown.
 	(void)deltaTime;
 	NPC *npc = (NPC *)object;
-	printf("%s <- EXIT <- Attacking\n", object->name);
-	printf("Aggression: %f\n\n", npc->aggression);
-	// Cleanup code for leaving Attacking state, such as resetting attack cooldown.
+
+	TraceLog(LOG_INFO, "%s <- EXIT <- Attacking", object->name);
+	TraceLog(LOG_INFO, "Aggression: %f", npc->aggression);
 }
 
 // Enter function for Shielding state, executed once upon entering Shielding
@@ -530,64 +536,67 @@ void NPCEnterShielding(GameObject *object, float deltaTime)
 {
 	(void)deltaTime;
 	NPC *npc = (NPC *)object;
-	printf("%s -> ENTER -> Shielding\n", object->name);
-	printf("Aggression: %f\n\n", npc->aggression);
+	TraceLog(LOG_INFO, "%s -> ENTER -> Shielding", object->name);
+	TraceLog(LOG_INFO, "Aggression: %f", npc->aggression);
 	// Initialization code for entering Shielding state, such as enabling shield effects.
 
 	// SHIELDING (Row 7, Pixel : Y = 6 x 64 = 384)
 	// Each frame is 64 x 64, so Pixel X = (Column - 1) x 64
+	// Initialize shielding animation
+
 	Rectangle sheilding[8] = {
-		{0, 384, 64, 64},     // Frame 1: Column 1 (Pixel : X 0)
-		{64, 384, 64, 64},    // Frame 2: Column 2 (Pixel : X 64)
-		{128, 384, 64, 64},   // Frame 3: Column 3 (Pixel : X 128)
-		{192, 384, 64, 64},   // Frame 4: Column 4 (Pixel : X 192)
-		{256, 384, 64, 64},   // Frame 5: Column 5 (Pixel : X 256)
-		{320, 384, 64, 64},   // Frame 6: Column 6 (Pixel : X 320)
-		{384, 384, 64, 64},   // Frame 7: Column 7 (Pixel : X 384)
-		{448, 384, 64, 64}    // Frame 8: Column 8 (Pixel : X 448)
+		{0, 384, 64, 64},	// Frame 1: Column 1 (Pixel : X 0)
+		{64, 384, 64, 64},	// Frame 2: Column 2 (Pixel : X 64)
+		{128, 384, 64, 64}, // Frame 3: Column 3 (Pixel : X 128)
+		{192, 384, 64, 64}, // Frame 4: Column 4 (Pixel : X 192)
+		{256, 384, 64, 64}, // Frame 5: Column 5 (Pixel : X 256)
+		{320, 384, 64, 64}, // Frame 6: Column 6 (Pixel : X 320)
+		{384, 384, 64, 64}, // Frame 7: Column 7 (Pixel : X 384)
+		{448, 384, 64, 64}	// Frame 8: Column 8 (Pixel : X 448)
 	};
 
-	// Initialize shielding animation
 	InitGameObjectAnimation(&npc->base, sheilding, 8, 0.08f);
 }
 
 // Update function for Shielding state, called repeatedly during game ticks while in Shielding
 void NPCUpdateShielding(GameObject *object, float deltaTime)
 {
-	(void)deltaTime;
 	// During game loop and game ticks, execute Shielding state behavior here, such as reducing incoming damage.
+	(void)deltaTime;
 	UpdateAnimation(&object->animation, deltaTime);
 }
 
 // Exit function for Shielding state, executed once upon leaving Shielding
 void NPCExitShielding(GameObject *object, float deltaTime)
 {
+	// Cleanup code for leaving Shielding state, if any.
 	(void)deltaTime;
 	NPC *npc = (NPC *)object;
-	printf("%s -> EXIT -> Shielding\n", object->name);
-	printf("Aggression: %f\n\n", npc->aggression);
-	// Cleanup code for leaving Shielding state, if any.
+	TraceLog(LOG_INFO, "%s <- EXIT <- Shielding", object->name);
+	TraceLog(LOG_INFO, "Aggression: %f", npc->aggression);
 }
 
 // Enter function for Dead state, executed once upon entering Dead
 void NPCEnterDead(GameObject *object, float deltaTime)
 {
+	// Initialization code for entering Dead state, such as playing death animation or disabling further actions.
 	(void)deltaTime;
 	NPC *npc = (NPC *)object;
-	printf("%s -> ENTER -> Dead\n", object->name);
-	printf("Aggression: %f\n\n", npc->aggression);
-	// Initialization code for entering Dead state, such as playing death animation or disabling further actions.
+	TraceLog(LOG_INFO, "%s -> ENTER -> Dead", object->name);
+	TraceLog(LOG_INFO, "Aggression: %f", npc->aggression);
+
 	// DEAD (Row 21, Pixel : Y = 20 x 64 = 1280)
 	// Each frame is 64 x 64, so Pixel X = (Column - 1) x 64
-	Rectangle dead[6] = {
-		{0, 1280, 64, 64},    // Frame 1: Column 1 (Pixel : X 0)
-		{64, 1280, 64, 64},   // Frame 2: Column 2 (Pixel : X 64)
-		{128, 1280, 64, 64},  // Frame 3: Column 3 (Pixel : X 128)
-		{192, 1280, 64, 64},  // Frame 4: Column 4 (Pixel : X 192)
-		{256, 1280, 64, 64},  // Frame 5: Column 5 (Pixel : X 256)
-		{320, 1280, 64, 64}   // Frame 6: Column 6 (Pixel : X 320)
-	};
 	// Initialize dead animation
+	Rectangle dead[6] = {
+		{0, 1280, 64, 64},	 // Frame 1: Column 1 (Pixel : X 0)
+		{64, 1280, 64, 64},	 // Frame 2: Column 2 (Pixel : X 64)
+		{128, 1280, 64, 64}, // Frame 3: Column 3 (Pixel : X 128)
+		{192, 1280, 64, 64}, // Frame 4: Column 4 (Pixel : X 192)
+		{256, 1280, 64, 64}, // Frame 5: Column 5 (Pixel : X 256)
+		{320, 1280, 64, 64}	 // Frame 6: Column 6 (Pixel : X 320)
+	};
+
 	InitGameObjectAnimation(&npc->base, dead, 6, 0.2f);
 }
 
@@ -602,9 +611,10 @@ void NPCUpdateDead(GameObject *object, float deltaTime)
 // Exit function for Dead state, executed once upon leaving Dead
 void NPCExitDead(GameObject *object, float deltaTime)
 {
+	// Cleanup code for leaving Dead state, such as removing NPC from the active world, playing respawn animations, etc.
 	(void)deltaTime;
 	NPC *npc = (NPC *)object;
-	printf("%s -> EXIT -> Dead\n", object->name);
-	printf("Aggression: %f\n\n", npc->aggression);
-	// Cleanup code for leaving Dead state, such as removing NPC from the active world, playing respawn animations, etc.
+
+	TraceLog(LOG_INFO, "%s <- EXIT <- Dead", object->name);
+	TraceLog(LOG_INFO, "Aggression: %f", npc->aggression);
 }
