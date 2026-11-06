@@ -139,7 +139,7 @@ void GetCommandBits(Command command, char *buffer)
  * @size:    The size of the buffer to avoid overflow.
  */
 
-void GetCommandName(Command command, char *buffer, int size)
+void GetCommandNames(Command command, char *buffer, int size)
 {
 	int used = snprintf(buffer, size, "%s", command == NONE ? "NONE" : "");
 

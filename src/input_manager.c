@@ -113,7 +113,7 @@ Command PollInput()
 		char bits[COMMAND_COUNT + 1]; // COMMAND_COUNT bits + null
 		char commandNames[COMMAND_NAMES_SIZE];
 		GetCommandBits(command, bits);
-		GetCommandName(command, commandNames, sizeof(commandNames));
+		GetCommandNames(command, commandNames, sizeof(commandNames));
 		TraceLog(LOG_DEBUG, "[Input] %s  %s", bits, commandNames);
 		previousCommand = command;
 	}

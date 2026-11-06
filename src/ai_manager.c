@@ -73,8 +73,10 @@ Command PollAI()
 
 	// Log each new decision (once a second, not every frame)
 	char bits[COMMAND_COUNT + 1];
+	char names[COMMAND_NAMES_SIZE];
 	GetCommandBits(command, bits);
-	TraceLog(LOG_INFO, "AI Command Bits: %s (%d)", bits, command);
+	GetCommandNames(command, names, sizeof(names));
+	TraceLog(LOG_DEBUG, "[AI] %s  %s", bits, names);
 
 	return command;
 }
