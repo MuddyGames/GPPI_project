@@ -31,9 +31,9 @@ bool CheckCollision(GameObject *lhs, GameObject *rhs)
  *
  * Calculates the collision manifold and shoves the lhs object out of
  * the rhs object so they're not sitting on top each other like two
- * lads sharing the same seat at the overcrowed Carlow train station.
+ * lads sharing the same seat on an overcrowed bus to Carlow.
  *
- * Colours are changed to show "hey, something lad hit me".
+ * Colours are changed to show "Something lad hit me!".
  */
 
 void HandleCollision(GameObject *lhs, GameObject *rhs)
@@ -68,7 +68,8 @@ void HandleCollision(GameObject *lhs, GameObject *rhs)
  * Bumping into each other doesn't hurt anymore .... the damage is dealt by
  * the sword, on the frame the blade lands (see AttackHit below).
  * The FSMs hear about the bump through EVENT_COLLISION_START, which is what
- * starts the NPC swinging. Add a wee tap here if you want bumps to hurt too.
+ * starts the NPC swinging. Add a wee tap here if you want bumps to hurt also, like getting a shoulder in a Hurling match.
+ * https://youtube.com/shorts/kRj12nW9-8c?si=0icIFwQSpqeUe4IC
  */
 
 void CollisionEntry(GameObject *lhs, GameObject *rhs)

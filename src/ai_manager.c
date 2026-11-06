@@ -28,9 +28,11 @@ void InitAIManager()
  *
  * This fella doesn't think too hard...he just picks a command at random
  * like someone closing their eyes and throwing darts at a pub wall.
+ * https://youtube.com/shorts/SYHlY0ggKlI?si=EdQH3sSAkor4i8Sc
  *
  * Handy for testing or for NPCs that aren't exactly the sharpest tools
  * in the shed (yet).
+ * https://youtube.com/shorts/3rPsJ1oUUsk?si=TWhdfESVxuqKAeNb
  *
  * It only makes up its mind once a second, then holds that command,
  * like a player holding a key down. Otherwise it would change its mind
