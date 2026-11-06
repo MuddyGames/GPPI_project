@@ -124,7 +124,7 @@ void InitGame(GameData *data)
 	// Initialise Game
 	data->gsm = STATE_PLAY;
 
-	TraceLog(LOG_INFO, "Game Initialised!");
+	TraceLog(LOG_INFO, "Game Initialising ...");
 
 	// Initialize the player and NPC with their respective names
 	// Setup position
@@ -150,6 +150,8 @@ void InitGame(GameData *data)
 	// Initialise Input Managers
 	InitInputManager();
 	InitAIManager();
+
+	TraceLog(LOG_INFO, "Game Initialised!");
 }
 
 /**

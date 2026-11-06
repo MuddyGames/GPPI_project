@@ -23,6 +23,11 @@ void GameLoop(GameData *data);
 
 int main(void)
 {
+	// Set the log level to debug for detailed output
+	// To turn off logging, you can set it to LOG_NONE
+	// Debug levels are: LOG_DEBUG, LOG_INFO, LOG_WARNING, LOG_ERROR, LOG_FATAL
+	SetTraceLogLevel(LOG_DEBUG);
+
 	// Init raylib window
 	InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Raylib Command Pattern with Animated FSM Starter Kit GPP I");
 
