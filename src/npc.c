@@ -1,6 +1,7 @@
 #include "gameobjects/npc.h"
 #include "utils/utils.h"
 #include "utils/audio_manager.h"
+#include "utils/mediator.h"
 
 /*
  * Sprite sheet layout (resources/npc_sprite_sheet.png)
@@ -483,9 +484,6 @@ void NPCEnterAttacking(GameObject *object, float deltaTime)
 	(void)deltaTime;
 	NPC *npc = (NPC *)object;
 
-	// Entry runs once per swipe, so this is the place for the swoosh
-	PlayActionSound(SOUND_SWIPE);
-
 
 	// A fresh swipe hasn't landed yet (see AttackHit in collision.c)
 	object->attackHit = false;
@@ -495,6 +493,9 @@ void NPCEnterAttacking(GameObject *object, float deltaTime)
 	if (Vector2Length(direction) > 0.0f)
 		object->currentDirection = DirectionAxis(direction);
 	InitAttackAnimation(object);
+
+	// Entry runs once per swipe, so this is the place for the swoosh
+	MediatorNotify(object->mediator, GAME_EVENT_SWIPE, object, NULL);
 }
 
 // Update function for Attacking state, called repeatedly during game ticks while in Attacking

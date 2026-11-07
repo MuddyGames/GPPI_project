@@ -15,8 +15,8 @@
 typedef struct Mediator
 {
 	GameObject *player; // The player (the HUD shows what this one is doing)
-	GameObject *npc;    // The NPC
-	Hud *hud;           // The HUD
+	GameObject *npc;	// The NPC
+	Hud *hud;			// The HUD
 } Mediator;
 
 // ---------------------------------------------------------------------------
@@ -31,11 +31,13 @@ typedef struct Mediator
 // ---------------------------------------------------------------------------
 typedef enum
 {
-	GAME_EVENT_SWIPE,     // A sword swipe started          (source swung)
-	GAME_EVENT_HIT,       // A sword swipe landed           (source hit target)
-	GAME_EVENT_BLOCK,     // A shield stopped a sword       (target blocked source)
-	GAME_EVENT_GAME_OVER, // Someone has won                (source is the winner)
-	GAME_EVENT_COUNT      // Total number of game events (for counting purposes)
+	GAME_EVENT_LEVEL_START, // Level has started, so reset the HUD and audio (source is NULL)
+	GAME_EVENT_SWIPE,		// A sword swipe started          (source swung)
+	GAME_EVENT_HIT,			// A sword swipe landed           (source hit target)
+	GAME_EVENT_BLOCK,		// A shield stopped a sword       (target blocked source)
+	GAME_EVENT_MISS,		// A sword swipe missed           (source swung, target dodged)
+	GAME_EVENT_GAME_OVER,	// Someone has won                (source is the winner)
+	GAME_EVENT_COUNT		// Total number of game events (for counting purposes)
 } GameEvent;
 
 // Create the game's mediator
@@ -44,8 +46,8 @@ Mediator *CreateMediator(GameObject *player, GameObject *npc, Hud *hud);
 // A command for an object (from the input or the AI): passes it on to the object,
 // and tells the HUD if it's the player's
 // Ideally we would just have Notify() and the object would handle it, but the HUD is a special case: it shows the player's stuff (commands)
-// If you want to be pure and use the pattern properly then a Notify that takes the arguments (object, command, deltaTime) and 
-// then calls ExecuteCommand() on the object and UpdateHud() on the HUD would be more correct. 
+// If you want to be pure and use the pattern properly then a Notify that takes the arguments (object, command, deltaTime) and
+// then calls ExecuteCommand() on the object and UpdateHud() on the HUD would be more correct.
 // But this is a simple game and we can get away with this.
 void MediatorReceiveCommand(Mediator *mediator, GameObject *object, Command command, float deltaTime);
 

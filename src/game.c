@@ -151,6 +151,8 @@ void InitGame(GameData *data)
 	InitAIManager();
 
 	TraceLog(LOG_INFO, "[Game] Initialised");
+
+	MediatorNotify(data->mediator, GAME_EVENT_LEVEL_START, NULL, NULL);
 }
 
 /**
@@ -241,20 +243,25 @@ void UpdateGame(GameData *data, float deltaTime)
 		if (data->player->base.health <= 0 || data->npc->base.health <= 0)
 		{
 			data->gsm = STATE_GAMEOVER;
-			PlayActionSound(SOUND_GAMEOVER);
+			//PlayActionSound(SOUND_GAMEOVER);
+
+			MediatorNotify(data->mediator, GAME_EVENT_GAME_OVER, (data->player->base.health <= 0) ? &data->npc->base : &data->player->base, NULL);
 
 			// Print the result once, when the game ends (not every frame after)
 			// Did the player lose
 			if (data->player->base.health <= 0)
 			{
 				TraceLog(LOG_INFO, "[Game] over: [%s] won", data->npc->base.name);
-				HudGameOver(&data->hud, data->npc->base.name); // the player lost
+				// Villian Won and Player Lost
+				MediatorNotify(data->mediator, GAME_EVENT_GAME_OVER, &data->npc->base, NULL);
 			}
-			else
+			// Did the NPC lose
+			else if (data->npc->base.health <= 0)
 			{
 				// NPC Lost
 				TraceLog(LOG_INFO, "[Game] Congratulations [%s] defeated [%s]", data->player->base.name, data->npc->base.name);
-				HudGameOver(&data->hud, data->player->base.name); // the player won
+				// Player Won and Villian Lost
+				MediatorNotify(data->mediator, GAME_EVENT_GAME_OVER, &data->player->base, NULL);
 			}
 		}
 	}

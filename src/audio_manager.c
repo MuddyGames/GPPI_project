@@ -7,14 +7,15 @@ static Sound sounds[SOUND_COUNT];
 
 // Where each sound lives (in resources/, so the web build packages them too)
 static const char *soundFiles[SOUND_COUNT] = {
-	"resources/sounds/swipe.wav",	// SOUND_SWIPE
-	"resources/sounds/hit.wav",		// SOUND_HIT
-	"resources/sounds/block.wav",	// SOUND_BLOCK
-	"resources/sounds/gameover.wav" // SOUND_GAMEOVER
+	"resources/sounds/levelstart.wav", // SOUND_LEVEL_START
+	"resources/sounds/swipe.wav",	   // SOUND_SWIPE
+	"resources/sounds/hit.wav",		   // SOUND_HIT
+	"resources/sounds/block.wav",	   // SOUND_BLOCK
+	"resources/sounds/gameover.wav"	   // SOUND_GAMEOVER
 };
 
 /**
- * InitAudioManager - Tunes up the band before the session starts.
+ * InitAudioManager : Tunes up the band before the session starts.
  *
  * Opens the audio device and loads every sound in soundFiles. Called once
  * from main.c after InitWindow(), not from InitGame(): a restart reuses the
@@ -36,7 +37,7 @@ void InitAudioManager()
 }
 
 /**
- * PlayActionSound - Plays one of the action sounds.
+ * PlayActionSound : Plays one of the action sounds.
  *
  * The game objects only say what happened (SOUND_SWIPE, SOUND_HIT...),
  * not which file to play or how. Swap the .wav files in resources/sounds/
@@ -59,7 +60,7 @@ void PlayActionSound(ActionSound sound)
 }
 
 /**
- * DeleteAudioManager - Packs up the band at closing time.
+ * DeleteAudioManager : Packs up the band at closing time.
  *
  * Unloads every sound, then closes the audio device. Called once from
  * main.c, before CloseWindow().

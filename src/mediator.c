@@ -35,6 +35,11 @@ Mediator *CreateMediator(GameObject *player, GameObject *npc, Hud *hud)
 	mediator->player = player;
 	mediator->npc = npc;
 	mediator->hud = hud;
+
+	// Let the Player and NPC know who to report to
+	player->mediator = mediator;
+	npc->mediator = mediator;
+
 	return mediator;
 }
 
@@ -115,6 +120,11 @@ void MediatorNotify(Mediator *mediator, GameEvent event, GameObject *source, Gam
 
 	switch (event)
 	{
+	case GAME_EVENT_LEVEL_START:
+		// Today: game.c resets the HUD and audio when the level starts.
+		// With the mediator, game.c just reports it:
+		PlayActionSound(SOUND_LEVEL_START); // Level Starts
+		break;
 	case GAME_EVENT_SWIPE:
 		// Today: player.c and npc.c each call PlayActionSound(SOUND_SWIPE) when the
 		// swipe starts. Report it instead, and play the sound here:
@@ -122,6 +132,7 @@ void MediatorNotify(Mediator *mediator, GameEvent event, GameObject *source, Gam
 		//     PlayActionSound(SOUND_SWIPE);
 		//
 		// Later: a whoosh trail behind the sword, a stamina cost on the HUD ...
+		PlayActionSound(SOUND_SWIPE);
 		break;
 
 	case GAME_EVENT_HIT:
@@ -154,8 +165,8 @@ void MediatorNotify(Mediator *mediator, GameEvent event, GameObject *source, Gam
 		//
 		// and in here:
 		//
-		//     PlayActionSound(SOUND_GAMEOVER);
-		//     HudGameOver(mediator->hud, source->name);
+		PlayActionSound(SOUND_GAMEOVER);
+		HudGameOver(mediator->hud, source->name);
 		break;
 
 	default:

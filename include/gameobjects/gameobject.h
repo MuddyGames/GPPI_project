@@ -15,6 +15,10 @@
 #include "fsm/fsm.h"
 #include "animation/animation.h"
 
+// Forward declaration: Mediator
+// No #include "utils/mediator.h" here
+typedef struct Mediator Mediator;
+
 // GameObjects Direction
 // This is used to set the animation directions
 typedef enum Direction
@@ -29,6 +33,9 @@ typedef enum Direction
 // (typedef GameObject is already declared in fsm.h, so only the struct is defined here)
 struct GameObject
 {
+	// Mediator
+	Mediator *mediator; // Pointer to the mediator for communication with other game objects and systems
+
 	const char *name; // The name of the game object (e.g., "Player", "Enemy")
 
 	// Positions and Transforms
@@ -55,8 +62,7 @@ struct GameObject
 	// Gameplay Components
 	int health;		// The health of the game object
 	bool attackHit; // Has the current sword swipe already landed (one hit per swipe)
-	float timer; // Can be used during updates
-
+	float timer;	// Can be used during updates
 };
 
 // Initialize a new game object with the given name and default values

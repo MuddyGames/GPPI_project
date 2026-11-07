@@ -1,6 +1,7 @@
 #include "gameobjects/player.h"
 #include "utils/utils.h"
 #include "utils/audio_manager.h"
+#include "utils/mediator.h"
 
 /*
  * Sprite sheet layout (resources/player_sprite_sheet.png)
@@ -569,7 +570,7 @@ void PlayerEnterAttacking(GameObject *object, float deltaTime)
 	InitAttackAnimation(object);
 
 	// Entry runs once per swipe, so this is the place for the swoosh
-	PlayActionSound(SOUND_SWIPE);
+	MediatorNotify(object->mediator, GAME_EVENT_SWIPE, object, NULL);
 }
 
 void PlayerUpdateAttacking(GameObject *object, float deltaTime)
