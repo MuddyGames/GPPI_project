@@ -154,23 +154,51 @@ static void UpdateCombat(GameData *data)
 	AttackHit(&data->npc->base, &data->player->base);
 }
 
+// Out of health, but not lying down yet? Send EVENT_DIE: the Dead state plays the fall
+static void KnockOut(GameObject *object, float deltaTime)
+{
+	if (object->health <= 0 && object->currentState != STATE_DEAD)
+		HandleEvent(object, EVENT_DIE, deltaTime);
+}
+
+// Has this fighter finished falling over? (Dead, and its death animation played out)
+static bool HasFallen(const GameObject *object)
+{
+	return object->currentState == STATE_DEAD && object->animation.finished;
+}
+
 /**
  * CheckGameOver : Is anyone out of health?
  *
- * Whoever's still standing wins. Both down on the same frame (they can hit
- * each other at once) is a draw, and the winner is NULL.
+ * Two steps, so the death animation gets to play:
+ *   1. Out of health? EVENT_DIE, and the Dead state plays the fall.
+ *      The game carries on meanwhile (the winner can still walk about).
+ *   2. Once every fighter who's down has finished falling: game over.
+ *
+ * Whoever's still standing wins. Both down at once (they can hit each other
+ * on the same frame) is a draw, and the winner is NULL.
  *
  * Reports it to the mediator once: the mediator logs it, plays the sound and
  * tells the HUD. game.c just says what happened.
  */
 
-static void CheckGameOver(GameData *data)
+static void CheckGameOver(GameData *data, float deltaTime)
 {
 	GameObject *player = &data->player->base;
 	GameObject *npc = &data->npc->base;
 
+	// 1. Down? Fall over (does nothing for anyone still standing, or already Dead)
+	KnockOut(player, deltaTime);
+	KnockOut(npc, deltaTime);
+
 	// Both still standing: on we go
 	if (player->health > 0 && npc->health > 0)
+		return;
+
+	// 2. Wait until everyone who's down has finished falling over
+	if (player->health <= 0 && !HasFallen(player))
+		return;
+	if (npc->health <= 0 && !HasFallen(npc))
 		return;
 
 	data->gsm = STATE_GAMEOVER;
@@ -204,7 +232,7 @@ void UpdateGame(GameData *data, float deltaTime)
 		UpdateNPC(data, deltaTime);		   // AI -> mediator -> FSM, chase the player
 		UpdateCollisions(data, deltaTime); // enter / ongoing / exit
 		UpdateCombat(data);				   // sword hits land on the hit frame
-		CheckGameOver(data);			   // anyone out of health?
+		CheckGameOver(data, deltaTime);	   // anyone down? fall over, then game over
 		break;
 
 	case STATE_GAMEOVER:

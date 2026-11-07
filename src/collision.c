@@ -116,6 +116,10 @@ void AttackHit(GameObject *attacker, GameObject *target)
 	if (attacker->currentState != STATE_ATTACKING || attacker->attackHit)
 		return;
 
+	// No hitting someone who's already down
+	if (target->currentState == STATE_DEAD)
+		return;
+
 	// Wait for the blade to come round
 	if (attacker->animation.currentFrame < ATTACK_HIT_FRAME)
 		return;

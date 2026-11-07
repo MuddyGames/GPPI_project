@@ -367,23 +367,29 @@ void PlayerExitShielding(GameObject *object, float deltaTime)
 }
 
 // ==========================================================================
-// DEAD (yours to finish: see the tasks)
+// DEAD (the fall is done; respawn is yours: see the tasks)
 // ==========================================================================
 
 void PlayerEnterDead(GameObject *object, float deltaTime)
 {
-	// TODO : Not Currently Implemented
 	(void)deltaTime;
 
-	// Complete the remainder of the method
+	// DEAD (Row 21, 6 frames): plays ONCE, then stays on the last frame, lying down
+	Rectangle dead[6];
+	SpriteRow(dead, 21, 6, SPRITE_CELL);
+	InitGameObjectAnimationOnce(object, dead, 6, 0.2f);
 }
 
 void PlayerUpdateDead(GameObject *object, float deltaTime)
 {
-	(void)deltaTime;
-	ChangeState(object, STATE_RESPAWN, deltaTime);
-	// Complete the remainder of the method
+	// The fall plays once, then stays on its last frame (animation.finished).
+	// game.c waits for that before game over.
 	UpdateAnimation(&object->animation, deltaTime);
+
+	// Respawn is yours to add (see the tasks): for example, when the fall has
+	// finished and there are lives left, give back some health and
+	//     HandleEvent(object, EVENT_RESPAWN, deltaTime);
+	// The Dead state's table already sends EVENT_RESPAWN to STATE_RESPAWN.
 }
 
 void PlayerExitDead(GameObject *object, float deltaTime)
