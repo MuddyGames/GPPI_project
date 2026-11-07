@@ -24,6 +24,9 @@ NPC *InitNPC(const char *name, Vector2 position, int radius);
 // Cleanup NPC
 void DeleteNPC(GameObject *object);
 
+// Aggression builds while chasing or attacking, and cools off otherwise
+void UpdateNPCAggression(NPC *npc, float deltaTime);
+
 // Initialise NPC-specific states for the given GameObject
 void InitNPCFSM(GameObject *object);
 
