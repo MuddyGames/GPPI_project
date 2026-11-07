@@ -9,6 +9,9 @@ void InitInputManager();
 // Poll Input
 Command PollInput();
 
+// Restart pressed? (R, or Start on a gamepad) Only used at game over
+bool PollRestart();
+
 // Cleanup
 void DeleteInputManager();
 
