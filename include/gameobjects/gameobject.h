@@ -40,7 +40,7 @@ struct GameObject
 
 	// Positions and Transforms
 	Vector2 position;			 // Gameobjects position in the game world
-	Vector2 inputAxis;			 // Input Axis (WASD / Arrow Keys / D-Pad and Tumbstick)
+	Vector2 inputAxis;			 // Input Axis (WASD / Arrow Keys / D-Pad and Thumbstick)
 	Direction currentDirection;	 // Used to face animations in correct direction
 	Direction previousDirection; // Used to face animations in correct direction
 
