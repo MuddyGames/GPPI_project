@@ -12,12 +12,12 @@
 // It knows about everyone: Player, NPC,  HUD (and audio).
 // Player, NPC,  HUD (and audio) don't know about each other: anything that needs passing between
 // them goes through here.
-typedef struct Mediator
+struct Mediator
 {
 	GameObject *player; // The player (the HUD shows what this one is doing)
 	GameObject *npc;	// The NPC
 	Hud *hud;			// The HUD
-} Mediator;
+};
 
 // ---------------------------------------------------------------------------
 // Game events: news for the rest of the game

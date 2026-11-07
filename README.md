@@ -7,11 +7,12 @@ It's designed for learning core game development patterns: event handling, state
 _StarterKit_ provides:
 
 - A Finite State Machine (FSM) for player and NPC behaviour, driven by transition tables
-- The Command pattern for input, passed on by a Mediator
+- The Command pattern for input, for the player and the AI alike
+- One Mediator that passes commands on, and tells the HUD and audio what happened in the game
 - Sprite-sheet animations, set up when each state starts
 - Circle-based collision detection, with collision events sent to the FSM
-- Sword damage on the frame the blade lands, and shield blocking
-- A HUD, action sounds, and a new background every game
+- Sword damage on the frame the blade lands, recovery after every swipe, and shield blocking
+- A HUD with a game-over banner, action sounds, a backing track, and a new background every game
 
 > The project was generated with [raylib project creator](https://raysan5.itch.io/raylib-project-creator) by raysan5.
 
@@ -138,7 +139,7 @@ A window opens on a field of grass (a new one every game), with the **Player Her
 |---|---|
 | Arrow keys, D-pad or left thumbstick | Walk |
 | S, Z, J or SPACE, or the right trigger | Sword swipe (hold for one swipe after another) |
-| R | Restart, after game over |
+| R, or Start on a gamepad | Restart, after game over |
 | ESC | Quit |
 
 Movement is on the arrow keys only, so the letters are free for actions. There are three sets of action keys, and they all work at once:
@@ -151,9 +152,9 @@ Movement is on the arrow keys only, so the letters are free for actions. There a
 
 Only the sword keys do something so far (plus SPACE, for now). Shield and Mega Blast are yours to add (see Task 1). Z/X/C sits next to the arrow keys for the other hand, which is how most players will find it comfortable.
 
-The HUD in the top left shows the command bits and the player's current state. Keep the terminal where you can see it too: every state change and every hit is printed there.
+The HUD in the top left shows the frame rate, the command bits, the player's current state and the active commands. At game over, a banner in the middle says who won. Keep the terminal where you can see it too: every state change and every hit is printed there (see [Running the game and filtering the log](#running-the-game-and-filtering-the-log)).
 
-> No sound? Some lab machines and WSL have no audio device. The game still runs, just quietly; raylib says so in the terminal.
+> No sound? Some lab machines and WSL have no audio device. The game still runs, just quietly; raylib says so once, in the terminal, when the game starts.
 
 ### In your browser
 
@@ -172,7 +173,7 @@ Press **Ctrl+C** in the terminal to stop the server.
 | `make run_web` | Builds it and opens it in your browser |
 | `make stop_web` | Stops a web server left running from earlier |
 
-Everything in `resources/` (sprite sheets and sounds) is packaged into the web build automatically. Browsers stay silent until you've pressed a key, so the first sound may not play. That's normal.
+Everything in `resources/` (sprite sheets, sounds and music) is packaged into the web build automatically. Browsers stay silent until you've pressed a key, so the first sound may not play. That's normal.
 
 ### In VS Code
 
@@ -192,41 +193,46 @@ Set a breakpoint in `AttackHit()` in `collision.c` and swing at The Villan. Step
 GPPI_project/
 ├── Makefile                build instructions
 ├── art/
-│   └── production/         grid versions of the sprite sheets, for working out frames (not distributed in web build to reduce .data file size)
+│   └── production/         grid versions of the sprite sheets, for working out frames
+│                           (kept out of resources/, so they're not in the web build)
 ├── src/
 │   ├── main.c              opens the window and the audio, runs the game loop
-│   ├── game.c              sets up, updates and draws the game; background; game over
+│   ├── game.c              the game's flow: InitGame, UpdateGame (and its helpers), DrawGame
+│   ├── background.c        paints a new field of grass every game (Perlin noise)
 │   ├── fsm.c               the state machine: HandleEvent, ChangeState, UpdateState
-│   ├── gameobject.c        what the player and NPC have in common
-│   ├── player.c            the player's states, transition tables and animations
-│   ├── npc.c               the NPC's states, transition tables and animations
+│   ├── gameobject.c        what the player and NPC have in common, and DrawGameObject
+│   ├── player.c            the player's states and transition tables
+│   ├── npc.c               the NPC's states, transition tables and aggression
+│   ├── sprites.c           where each animation is on the sprite sheet (SpriteRow)
 │   ├── animation.c         plays frames from a sprite sheet
-│   ├── input_manager.c     turns key, mouse and button presses into commands
+│   ├── input_manager.c     turns key and button presses into commands; PollRestart
 │   ├── ai_manager.c        makes up commands for the NPC, once a second
-│   ├── mediator.c          passes each command to a game object and the HUD
+│   ├── mediator.c          passes commands on, and tells the HUD and audio what happened
 │   ├── command.c           ExecuteCommand(): turns command bits into FSM events
-│   ├── hud.c               shows the command bits and the player's state
-│   ├── audio_manager.c     loads and plays the action sounds
-│   ├── collision.c         collision checks, pushback, and sword damage (AttackHit)
+│   ├── hud.c               frame rate, command bits, state, game-over banner
+│   ├── audio_manager.c     action sounds and the backing track
+│   ├── collision.c         collision checks, pushback, and sword hits (AttackHit)
 │   ├── utils.c             directions and movement helpers
 │   └── cute_c2_impl.c      builds the cute_c2 collision library; leave it alone
 ├── include/
-│   ├── animation/          animation.h
+│   ├── animation/          animation.h, sprites.h (the sprite sheet reference card)
 │   ├── command/            command.h      the command bit flags
 │   ├── events/             events.h       the Event enum
 │   ├── fsm/                fsm.h          the State enum, StateConfig, EventStateTransition
-│   ├── game/               game.h         GameData
+│   ├── game/               game.h, background.h
 │   ├── gameobjects/        gameobject.h, player.h, npc.h
 │   ├── hud/                hud.h
 │   └── utils/              ai_manager.h, audio_manager.h, collision.h, constants.h,
 │                           cute_c2.h, input_manager.h, mediator.h, utils.h
-├── resources/              sprite sheets, sounds/ and icon/ (packaged into the web build)
+├── resources/              sprite sheets, sounds/, music/ and icon/ (packaged into the web build)
 ├── build/                  everything make creates
 ├── platform/               icons and web page template; leave these alone
 └── setup/                  setup scripts (run once)
 ```
 
 Headers live in subfolders, so includes name the folder too: `#include "gameobjects/player.h"`. The `.c` files are all in `src/`.
+
+`player.c` and `npc.c` are split into sections with the same banners, in the same order (setup, state machine, then one section per state), so you can compare the two side by side.
 
 ---
 
@@ -236,43 +242,65 @@ _StarterKit_ is built from several design patterns and systems working together.
 
 ### Game System Flow
 
-[![](https://mermaid.ink/img/pako:eNpVkltv4jAQhf-KNSv1KUW5EkillSABygO7ldinTfrgJWNIFdvIcdqmiP--zqVtyIPlOd85M5YyFzjIHCECVsq3w4kqTf4kmSDmW6Rbca412VFBj6ieyf39T7JMd5gXVEv13LuWnRynseScipzcvaLSD2T1ikKTwRN3niRd73eDknTKKl2IglNdSEH2TaWR3-B1uqEcye9_L3jQ1YDWHdqkTyVtUN2Ij-mvp3hQNp2yNc8qy6JqBySoTRtzGxyPvaMvtv0L-6I_K92USBaEFWUZ_UCHBYyNyXIgjDEfnTGJvzPsliRfmbbfmKw-SdCmxmT9Pce-7bYddUMHLOCoOC1y8zcvrS8DfUKOGUTmmiOjdakzyMTVWGmt5b4RB4i0qtECJevjCSJGy8pU9TmnGpOCHhXlX-qZir9S8s_IUbWjhjiKHFUsa6EhcsPOC9EF3iHyfG_ihkHoTj1n5gVz34IGIsefzD3bnob21PXCcO5dLfjomtuTaRD6MzeYOa5jh044t8CsnNm4Xb-p3cJe_wNNUc_m?type=png)](https://mermaid.live/edit#pako:eNpVkltv4jAQhf-KNSv1KUW5EkillSABygO7ldinTfrgJWNIFdvIcdqmiP--zqVtyIPlOd85M5YyFzjIHCECVsq3w4kqTf4kmSDmW6Rbca412VFBj6ieyf39T7JMd5gXVEv13LuWnRynseScipzcvaLSD2T1ikKTwRN3niRd73eDknTKKl2IglNdSEH2TaWR3-B1uqEcye9_L3jQ1YDWHdqkTyVtUN2Ij-mvp3hQNp2yNc8qy6JqBySoTRtzGxyPvaMvtv0L-6I_K92USBaEFWUZ_UCHBYyNyXIgjDEfnTGJvzPsliRfmbbfmKw-SdCmxmT9Pce-7bYddUMHLOCoOC1y8zcvrS8DfUKOGUTmmiOjdakzyMTVWGmt5b4RB4i0qtECJevjCSJGy8pU9TmnGpOCHhXlX-qZir9S8s_IUbWjhjiKHFUsa6EhcsPOC9EF3iHyfG_ihkHoTj1n5gVz34IGIsefzD3bnob21PXCcO5dLfjomtuTaRD6MzeYOa5jh044t8CsnNm4Xb-p3cJe_wNNUc_m)
+[![](https://mermaid.ink/img/pako:eNp1k1FrgzAUhf_KJXvYBitbYX3pw8DZloZVK7NlD2kZQZM1TGPRuK3U_vfFaG1TtkAQ73dO7jExexRlMUNDQDzJvqMNzRUsRisJemCPYLktFXhU0g-Wr6HXe6q2Cd2x_LqAKEtTKuMKPOKxWFCV5evG6GDiYNvlB65laYSeYSs0_mFRqZjb4JvbFarAJe3r-lx72R3qWSiqWAXT5Yjo2epdo2dfTKqiggmZhF5LJjUBhzhSpFSJTFr1gASmh1X0if6AthKYijuf6YBJIgq9gEnhKEWjz6lQrc4_6to885lJpJ8zHOK5_x4unNcF3MPYH-mAtmqKa_I8m7sv-unhMOw2zfSvwjccjLua_0et2bAiK2VcmIBpWYioAmdJnDIWWXdAK9kYCrVLmD514CJJhleszwecnyN9qP-ho4lz_sj658Q9ebhNJp2nXs9qdCSD2nVOglOfB3s1_19S7-mpk830_3LMZ4aVYnmB0B2glOUpFbG-MXukNiw1dydmnJaJQofDL00UAuY?type=png)](https://mermaid.live/edit#pako:eNp1k1FrgzAUhf_KJXvYBitbYX3pw8DZloZVK7NlD2kZQZM1TGPRuK3U_vfFaG1TtkAQ73dO7jExexRlMUNDQDzJvqMNzRUsRisJemCPYLktFXhU0g-Wr6HXe6q2Cd2x_LqAKEtTKuMKPOKxWFCV5evG6GDiYNvlB65laYSeYSs0_mFRqZjb4JvbFarAJe3r-lx72R3qWSiqWAXT5Yjo2epdo2dfTKqiggmZhF5LJjUBhzhSpFSJTFr1gASmh1X0if6AthKYijuf6YBJIgq9gEnhKEWjz6lQrc4_6to885lJpJ8zHOK5_x4unNcF3MPYH-mAtmqKa_I8m7sv-unhMOw2zfSvwjccjLua_0et2bAiK2VcmIBpWYioAmdJnDIWWXdAK9kYCrVLmD514CJJhleszwecnyN9qP-ho4lz_sj658Q9ebhNJp2nXs9qdCSD2nVOglOfB3s1_19S7-mpk830_3LMZ4aVYnmB0B2glOUpFbG-MXukNiw1dydmnJaJQofDL00UAuY)
 
-1. **Input Manager** captures keyboard and gamepad input (the **AI Manager** does the same job for the NPC).
-2. **Mediator** passes each command on to the game object and the HUD.
+1. **Input Manager** captures keyboard and gamepad input; the **AI Manager** does the same job for the NPC.
+2. **Mediator** passes each command on to its game object, and tells the HUD about the player's.
 3. **Command System** (`ExecuteCommand()`) translates the command bits into FSM events.
 4. **FSM** looks up the event in the current state's transition table, and changes state if there's a match.
 5. **Animation System** plays the animation that each state sets up when it starts.
 6. **Game Objects** (Player and NPC) run their state's behaviour every frame.
-7. **Collision Detection** checks for contact and sword hits, and sends collision events to the FSM.
+7. **Collision Detection** checks for contact and sword hits. Contact goes to the FSM as events; hits, blocks and misses go to the **Mediator**, which decides who hears about them (sounds, the log, the HUD).
 
 ### Command Flow
 
-[![](https://mermaid.ink/img/pako:eNptk21v2jAQx7-K5VetlFICgTxoQqpSylCVUS10Lyak6UiuIVNiZ47TljG--84JdCCWF_HD_3d3-p_tHU9kijzgNf5qUCR4n0OmoFwJRl8FSudJXoHQbB4xqNlcVI1mEQjIUF1CLRNhmoOW_5HD2OihLEsQ6aX8ELfxNFxqs4WRZlDiYv0TE90R3X8e3Uwm8yhgT7Io2CNu1xJUemvgCtIThpCv8HYwcQ8aOs1IYUzhSiZYH0x2UhgftKUCURegkWl5dMAeCsjqT2t1O7mKFt-mP56f2B92t1zehY_XJ_FU9syzqUcmAzZ9x6ShlGcqKUc9bJRCMh9rU_gzIQVOX2nn6vqUnS0C9lylhvnXoC6ow2aLY8YuU7gBkWF62sMvkvblKyrqlGUSnp00u5l8HKuZHxtAU3NoNJjCrKtcc4uXqErIU7pYO5N_xfUGS1zxgKYpvkBT6BVfiT2h0GgZb0XCA60atLiSTbbhwQsUNa2a1tfhVn7s0pX4LmV5DMmUKXUIR5GiCmUjNA_svt_CPNjxd1p6fs8e-bbtjUeDoTN0Rxbf8sAb9lzH9R137A8817b3Fv_dZu_33PHItgejodd3fGIci1MXqAlR92rax7P_Czt8BME?type=png)](https://mermaid.live/edit#pako:eNptk21v2jAQx7-K5VetlFICgTxoQqpSylCVUS10Lyak6UiuIVNiZ47TljG--84JdCCWF_HD_3d3-p_tHU9kijzgNf5qUCR4n0OmoFwJRl8FSudJXoHQbB4xqNlcVI1mEQjIUF1CLRNhmoOW_5HD2OihLEsQ6aX8ELfxNFxqs4WRZlDiYv0TE90R3X8e3Uwm8yhgT7Io2CNu1xJUemvgCtIThpCv8HYwcQ8aOs1IYUzhSiZYH0x2UhgftKUCURegkWl5dMAeCsjqT2t1O7mKFt-mP56f2B92t1zehY_XJ_FU9syzqUcmAzZ9x6ShlGcqKUc9bJRCMh9rU_gzIQVOX2nn6vqUnS0C9lylhvnXoC6ow2aLY8YuU7gBkWF62sMvkvblKyrqlGUSnp00u5l8HKuZHxtAU3NoNJjCrKtcc4uXqErIU7pYO5N_xfUGS1zxgKYpvkBT6BVfiT2h0GgZb0XCA60atLiSTbbhwQsUNa2a1tfhVn7s0pX4LmV5DMmUKXUIR5GiCmUjNA_svt_CPNjxd1p6fs8e-bbtjUeDoTN0Rxbf8sAb9lzH9R137A8817b3Fv_dZu_33PHItgejodd3fGIci1MXqAlR92rax7P_Czt8BME)
+[![](https://mermaid.ink/img/pako:eNptUtFugkAQ_JUNL8UE_QAeTAylQlq0KehTE7NyW6XCHT0OW2P99-6BGhPLyx03M7tzc3t0ciXI8cFp6KslmdNjgRuN1bsE_mrUpsiLGqWBOAFsIJZ1ayBBiRvS96SOk5Ao0Kh_4CC1eKCqCqW4h5_STs_LPTadW2iKFc3Xn5Sbe0ZkCdHi8V32WJwMx-M48eFVlWXn2x34sKPDWqEWwA5gw-VqFDd8pl_sv1FOxZ7Obt26xANpD5L5Mly9hE8Z_MIkyybB86DXW3mQ-hD-UN6aqy7vVw_6AmdykDKbL-pDxGBJ4Z6kccNlOMtWtoMH_b7vAKPR6CxkzUX5otQOzJaArBjaGgrZ_eet1vakMWjooQGD65Ju5dO5D8EW5YZSS7G5qFKw84Iz8mwNCZK-IZRGH9yb-0U-LGrBkqi9uVnXBySHObiEP1N8ovakOVaPVRnbmr0GbGVHTWeyYTpohaJ_oEnsDmA4vqZv9-cI7daOhrvm0bNSfmRQsjxAs1XffbVruI4HTkW6wkLwWB8dBqtuwAV9YFsa53T6AzV883I?type=png)](https://mermaid.live/edit#pako:eNptUtFugkAQ_JUNL8UE_QAeTAylQlq0KehTE7NyW6XCHT0OW2P99-6BGhPLyx03M7tzc3t0ciXI8cFp6KslmdNjgRuN1bsE_mrUpsiLGqWBOAFsIJZ1ayBBiRvS96SOk5Ao0Kh_4CC1eKCqCqW4h5_STs_LPTadW2iKFc3Xn5Sbe0ZkCdHi8V32WJwMx-M48eFVlWXn2x34sKPDWqEWwA5gw-VqFDd8pl_sv1FOxZ7Obt26xANpD5L5Mly9hE8Z_MIkyybB86DXW3mQ-hD-UN6aqy7vVw_6AmdykDKbL-pDxGBJ4Z6kccNlOMtWtoMH_b7vAKPR6CxkzUX5otQOzJaArBjaGgrZ_eet1vakMWjooQGD65Ju5dO5D8EW5YZSS7G5qFKw84Iz8mwNCZK-IZRGH9yb-0U-LGrBkqi9uVnXBySHObiEP1N8ovakOVaPVRnbmr0GbGVHTWeyYTpohaJ_oEnsDmA4vqZv9-cI7daOhrvm0bNSfmRQsjxAs1XffbVruI4HTkW6wkLwWB8dBqtuwAV9YFsa53T6AzV883I)
 
 1. **Input Manager** polls the keyboard and gamepad (the **AI Manager** chooses the NPC's input).
-2. **Mediator** receives the command bits and hands them on.
+2. **Mediator** receives the command bits (`MediatorReceiveCommand()`) and hands them on.
 3. **Command System** turns the bits into events, such as `EVENT_MOVE` or `EVENT_ATTACK`.
 4. **FSM** checks the event against the current state's transition table, in `HandleEvent()`.
 5. **GameObject** changes state if the table allows it: the old state's `Exit()` runs, then the new state's `Entry()`.
 
 ### Control Flow (Game Loop)
 
-[![](https://mermaid.ink/img/pako:eNqdlV1vmzAUhv8KclSpk5IKEkKASpsI2Emar2ntNm2kF25wEjawIzBruzT_fcZAirJdjHKBbM77vOdwbPABrFlAgA02EXtc73DClTtvRVdUEdfFhdLpdBQ0W35VLtcs3uM1VyL8QKL0XR4pVLdcUJf-CMdEmTG2Lx7c54r3iuN_ZFE0ofuMt3T1uqVr1_cF5si4689JEGLOkjGmQURcFsdikGtPwxPiSsTzRQJOlAKAvwiV1vALXNzVxJ4Uw0MhvkswTUMeMvrhWMSLO8xVL99I-qIgHz6F0koiNSskrUY-pJwk_xKMpGDsf94HIlBG_5YVyRbsRRnXaxhLelLSDg1jnBeaO-RNXT78IGtes5lI_Vx21pmctXUugzelmeIKTRiQJD2TFfcbKZ4epCqtNWf62paZX61MqTlzmkmPhe8l-DEv9yw8Pb3zotpWC0ksD58ySkO6rXIuX3PKHVR_mvOQBvVdJqb37yrLlD9HpMCUTRhFdstSIbTUdsoT9pPYrZ6uW31YTjuPYcB3trZ_qtPCsGQRGhqu0Yg9kVAf9puQ0zeTyzeTTkl6BnSQ2YR0SxIOUR8Nm5BeRZqeA1ETElXv6XhDr1G1o4p0Uc9tlHNckRBZcNCEnFRkF-lIb0LOq1XRIfIaVXtT5fSgB90m5Oy1twOn0deyOO0hsSr_US1og5gkMQ4DcdgccqcV4DsSkxWwxTAgG5xFfAVW9CikOOPs9pmugc2TjLRBwrLtDtgbHKVilsl_mxfibYLjSrLH9Dtjp-k2yTOVNKHiF-iyjHJga31DioF9AE_A7g7MK3NgGj2tb2kDy7Da4BnYna5qXamappuWaZiaoavGsQ1-S3_tSld7mtrtWwIyu1av3wbiDBNH2Lw4SuWJevwDFQ0-7g?type=png)](https://mermaid.live/edit#pako:eNqdlV1vmzAUhv8KclSpk5IKEkKASpsI2Emar2ntNm2kF25wEjawIzBruzT_fcZAirJdjHKBbM77vOdwbPABrFlAgA02EXtc73DClTtvRVdUEdfFhdLpdBQ0W35VLtcs3uM1VyL8QKL0XR4pVLdcUJf-CMdEmTG2Lx7c54r3iuN_ZFE0ofuMt3T1uqVr1_cF5si4689JEGLOkjGmQURcFsdikGtPwxPiSsTzRQJOlAKAvwiV1vALXNzVxJ4Uw0MhvkswTUMeMvrhWMSLO8xVL99I-qIgHz6F0koiNSskrUY-pJwk_xKMpGDsf94HIlBG_5YVyRbsRRnXaxhLelLSDg1jnBeaO-RNXT78IGtes5lI_Vx21pmctXUugzelmeIKTRiQJD2TFfcbKZ4epCqtNWf62paZX61MqTlzmkmPhe8l-DEv9yw8Pb3zotpWC0ksD58ySkO6rXIuX3PKHVR_mvOQBvVdJqb37yrLlD9HpMCUTRhFdstSIbTUdsoT9pPYrZ6uW31YTjuPYcB3trZ_qtPCsGQRGhqu0Yg9kVAf9puQ0zeTyzeTTkl6BnSQ2YR0SxIOUR8Nm5BeRZqeA1ETElXv6XhDr1G1o4p0Uc9tlHNckRBZcNCEnFRkF-lIb0LOq1XRIfIaVXtT5fSgB90m5Oy1twOn0deyOO0hsSr_US1og5gkMQ4DcdgccqcV4DsSkxWwxTAgG5xFfAVW9CikOOPs9pmugc2TjLRBwrLtDtgbHKVilsl_mxfibYLjSrLH9Dtjp-k2yTOVNKHiF-iyjHJga31DioF9AE_A7g7MK3NgGj2tb2kDy7Da4BnYna5qXamappuWaZiaoavGsQ1-S3_tSld7mtrtWwIyu1av3wbiDBNH2Lw4SuWJevwDFQ0-7g)
+[![](https://mermaid.ink/img/pako:eNqNlG1v2jAUhf-KlX4BKdUqFVBBU1GIHYooEAWyqVqmyRATLBIbJaYUAf99tvMCUreofMN-zjn3Xl_lZKx4SIweMNYxP6w2OBVgAQMG5G8u5L_Gr8AY4oS8cr5rNAPjdxPc3z8DfyjP_V2IBVG3-iZX-UMNzE_qHGRCEv1LwApLdXeeL6wF-uO-Wm9n4FY-boyPJG00vy_Tb88uj-MR2-2FCSYkpFjw1CMrQt-JzZMEs9AEuWquAqpwV2dPK8-pa98YWqP_u-EoSkmWUc7-7TzVznblbEs_qvCsCCBMkNQEnEWcssgE5IOKSm1r9fhGnSyxKJSWEHi1faGy1yUXG3DAx6xSjrVSTdvekNVWDXX2rsakic9THVoTNPuBvDPwToGhuvZIph-y2Q-MSy7wtOCNZJIaqaJYzHGovCEWuChrxKi4edtcmT-u5VedWPuQ8glmOKqKuiZM-VmyxcmokJZWlq8PoLSCKT7kUTp5KccRpXyv3kW-oAl2ejVM8OLDKgFq9ez0k7KQH-Si0TgGfEdYv2hydm1Sb_LtqSoMsVAttx3z7LrDzbK6TBxjkgvBWlr37roPCHUfzEykfEt6d4-tVreNbmFpWKCOM-jYnRp0XoGoNWjXgN5XwdlXQbcAYQdZzlMNOC3BFnKgUwPaZTREENk14LgELTiAddHDErSdR7suWi5VTqKB03YGNaTctoJ8ghaq84TVgGSVn0HDBEZC0gTTUH42T4bYkER_QEOyxvtYGJfLX_rhoGY?type=png)](https://mermaid.live/edit#pako:eNqNlG1v2jAUhf-KlX4BKdUqFVBBU1GIHYooEAWyqVqmyRATLBIbJaYUAf99tvMCUreofMN-zjn3Xl_lZKx4SIweMNYxP6w2OBVgAQMG5G8u5L_Gr8AY4oS8cr5rNAPjdxPc3z8DfyjP_V2IBVG3-iZX-UMNzE_qHGRCEv1LwApLdXeeL6wF-uO-Wm9n4FY-boyPJG00vy_Tb88uj-MR2-2FCSYkpFjw1CMrQt-JzZMEs9AEuWquAqpwV2dPK8-pa98YWqP_u-EoSkmWUc7-7TzVznblbEs_qvCsCCBMkNQEnEWcssgE5IOKSm1r9fhGnSyxKJSWEHi1faGy1yUXG3DAx6xSjrVSTdvekNVWDXX2rsakic9THVoTNPuBvDPwToGhuvZIph-y2Q-MSy7wtOCNZJIaqaJYzHGovCEWuChrxKi4edtcmT-u5VedWPuQ8glmOKqKuiZM-VmyxcmokJZWlq8PoLSCKT7kUTp5KccRpXyv3kW-oAl2ejVM8OLDKgFq9ez0k7KQH-Si0TgGfEdYv2hydm1Sb_LtqSoMsVAttx3z7LrDzbK6TBxjkgvBWlr37roPCHUfzEykfEt6d4-tVreNbmFpWKCOM-jYnRp0XoGoNWjXgN5XwdlXQbcAYQdZzlMNOC3BFnKgUwPaZTREENk14LgELTiAddHDErSdR7suWi5VTqKB03YGNaTctoJ8ghaq84TVgGSVn0HDBEZC0gTTUH42T4bYkER_QEOyxvtYGJfLX_rhoGY)
 
-**Each frame, in `UpdateGame()` and `GameLoop()`:**
+**Each frame, in `GameLoop()` (`main.c`):** `UpdateGame()`, then `UpdateAudioManager()`, then `DrawGame()`.
 
-1. **PollInput()**: read keyboard and gamepad
-2. **MediatorReceiveCommand()**: pass command to player and HUD
-3. **ExecuteCommand()**: turn command into events
-4. **HandleEvent()**: look event up in current state's transition table
+`UpdateGame()` in `game.c` reads like a list, because each step is its own small function:
+
+```c
+case STATE_PLAY:
+	UpdatePlayer(data, deltaTime);     // input -> mediator -> FSM
+	UpdateNPC(data, deltaTime);        // AI -> mediator -> FSM, chase the player
+	UpdateCollisions(data, deltaTime); // enter / ongoing / exit
+	UpdateCombat(data);                // sword hits land on the hit frame
+	CheckGameOver(data);               // anyone out of health?
+	break;
+
+case STATE_GAMEOVER:
+	if (PollRestart())                 // R, or Start on a gamepad
+	{
+		UnloadGameData(data);
+		InitGame(data);
+	}
+	break;
+```
+
+Inside those helpers:
+
+1. **PollInput()** / **PollAI()**: read the keyboard and gamepad, or let the AI decide
+2. **MediatorReceiveCommand()**: pass the command to its object (and the player's to the HUD)
+3. **ExecuteCommand()**: turn the command into events
+4. **HandleEvent()**: look the event up in the current state's transition table
 5. **ChangeState()**: if there's a match, `Exit()` the old state, then `Entry()` the new one
-6. **UpdateState()**: run current state's `Update()`, which also calls `UpdateAnimation()`
-7. **PollAI()** and same steps for NPC
-8. **Collision detection**: collision start, ongoing or end, with pushback and events
-9. **AttackHit()**: does either sword swipe land this frame?
-10. **Game over check**
-11. **DrawGame()**: background, characters, health bars and HUD
+6. **UpdateState()**: run the current state's `Update()`, which also calls `UpdateAnimation()`
+7. **Collisions**: start, ongoing or end, with pushback and events
+8. **AttackHit()**: does either sword swipe land this frame? Reports hit, block or miss to the mediator
+9. **CheckGameOver()**: reports the winner (or a draw) to the mediator once
+
+When you add something new (pickups, a second NPC), give it its own helper and its own line in `UpdateGame()`.
 
 ### Key Components
 
@@ -280,7 +308,7 @@ _StarterKit_ is built from several design patterns and systems working together.
 2. **Command Pattern**: input as bit flags, so several commands (and diagonal movement) work at once
 3. **Animation System**: sprite-sheet animations, started by each state's `Entry()`
 4. **Collision Detection**: circle colliders with cute_c2, plus hit-frame sword damage
-5. **Mediator Pattern**: commands go to game object and HUD, which never know about each other
+5. **Mediator Pattern**: one mediator knows the player, the NPC, the HUD and the audio; they never know about each other
 6. **Event System**: events drive every state change, including collisions and finished animations
 7. **Cross-Platform Support**: Linux, Windows (w64devkit), WSL and browser
 
@@ -315,26 +343,25 @@ Which event leads to which state is set separately, in the state's **transition 
 
 **Example State Setup:**
 
+Each state is three steps: its transition table, `InitStateConfig()` (its name and functions), and `StateTransitions()` (hand it the table).
+
 ```c
-// ---- STATE_IDLE state configuration ----
-// Define valid transitions from STATE_IDLE
+// ---- STATE_IDLE ----
 EventStateTransition idleValidTransitions[] = {
 	// EVENT -> STATE
 	{EVENT_MOVE, STATE_WALKING},
 	{EVENT_ATTACK, STATE_ATTACKING},
 	{EVENT_DEFEND, STATE_SHIELD},
 	{EVENT_DIE, STATE_DEAD}};
-
-// Set up the state configuration for STATE_IDLE
 InitStateConfig(object, STATE_IDLE, "Player_Idle", PlayerEnterIdle, PlayerUpdateIdle, PlayerExitIdle);
-
-// Configure valid transitions for STATE_IDLE
-StateTransitions(&object->stateConfigs[STATE_IDLE], idleValidTransitions, sizeof(idleValidTransitions) / sizeof(EventStateTransition));
+StateTransitions(&object->stateConfigs[STATE_IDLE], idleValidTransitions, ARRAY_COUNT(idleValidTransitions));
 ```
+
+`ARRAY_COUNT()` (in `utils.h`) counts the pairs in the table for you. It only works on a real array, not on a pointer to one.
 
 > **One table instead of two locks.** In the FSM practical, a state's `HandleEvent` function decided which state to ask for, and a separate list said which states were allowed. Here the table does both jobs: the event and the state it leads to sit side by side. `AllocateStateConfigs()` also sets every unused state to `UNIMPLEMENTED_STATE_CONFIG`, so a new state can't crash the game when it closes.
 
-A state can also end itself. A sword swipe plays once; when it finishes, the state's `Update()` sends `EVENT_ANIMATION_END`, and the table decides what comes next:
+A state can also end itself. A sword swipe plays once; when it finishes, the fighter holds the last frame for `ATTACK_RECOVERY` seconds (sword down, off balance), then the state's `Update()` sends `EVENT_ANIMATION_END`, and the table decides what comes next:
 
 ```c
 EventStateTransition attackValidTransitions[] = {
@@ -343,9 +370,9 @@ EventStateTransition attackValidTransitions[] = {
 	{EVENT_DIE, STATE_DEAD}};
 ```
 
-**FSM State Diagram:**
+**The player's FSM** (straight from the tables in `InitPlayerFSM()`):
 
-[![](https://mermaid.ink/img/pako:eNqNlF1vgjAUhv8KOZcLGhFB7MUSAt1GhrAI0WRjMY1UJRFqsCzbjP99-AU6VOSKHp6np-dNyhomLKSAYMUJp2ZEZimJG1_tIBHy5-PhU2g0HgXP1308tkwb7-vl-uTzSLdfLedZQAIeYscf993hLVz3fd04E_aVG4r3YmHbLHgTP2HHvMGbWD-hrcNpToXjmc-HLBzHdfBt_J4pqlbtIFXl8izXaMO1bcuzXKdQiso4JwZ-NYpykkoYehLFhEcsEQwWLxeU0zqxPvlDBHcGX6HrG5QRXOlRJvIv_Etmfb8dUQoD7L3pozL_w_rUOCJ35A0ixDSNSRTmV3W93SQAPqcxDQDlryGdkmzBAwiSTY6SjDPvJ5kA4mlGRUhZNpsDmpLFKl9ly7C86kV1SZJ3xuKjMku3rQ46TUKaGixLOCBJ3rGA1vANSFOaSrunqVJHaUk9RZZE-AHUkZuS2lW7eU2TpZaibET43W3eamqSrEptVZU1Re51NUUEGkacpf39b2j3N9r8Ab3WRuc?type=png)](https://mermaid.live/edit#pako:eNqNlF1vgjAUhv8KOZcLGhFB7MUSAt1GhrAI0WRjMY1UJRFqsCzbjP99-AU6VOSKHp6np-dNyhomLKSAYMUJp2ZEZimJG1_tIBHy5-PhU2g0HgXP1308tkwb7-vl-uTzSLdfLedZQAIeYscf993hLVz3fd04E_aVG4r3YmHbLHgTP2HHvMGbWD-hrcNpToXjmc-HLBzHdfBt_J4pqlbtIFXl8izXaMO1bcuzXKdQiso4JwZ-NYpykkoYehLFhEcsEQwWLxeU0zqxPvlDBHcGX6HrG5QRXOlRJvIv_Etmfb8dUQoD7L3pozL_w_rUOCJ35A0ixDSNSRTmV3W93SQAPqcxDQDlryGdkmzBAwiSTY6SjDPvJ5kA4mlGRUhZNpsDmpLFKl9ly7C86kV1SZJ3xuKjMku3rQ46TUKaGixLOCBJ3rGA1vANSFOaSrunqVJHaUk9RZZE-AHUkZuS2lW7eU2TpZaibET43W3eamqSrEptVZU1Re51NUUEGkacpf39b2j3N9r8Ab3WRuc)
+[![](https://mermaid.ink/img/pako:eNqNk19PgzAUxb_KTR8NvPi4B5NmvWojK2Y0W4wYQqTbSEZZWNWHZd9dhA0YSEPf2vs7vef0z4l85okiMyBHExvF0nhbxJn7fR9qKMf73Qe47gMEkkqMOPMw1HWlXekAa-q9cPEEM8AVChkt_BVacColnd8I6hWLJHjm6LGGZ_iIgll4hrRD8579q9_biA0vfIF2fEqCocpuqt1zxBYVfEEl90XUy_6f0t7rcpwT8w_oKfEHIrujqtrCSwxe6Vo0_GXeVVyRkRCNotbo3Cgo0u3OQL7px6iRv-FrBcef9KAcMDuloUbKzeblk16-OS1ZlUcvRumkahlq4gDJVJHFaVJ-txMpdVn18RK1ib_2hpzPv62J-0o?type=png)](https://mermaid.live/edit#pako:eNqNk19PgzAUxb_KTR8NvPi4B5NmvWojK2Y0W4wYQqTbSEZZWNWHZd9dhA0YSEPf2vs7vef0z4l85okiMyBHExvF0nhbxJn7fR9qKMf73Qe47gMEkkqMOPMw1HWlXekAa-q9cPEEM8AVChkt_BVacColnd8I6hWLJHjm6LGGZ_iIgll4hrRD8579q9_biA0vfIF2fEqCocpuqt1zxBYVfEEl90XUy_6f0t7rcpwT8w_oKfEHIrujqtrCSwxe6Vo0_GXeVVyRkRCNotbo3Cgo0u3OQL7px6iRv-FrBcef9KAcMDuloUbKzeblk16-OS1ZlUcvRumkahlq4gDJVJHFaVJ-txMpdVn18RK1ib_2hpzPv62J-0o)
 
 **The NPC's tables** use the collision events: touching the player while walking or idle starts a swipe, and the swipe sends it back to chasing.
 
@@ -396,7 +423,7 @@ typedef enum
 	MOVE_LEFT 			= 1 << 2,	// Binary: 000100 Command to move left
 	MOVE_RIGHT 			= 1 << 3,	// Binary: 001000 Command to move right
 	ATTACK				= 1 << 4,	// Binary: 010000 Command to perform an attack action (e.g., slash with sword)
-	DEFEND				= 1 << 5,	// Binary: 100000 Command to perform an defend action (e.g., defend with sheild)
+	DEFEND				= 1 << 5,	// Binary: 100000 Command to perform a defend action (e.g., defend with shield)
 	COMMAND_COUNT 		= 6			// Total number of commands, useful for looping or limits
 } Command;
 ```
@@ -442,17 +469,17 @@ typedef struct
 
 ```c
 // In a state's Entry(): set up its animation
-InitGameObjectAnimation(object, walk_UP, 9, 0.055f);                 // loops
-InitGameObjectAnimationOnce(object, sword_attack_UP, 6, 0.035f);     // plays once
+InitWalkAnimation(object);      // loops (the walk for the way it's facing, see sprites.c)
+InitAttackAnimation(object);    // plays once (one sword swipe)
 
 // In a state's Update(): move the animation on
 UpdateAnimation(&object->animation, deltaTime);
 
-if (object->animation.finished)                                      // a one-off animation is done
+if (object->animation.finished) // a one-off animation is done
     HandleEvent(object, EVENT_ANIMATION_END, deltaTime);
 
-// In DrawGame(): draw the current frame, centred on the GameObject
-DrawAnimation(&data->player->base.animation, data->player->base.position, WHITE);
+// In DrawGameObject() (gameobject.c): draw the current frame, centred on the GameObject
+DrawAnimation(&object->animation, object->position, WHITE);
 ```
 
 ### 5. Collision Detection
@@ -470,24 +497,22 @@ Circle-based collision using the [cute_c2](https://github.com/RandyGaul/cute_hea
 **Collision Flow:**
 
 ```c
-// Colliders follow the GameObjects: GameObjectMove() in utils.c keeps them in step
+// UpdateCollisions() in game.c
+// (colliders follow the GameObjects: GameObjectMove() in utils.c keeps them in step)
+bool isColliding = CheckCollision(player, npc);
 
-// Check collision
-bool isColliding = CheckCollision(&data->player->base, &data->npc->base);
-
-// ENTER: first frame of the collision
-if (isColliding && !data->player->base.isColliding)
+if (isColliding && !player->isColliding)
 {
-    HandleEvent(&data->player->base, EVENT_COLLISION_START, deltaTime);
-    HandleEvent(&data->npc->base, EVENT_COLLISION_START, deltaTime);
+	// ENTER: first frame of the collision
+	HandleEvent(player, EVENT_COLLISION_START, deltaTime);
+	HandleEvent(npc, EVENT_COLLISION_START, deltaTime);
 
-    CollisionEntry(&data->player->base, &data->npc->base);
-    HandleCollision(&data->player->base, &data->npc->base);   // pushback
+	CollisionEntry(player, npc);
+	HandleCollision(player, npc); // pushback
 }
+// ... ONGOING and EXIT
 
-// ... EXIT and ONGOING collision
-
-// Sword swipes: damage lands once per swipe, on the hit frame
+// UpdateCombat() in game.c: damage lands once per swipe, on the hit frame
 AttackHit(&data->player->base, &data->npc->base);
 AttackHit(&data->npc->base, &data->player->base);
 ```
@@ -498,7 +523,9 @@ AttackHit(&data->npc->base, &data->player->base);
 - in front of the attacker,
 - not shielding.
 
-The damage, reach and hit frame are all in `constants.h`.
+`AttackHit()` only decides **what** happened, and reports it to the mediator: `GAME_EVENT_HIT`, `GAME_EVENT_BLOCK` or `GAME_EVENT_MISS`. The sounds and log lines live in the mediator, so there's no audio code in `collision.c`.
+
+The damage, reach, hit frame and `ATTACK_RECOVERY` are all in `constants.h`.
 
 ### 6. GameObject
 
@@ -507,6 +534,8 @@ The damage, reach and hit frame are all in `constants.h`.
 ```c
 struct GameObject
 {
+	Mediator *mediator; // Who to tell when something happens (not owned: GameData frees it)
+
 	const char *name; // The name of the game object (e.g., "Player", "Enemy")
 
 	// Positions and Transforms
@@ -533,11 +562,11 @@ struct GameObject
 	// Gameplay Components
 	int health;		// The health of the game object
 	bool attackHit; // Has the current sword swipe already landed (one hit per swipe)
-	float timer; // Can be used during updates
+	float timer;	// Can be used during updates (the swipe uses it for recovery)
 };
 ```
 
-(`typedef struct GameObject GameObject;` is in `fsm.h`, so the FSM can use it before the struct is defined.)
+(`typedef struct GameObject GameObject;` is in `fsm.h`, so the FSM can use it before the struct is defined. `gameobject.h` does the same for `Mediator`, because `mediator.h` already includes `gameobject.h` and the two can't include each other.)
 
 **Player and NPC Entities:**
 
@@ -588,15 +617,60 @@ Command PollInput()
 }
 ```
 
-The sword keys use `IsKeyDown`, so holding one gives one swipe after another. Each swipe always plays to the end before the next one starts.
+The sword keys use `IsKeyDown`, so holding one gives one swipe after another. Each swipe always plays to the end, plus its recovery, before the next one starts.
+
+Restart isn't a command: it's only asked at game over, so `PollRestart()` in `input_manager.c` checks R and the gamepad's Start button directly.
+
+### 8. Mediator
+
+There's **one** mediator for the whole game (`data->mediator`). It's the only part that knows the player, the NPC and the HUD; they never know about each other. It has two jobs, for two kinds of message:
+
+| | A command | A game event |
+|---|---|---|
+| Meaning | "Please do this" | "This happened" |
+| Example | `MOVE_LEFT \| ATTACK` | `GAME_EVENT_HIT`: Villan hit Player |
+| Function | `MediatorReceiveCommand(mediator, object, command, dt)` | `MediatorNotify(mediator, event, source, target)` |
+| Can it be refused? | Yes: the FSM may say no | No: it's already happened |
+| Who reacts | The object (and the HUD, for the player) | Whoever the mediator decides: sounds, the log, the HUD ... |
+
+**Who reports what:**
+
+| Game event | Reported by | The mediator ... |
+|---|---|---|
+| `GAME_EVENT_LEVEL_START` | `game.c` | plays the level-start sound and starts the backing track |
+| `GAME_EVENT_SWIPE` | `player.c`, `npc.c` (Attacking `Entry()`) | plays the swoosh |
+| `GAME_EVENT_HIT` | `collision.c` | logs it, plays the hit sound |
+| `GAME_EVENT_BLOCK` | `collision.c` | logs it, plays the block sound |
+| `GAME_EVENT_MISS` | `collision.c` | a debug log line, for now |
+| `GAME_EVENT_GAME_OVER` | `game.c` | logs the winner (or a draw), stops the music, plays the sound, shows the banner |
+
+Each game object keeps a pointer to the mediator (`object->mediator`), set by `CreateMediator()`, so a state can report without knowing who's listening:
+
+```c
+// In PlayerEnterAttacking(): Entry runs once per swipe, so it's reported here
+MediatorNotify(object->mediator, GAME_EVENT_SWIPE, object, NULL);
+```
+
+`GameData` owns the mediator and frees it; the game objects only borrow it.
+
+> **Why the HUD only shows the player:** like the HUD in any game, it shows *your* stuff. That rule is one line in `MediatorReceiveCommand()`, with a comment, and it's where the F1 debug overlay stretch task would send the NPC's command too.
+
+### 9. Audio
+
+`audio_manager.c` keeps the sounds and music to itself; nobody else holds a `Sound` or `Music`. All of it is loaded once at startup (in `main.c`), not on every restart.
+
+- **Action sounds** (`resources/sounds/*.wav`): `PlayActionSound(SOUND_SWIPE)` and friends, called from the mediator.
+- **Backing track** (`resources/music/background.ogg`): streamed, so `UpdateAudioManager()` has to feed it every frame (`main.c` does). `PlayBackingTrack()` starts it from the top; `StopBackingTrack()` stops it. Music is better as `.ogg` than `.wav`: it's much smaller, which matters for the web build.
+
+If a file is missing, or the machine has no audio device, raylib says so once and the game carries on quietly.
 
 ---
 
 ## Animation Sprite Sheets
 
-Player and NPC sprite sheets are in `resources/` (`player_sprite_sheet.png` and `npc_sprite_sheet.png`). The `assets/production/` folder has <a href="./assets/production/grid_player_sprite_sheet.png">grid_player_sprite_sheet</a>, with each animation laid out on a numbered grid, to help you pick the right frames. It's kept out of `resources/`, so it isn't packaged into the web build.
+Player and NPC sprite sheets are in `resources/` (`player_sprite_sheet.png` and `npc_sprite_sheet.png`). The `art/production/` folder has <a href="./art/production/grid_player_sprite_sheet.png">grid_player_sprite_sheet</a>, with each animation laid out on a numbered grid, to help you pick the right frames. It's kept out of `resources/`, so it isn't packaged into the web build.
 
-On entry to a state, the entry method sets up the animation atlas (coordinates) for that state's animation. The example below is `InitWalkAnimation`.
+On entry to a state, the entry method sets up the animation atlas (coordinates) for that state's animation. Where each animation lives on the sheet is in one place: `include/animation/sprites.h` and `src/sprites.c`, the sprite sheet's reference card. The player and the NPC share a layout, so they share the walk and swipe animations too.
 
 ### Setting Up New Animations
 
@@ -617,42 +691,42 @@ Each frame begins at the top-left corner of its cell on the sprite sheet.
 > **Important:** All frames in a given animation must use the same width and height.
 
 Example: Standard Walk Animation (64x64)
-<img src="./assets/production/InitWalkAnimation.png" alt="InitWalkAnimation Animation Sprites" />
+<img src="./art/production/InitWalkAnimation.png" alt="InitWalkAnimation Animation Sprites" />
 
-Example: Walk Up Animation (64x64), from `player.c`:
-
-```c
-// WALK UP (Row 9, Pixel : Y = 8 x 64 = 512)
-// Each frame is 64 x 64, so Pixel X = (Column - 1) x 64
-static Rectangle walk_UP[9] = {
-	{0, 512, 64, 64},     // Frame 1: Column 1 (Pixel : X 0)
-	{64, 512, 64, 64},    // Frame 2: Column 2 (Pixel : X 64)
-	{128, 512, 64, 64},   // Frame 3: Column 3 (Pixel : X 128)
-	{192, 512, 64, 64},   // Frame 4: Column 4 (Pixel : X 192)
-	{256, 512, 64, 64},   // Frame 5: Column 5 (Pixel : X 256)
-	{320, 512, 64, 64},   // Frame 6: Column 6 (Pixel : X 320)
-	{384, 512, 64, 64},   // Frame 7: Column 7 (Pixel : X 384)
-	{448, 512, 64, 64},   // Frame 8: Column 8 (Pixel : X 448)
-	{512, 512, 64, 64}    // Frame 9: Column 9 (Pixel : X 512)
-};
-```
-
-Example: Sword Attack Animation (192x192), from `player.c`:
+Every frame is a `Rectangle {Pixel X, Pixel Y, width, height}`. Along a row only Pixel X changes, so a whole row of frames is just a bit of maths. `SpriteRow()` in `sprites.c` does it for you:
 
 ```c
-// ATTACK UP (Rows 47-49, Pixel : Y = 46 x 64 = 2944)
-// Each frame is 192 x 192, so Pixel X = (Column - 1) x 192
-static Rectangle sword_attack_UP[6] = {
-	{0, 2944, 192, 192},    // Frame 1: Column 1 (Pixel : X 0)
-	{192, 2944, 192, 192},  // Frame 2: Column 2 (Pixel : X 192)
-	{384, 2944, 192, 192},  // Frame 3: Column 3 (Pixel : X 384)
-	{576, 2944, 192, 192},  // Frame 4: Column 4 (Pixel : X 576)
-	{768, 2944, 192, 192},  // Frame 5: Column 5 (Pixel : X 768)
-	{960, 2944, 192, 192}   // Frame 6: Column 6 (Pixel : X 960)
-};
+SpriteRow(frames, row, count, size);   // row counted from 1, size SPRITE_CELL (64) or SPRITE_SWIPE (192)
 ```
 
-> **Note:** Since 192px = 3 x 64px, sword attack frames advance by 192px along the x-axis (0, 192, 384, 576...). But they start on the **64px** grid going down (rows 47–49 start at y = 2944), not on a 192px one: 2944 isn't a multiple of 192.
+Example: Walk Up (Row 9, 9 frames of 64x64):
+
+```c
+Rectangle frames[9];
+SpriteRow(frames, 9, 9, SPRITE_CELL);
+
+// Pixel Y = (9 - 1) x 64 = 512, so frames[] holds:
+//   {0,   512, 64, 64}   // Frame 1: Column 1 (Pixel : X 0)
+//   {64,  512, 64, 64}   // Frame 2: Column 2 (Pixel : X 64)
+//   {128, 512, 64, 64}   // Frame 3: Column 3 (Pixel : X 128)
+//   ...
+//   {512, 512, 64, 64}   // Frame 9: Column 9 (Pixel : X 512)
+```
+
+Example: Sword Attack Up (Rows 47-49, 6 frames of 192x192):
+
+```c
+Rectangle frames[6];
+SpriteRow(frames, 47, 6, SPRITE_SWIPE);
+
+// Pixel Y = (47 - 1) x 64 = 2944, so frames[] holds:
+//   {0,   2944, 192, 192}  // Frame 1: Column 1 (Pixel : X 0)
+//   {192, 2944, 192, 192}  // Frame 2: Column 2 (Pixel : X 192)
+//   ...
+//   {960, 2944, 192, 192}  // Frame 6: Column 6 (Pixel : X 960)
+```
+
+> **Note:** Since 192px = 3 x 64px, sword attack frames advance by 192px along the x-axis (0, 192, 384, 576...). But they start on the **64px** grid going down (rows 47–49 start at y = 2944), not on a 192px one: 2944 isn't a multiple of 192. That's why `SpriteRow()` always takes the row on the 64 grid.
 
 ### Initialising an Animation
 
@@ -668,18 +742,13 @@ InitGameObjectAnimationOnce(object, frameArray, frameCount, frameSpeed);   // pl
 - `frameCount`: number of frames in that array
 - `frameSpeed`: time between frames (lower = faster animation)
 
-Complete Example:
+The frames are copied, so the array can be a local variable. A complete new animation is three lines:
 
 ```c
-// Define the frame array
-static Rectangle walk_UP[9] = {
-	{0, 512, 64, 64},
-	{64, 512, 64, 64},
-	// ... remaining frames
-};
-
-// Initialise the animation
-InitGameObjectAnimation(object, walk_UP, 9, 0.055f);
+// DEAD (Row 21, 6 frames), from npc.c
+Rectangle dead[6];
+SpriteRow(dead, 21, 6, SPRITE_CELL);
+InitGameObjectAnimation(object, dead, 6, 0.2f);
 ```
 
 Timing Guidelines:
@@ -695,7 +764,7 @@ Timing Guidelines:
 
 ### Coordinate Calculation Rules
 
-The grid on the production sheets counts **from 1**, and so do the comments in `player.c` and `npc.c`.
+The grid on the production sheets counts **from 1**, and so do `SpriteRow()` and the comments in `sprites.c`, `player.c` and `npc.c`. This is the maths `SpriteRow()` does for you, so you can check a row by hand:
 
 #### For 64x64 Animations:
 
@@ -713,16 +782,17 @@ The grid on the production sheets counts **from 1**, and so do the comments in `
 
 ### Naming Conventions
 
-**Recommended patterns for frame arrays:**
+Name the frame array after the animation, and say where it is on the sheet in a comment:
 
 ```c
-static Rectangle walk_UP[9];          // Direction-based movement
-static Rectangle sword_attack_UP[6];  // Action-based animations
-static Rectangle idle_DOWN[4];        // State-based animations
-static Rectangle death_GENERIC[8];    // Generic animations
+// IDLE (Row 3, 7 frames)
+Rectangle idle[7];
+
+// SHIELDING (Row 7, 8 frames)
+Rectangle shielding[8];
 ```
 
-> Use descriptive, UPPERCASE suffixes for clarity (this will help you when debugging).
+For an animation with a version for each direction, use a lookup table indexed by `Direction`, like `WALK_ROWS[]` and `ATTACK_ROWS[]` in `sprites.c`, instead of four arrays and a `switch`.
 
 ### Pitfalls & Debugging
 
@@ -730,7 +800,7 @@ static Rectangle death_GENERIC[8];    // Generic animations
 
 - **Frame "jumps" or glitches:** the width or height is probably wrong. Check all frames use the same size.
 - **Animation doesn't advance:**
-    - Confirm `frameCount` matches the actual number of frames in your array
+    - Confirm `frameCount` matches the actual number of frames in your array (and that the array is big enough for `SpriteRow()` to fill)
     - Make sure the state's entry function calls `InitGameObjectAnimation` (or `…Once`)
     - Make sure the state's update function calls `UpdateAnimation`
 - **Wrong frames display:** double-check the x and y offsets against the grid. Animation bugs are often misaligned rectangles.
@@ -749,7 +819,7 @@ When using large sprites like _sword attacks_:
 - [ ] All frames in the animation have identical width / height
 - [ ] X-coordinate advances by the sprite width (64 or 192)
 - [ ] Y-coordinate is the same for all frames in the row, and on the 64px grid
-- [ ] `frameCount` parameter matches array length
+- [ ] `frameCount` matches the array length, and the `count` you gave `SpriteRow()`
 - [ ] `frameSpeed` is within a reasonable range (0.03f - 0.20f)
 
 ---
@@ -762,9 +832,11 @@ Already working in the _StarterKit_:
 - [x] Sword swipes that stand still, play once, and land damage on the hit frame
 - [x] NPC: chases the player (Walking), swipes when it catches you, shields when the AI decides
 - [x] Shield blocks damage
-- [x] Health bars, game over, and R to restart
-- [x] HUD: command bits, the player's state and the active commands
-- [x] Action sounds: swipe, hit, block and game over
+- [x] Recovery after every swipe (`ATTACK_RECOVERY`), so a missed swing leaves you open
+- [x] Health bars, a game-over banner with the winner (or a draw), and R or Start to restart
+- [x] HUD: frame rate, command bits, the player's state and the active commands
+- [x] One mediator: commands in, game events out (swipe, hit, block, miss, game over)
+- [x] Action sounds and a backing track, all triggered through the mediator
 - [x] A new background every game
 
 The following tasks are suggested to help with your project.
@@ -884,13 +956,15 @@ Already working: health bars for both, damage on the hit frame of a sword swipe,
    - Colour changes on damage
    - Victory / defeat animations
 
-2. **Audio feedback (Options).** The audio manager already plays placeholder sounds for swipes, hits, blocks and game over:
+2. **Audio feedback (Options).** The audio manager already plays placeholder sounds for swipes, hits, blocks and game over, and a backing track:
 
-   - Replace the placeholder `.wav` files in `resources/sounds/` with your own ([rFXGen](https://raylibtech.itch.io/rfxgen) by raysan5, or [Kenney](https://kenney.nl/assets/category:Audio))
+   - Replace the placeholder files in `resources/sounds/` and `resources/music/` with your own ([rFXGen](https://raylibtech.itch.io/rfxgen) by raysan5, or [Kenney](https://kenney.nl/assets/category:Audio))
    - Shield and magic cast sounds (add to `ActionSound` in `audio_manager.h` and to `soundFiles[]`)
-   - Background music (raylib's `LoadMusicStream()`, updated every frame with `UpdateMusicStream()`)
+   - Lower the music behind the game-over banner instead of stopping it, or switch to a faster track when the NPC's aggression maxes out
 
-   Play one-off sounds from a state's `Entry()`, like swipe sound, so they play once per action.
+   **Report, don't play.** A state reports what happened, once, from its `Entry()` (`MediatorNotify(object->mediator, GAME_EVENT_..., object, NULL)`), and the mediator plays the sound. Add a new `GameEvent` for a new action, and its reactions in one new `case`.
+
+3. **Effects through the mediator.** The `GAME_EVENT_HIT` case already has comments for `HudFlash()` and `ShakeCamera()`: write them, and call them there. Nothing in `collision.c` needs to change.
 
 ### Task 5: Implement Combat Mode
 
@@ -913,17 +987,23 @@ Already working: health bars for both, damage on the hit frame of a sword swipe,
 1. Build on real-time loop that's already there:
 
    - Both player and NPC can act at the same time
-   - Add cooldowns for actions
+   - Swipes already have recovery (`ATTACK_RECOVERY`); give your new actions their own
    - Implement timing-based combat
    - Add dodge / movement mechanics
 
-2. Balance action speeds and cooldowns
+2. Balance action speeds, recovery and cooldowns
 
 **MAKE SURE TO BUILD A STATE DIAGRAM e.g.**
 
 [![](https://mermaid.ink/img/pako:eNqNlN9LwzAQx_-VkEdZX3zsgyCrysAp2IGg9SFrrm00P0qaTMbY_26SrjYb6zQP5XL55PK95K47XCoKOMWdIQYyRmpNRLK5LiRy4_3qAyXJDVpQDihFC8kMIxzlnu2J_hs2owci4Hn9CaVBu97vR9jrg7wS_sVk7eIs1QbQ3QakOYPdGkPKA9jbk2jeMODUcRlUIOkpN1rD0VEuTyrIEEc7Yu5vHTH9bylj2EjMIf5ciZaDATqFn1xhZrWf9cy5ww6qjtNeNRqIOQvFOc-VlQb0hei_75ABCakzuHRF09RxktNcpHQaGq3AePgFupZ8S8cP1smewR1d1OAa3qSH93HVS-WKXrO6MUhVUfVHgkNfrDSRnescJTsXThqtOAeK1tt0JBM0t1o7UXFz9QsLWSrhLyeI7uKl-3yJHlXNyt7pC8-LwjMsQAvCqGvs0IoFNo2r9QKnzqRQEctNgQu5dyixRuVbWeLUaAszrJWtG5xWhHduZls6_hgGpCXyTSlxgPY_DLtCBw?type=png)](https://mermaid.live/edit#pako:eNqNlN9LwzAQx_-VkEdZX3zsgyCrysAp2IGg9SFrrm00P0qaTMbY_26SrjYb6zQP5XL55PK95K47XCoKOMWdIQYyRmpNRLK5LiRy4_3qAyXJDVpQDihFC8kMIxzlnu2J_hs2owci4Hn9CaVBu97vR9jrg7wS_sVk7eIs1QbQ3QakOYPdGkPKA9jbk2jeMODUcRlUIOkpN1rD0VEuTyrIEEc7Yu5vHTH9bylj2EjMIf5ciZaDATqFn1xhZrWf9cy5ww6qjtNeNRqIOQvFOc-VlQb0hei_75ABCakzuHRF09RxktNcpHQaGq3AePgFupZ8S8cP1smewR1d1OAa3qSH93HVS-WKXrO6MUhVUfVHgkNfrDSRnescJTsXThqtOAeK1tt0JBM0t1o7UXFz9QsLWSrhLyeI7uKl-3yJHlXNyt7pC8-LwjMsQAvCqGvs0IoFNo2r9QKnzqRQEctNgQu5dyixRuVbWeLUaAszrJWtG5xWhHduZls6_hgGpCXyTSlxgPY_DLtCBw)
 
 Click diagram to open it in Mermaid Live Editor, then change it to match your game.
+
+### Stretch tasks
+
+- **F1 debug overlay:** show the NPC's command and state on the HUD while F1 is held, so you can see what the AI is thinking. `MediatorReceiveCommand()` marks the spot.
+- **Overlapping sounds:** the player and the NPC share one `Sound` for the swoosh, so if both swing at once, one cuts the other off. raylib's `LoadSoundAlias()` gives each its own copy.
+- **Win and loss music:** a short sting for each, chosen by the mediator from the winner it's given.
 
 ---
 
@@ -946,15 +1026,21 @@ EventStateTransition xValidTransitions[] = {
 	{EVENT_NONE, STATE_IDLE},
 	{EVENT_DIE, STATE_DEAD}};
 InitStateConfig(object, STATE_X, "Player_X", PlayerEnterX, PlayerUpdateX, PlayerExitX);
-StateTransitions(&object->stateConfigs[STATE_X], xValidTransitions, sizeof(xValidTransitions) / sizeof(EventStateTransition));
+StateTransitions(&object->stateConfigs[STATE_X], xValidTransitions, ARRAY_COUNT(xValidTransitions));
 
 // Animations
+Rectangle frames[8];
+SpriteRow(frames, row, 8, SPRITE_CELL);                       // where a row of frames is on the sheet
 InitGameObjectAnimation(object, frames, count, 0.055f);       // loops
 InitGameObjectAnimationOnce(object, frames, count, 0.035f);   // plays once, then animation.finished
 UpdateAnimation(&object->animation, deltaTime);
 
-// Sounds
-PlayActionSound(SOUND_SWIPE);                // SOUND_HIT, SOUND_BLOCK, SOUND_GAMEOVER
+// Something happened: tell the mediator, it decides who hears about it
+MediatorNotify(object->mediator, GAME_EVENT_SWIPE, object, NULL);   // HIT, BLOCK, MISS, GAME_OVER
+
+// Logging (filter it with grep: see below)
+TraceLog(LOG_INFO, "[%s] something happened", object->name);
+TraceLog(LOG_DEBUG, "[%s] detail", object->name);  // only with SetTraceLogLevel(LOG_DEBUG)
 
 // Input
 IsKeyDown(KEY_UP);                           // true every frame key is held (walking, shield)
@@ -972,14 +1058,16 @@ Don't panic. Nine times out of ten it's one of these:
 | `raylib.h: No such file or directory` | make can't find raylib | Run setup script again (Step 2) |
 | `gameobjects/player.h: No such file or directory` | An include is missing its folder, or the file is in the wrong folder | Headers go in `include/<folder>/`, included as `"folder/file.h"` |
 | A state never starts | Its event isn't in current state's transition table | Add the `{EVENT, STATE}` pair to the table |
-| `Invalid state transition from A to B` | `ChangeState()` was called for a state not in A's table | Add B to A's table, or send an event instead |
+| `[Player Hero] A -> B is not allowed` | `ChangeState()` was called for a state not in A's table | Add B to A's table, or send an event instead |
 | A state never ends | Nothing in its `Update()` sends an event or changes state | End it on a timer, or on `EVENT_ANIMATION_END` |
 | The character slides | The state moves the character, but animation has no walking legs | Don't move in that state (see Attacking) |
 | Animation stuck on one frame | `UpdateAnimation()` isn't called in state's `Update()`, or the animation is set up again every frame | Set it up once in `Entry()`, update it in `Update()` |
-| Something happens 60 times a second | One-off code (a sound, damage) in `Update()` | Move it to `Entry()`, or use a flag like `attackHit` |
+| Something happens 60 times a second | One-off code (a report, damage) in `Update()` | Move it to `Entry()`, or use a flag like `attackHit` |
+| A sound plays from the wrong place, or twice | It's played directly as well as through the mediator | Report it with `MediatorNotify()`, and only play sounds in `mediator.c` |
+| Music plays for a split second, then stops | The stream isn't being fed | `UpdateAudioManager()` must run every frame (it's in `GameLoop()`) |
 | A new key does two things | It's already used by another command | Check `PollInput()`: movement is on the arrows, and each letter in the key table does one thing |
 | No sound | No audio device (WSL, some lab machines), or browser is waiting for a key press | The game still works; press a key first in the browser |
-| Sprites don't show in browser | The sprite sheet isn't in `resources/` | Everything the game loads must be in `resources/` |
+| Sprites, sounds or music missing in the browser | The file isn't in `resources/` | Everything the game loads must be in `resources/` |
 | Wrong frames or a frame "jumps" | A rectangle is off grid | Check it with the formulas in [Coordinate Calculation Rules](#coordinate-calculation-rules) |
 | `Emscripten not found in …` (Linux) | Emscripten isn't in `~/emsdk` | Run the setup script (Step 2) |
 | `emcc: No such file or directory` (Windows) | Emscripten isn't loaded in this terminal | Close w64devkit and open it again |
@@ -1011,23 +1099,32 @@ valgrind -s \
 
 The suppression file hides leaks reported inside graphics and audio drivers, which aren't yours. Play for a bit, restart with R a few times, then close game: starter kit frees everything it creates, so anything valgrind reports as "definitely lost" is from your code.
 
-### Running game and filtering log
+### Running the game and filtering the log
 
-Every line game logs starts with : `[Game]`, `[FSM]` ,`[Input]`, `[AI]`, `[Player Hero]` or `[The Villan]`. Pipe output through `grep` to filter.
+Every line the game logs starts with who it's about:
 
-Only player:
+| Prefix | Lines |
+|---|---|
+| `[Game]` | starting, game over, closing |
+| `[FSM]` | each state's transition table at startup, then every state change: `[FSM] [Player Hero] Idle -> Walking` |
+| `[Input]` / `[AI]` | the command bits when they change: `[Input] 010100  MOVE_LEFT \| ATTACK` |
+| `[Player Hero]` / `[The Villan]` | where they start, and every hit and block |
+
+Pipe the output through `grep` to see just the bits you care about.
+
+Only the player:
 
 ```bash
 make run | grep "\[Player Hero\]"
 ```
 
-The player and game (`-E` lets you use `|` to mean "or"):
+The player and the game (`-E` lets you use `|` to mean "or"):
 
 ```bash
 make run | grep -E "\[(Player Hero|Game)\]"
 ```
 
-Everything about fight, without input and AI chatter:
+Everything about the fight, without the input and AI chatter:
 
 ```bash
 make run | grep -v -E "\[(Input|AI)\]"
@@ -1036,18 +1133,19 @@ make run | grep -v -E "\[(Input|AI)\]"
 Only state changes:
 
 ```bash
-make run | grep -- "\[(FSM\]"
+make run | grep -E "\[FSM\] \["
 ```
 
-Keep a copy of full log to read afterwards, as well as seeing it on screen:
+Keep a copy of the full log to read afterwards, as well as seeing it on screen:
 
 ```bash
 make run | tee game.log
 grep "\[The Villan\]" game.log
 ```
 
-> Square brackets need a backslash (`\[`) because `[` means something special to `grep`.
+> The square brackets need a backslash (`\[`) because `[` means something special to `grep`. Leave it out and `grep` goes looking for any single letter from "Player Hero", and you'll get the whole log back.
 
+**More detail:** add `SetTraceLogLevel(LOG_DEBUG);` before `InitWindow()` in `main.c` to see the debug lines too, such as `[The Villan] missed [Player Hero]`. raylib adds a few of its own (texture loading and so on); those aren't from your code.
 
 ---
 

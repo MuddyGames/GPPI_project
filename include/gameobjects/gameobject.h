@@ -84,6 +84,9 @@ void InitGameObjectAnimationOnce(GameObject *object, Rectangle *frames, int fram
 // Keep on screen
 void ClampGameObjectOnScreen(GameObject *object);
 
+// Draw a game object: collider ring, sprite, position and health bar
+void DrawGameObject(const GameObject *object);
+
 // Delete a game object and free associated memory/resources
 void DeleteGameObject(GameObject *object);
 

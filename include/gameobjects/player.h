@@ -49,10 +49,10 @@ void PlayerEnterShielding(GameObject *object, float deltaTime);	 // Called when 
 void PlayerUpdateShielding(GameObject *object, float deltaTime); // Called to update the player's behavior while shielding
 void PlayerExitShielding(GameObject *object, float deltaTime);	 // Called when exiting the shielding state
 
-// State functions for die state
-void PlayerEnterDie(GameObject *object, float deltaTime);  // Called when entering the die state
-void PlayerUpdateDie(GameObject *object, float deltaTime); // Called to update the player's behavior while dead
-void PlayerExitDie(GameObject *object, float deltaTime);   // Called when exiting the dead state
+// State functions for Death state
+void PlayerEnterDead(GameObject *object, float deltaTime);  // Called when entering the dead state
+void PlayerUpdateDead(GameObject *object, float deltaTime); // Called to update the player's behavior while dead
+void PlayerExitDead(GameObject *object, float deltaTime);   // Called when exiting the dead state
 
 // State functions for respawn state
 void PlayerEnterRespawn(GameObject *object, float deltaTime);  // Called when entering the respawn state

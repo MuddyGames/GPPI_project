@@ -4,6 +4,7 @@
     <ClCompile Include="..\..\..\src\ai_manager.c" />
     <ClCompile Include="..\..\..\src\animation.c" />
     <ClCompile Include="..\..\..\src\audio_manager.c" />
+    <ClCompile Include="..\..\..\src\background.c" />
     <ClCompile Include="..\..\..\src\collision.c" />
     <ClCompile Include="..\..\..\src\command.c" />
     <ClCompile Include="..\..\..\src\cute_c2_impl.c" />
@@ -16,6 +17,7 @@
     <ClCompile Include="..\..\..\src\mediator.c" />
     <ClCompile Include="..\..\..\src\npc.c" />
     <ClCompile Include="..\..\..\src\player.c" />
+    <ClCompile Include="..\..\..\src\sprites.c" />
     <ClCompile Include="..\..\..\src\utils.c" />
   </ItemGroup>
   <ItemGroup>
@@ -54,6 +56,9 @@
     <ClInclude Include="..\..\..\include\animation\animation.h">
       <Filter>include\animation</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\animation\sprites.h">
+      <Filter>include\animation</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\include\command\command.h">
       <Filter>include\command</Filter>
     </ClInclude>
@@ -62,6 +67,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\include\fsm\fsm.h">
       <Filter>include\fsm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\game\background.h">
+      <Filter>include\game</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\game\game.h">
       <Filter>include\game</Filter>

@@ -176,3 +176,92 @@ void DeleteGameObject(GameObject *object)
 	free(object);
 	object = NULL; // Nullify
 }
+
+// Health bar above the object: green for what's left, red for what's lost
+static void DrawGameObjectHealthBar(const GameObject *object)
+{
+	// Healthbar Dimensions
+	const int healthBarWidth = 100;
+	const int healthBarHeight = 10;
+
+	// Center above GameObject
+	const int healthBarX = object->position.x - (healthBarWidth / 2);
+	const int healthBarY = object->position.y - 40;
+
+	// Make sure health is between 0 and 100
+	int health = object->health;
+	if (health < 0)
+		health = 0;
+	if (health > 100)
+		health = 100;
+
+	// Bar width
+	float healthPercentage = health / 100.0f;
+	int currentHealth = (int)(healthBarWidth * healthPercentage);
+	int lostHealth = healthBarWidth - currentHealth;
+	lostHealth = Clamp(lostHealth, 0, healthBarWidth);
+
+	// Colours
+	Color background = ColorAlpha(GRAY, 0.5f);
+	Color currentHealthColor = ColorAlpha(GREEN, 0.5f);
+	Color lostHealthColor = ColorAlpha(RED, 0.5f);
+
+	// Background (gray)
+	DrawRectangle(healthBarX, healthBarY, healthBarWidth, healthBarHeight, background);
+
+	// Current health (green)
+	DrawRectangle(healthBarX, healthBarY, currentHealth, healthBarHeight, currentHealthColor);
+
+	// Lost health (red)
+	DrawRectangle(healthBarX + currentHealth, healthBarY, lostHealth, healthBarHeight, lostHealthColor);
+}
+
+// Draw the GameObject in this example a simple Circle which is a collider
+static void DrawGameObjectColliderCircle(const GameObject *object)
+{
+	// Set alpha for collisision circle
+	Color background = ColorAlpha(object->color, 0.5f);
+
+	// Circle Thickness
+	int thickness = 5;
+
+	// GameObject Circle
+	DrawRing(
+		object->position,					// Vector2 (x, y)
+		object->collider.r - thickness / 2, // inner radius
+		object->collider.r + thickness / 2, // outer radius
+		0.0f, 360.0f,						// start angle, end angle
+		64,									// segments
+		background							// Color
+	);
+}
+
+// Draw position information at the bottom of the GameObject
+static void DrawGameObjectPositionInfo(const GameObject *object)
+{
+	const char *information = TextFormat("(%.f, %.f)",
+										 object->position.x,
+										 object->position.y);
+	DrawText(
+		information,
+		object->position.x - (MeasureText(information, DEFAULT_FONT_SIZE) / 2), // Measure the text with with MeasureText
+		object->position.y + 30,												// Place it below the GameObject
+		DEFAULT_FONT_SIZE, DARKGRAY);
+}
+
+/**
+ * DrawGameObject : Draws one game object, with its bits and pieces.
+ *
+ * Collider ring underneath, then the sprite, then its position and health
+ * bar on top. The player and the NPC are drawn exactly the same way.
+ *
+ * @object: The game object to draw.
+ */
+
+void DrawGameObject(const GameObject *object)
+{
+	DrawGameObjectColliderCircle(object);                       // Ring underneath
+	DrawAnimation(&object->animation, object->position, WHITE); // The sprite
+	DrawGameObjectPositionInfo(object);                         // (x, y) underneath
+	DrawGameObjectHealthBar(object);                            // Health above
+}

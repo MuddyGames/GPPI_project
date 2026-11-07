@@ -61,11 +61,18 @@ void InitAudioManager()
 
 void PlayActionSound(ActionSound sound)
 {
-	if (sound < 0 || sound >= SOUND_COUNT || !IsSoundValid(sounds[sound]))
+	// Not one of ours: that's a bug in the calling code, so say so
+	if (sound < 0 || sound >= SOUND_COUNT)
 	{
 		TraceLog(LOG_ERROR, "[AudioManager] Invalid sound index %d", sound);
 		return;
 	}
+
+	// Didn't load (missing file, or no audio device on this machine): raylib
+	// already said so once at startup, so carry on quietly rather than
+	// complaining on every swipe
+	if (!IsSoundValid(sounds[sound]))
+		return;
 
 	// A little variety: 90% to 110% of the normal pitch
 	// SetSoundPitch(sounds[sound], GetRandomValue(90, 110) / 100.0f);

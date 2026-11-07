@@ -6,6 +6,7 @@
 
 #include "command/command.h"
 #include "utils/ai_manager.h"
+#include "utils/utils.h"
 
 /**
  * InitAIManager : Sets up the AI manager....or at least pretends to. All it
@@ -65,7 +66,7 @@ Command PollAI()
 		MOVE_RIGHT,
 		DEFEND};
 
-	int count = sizeof(commands) / sizeof(commands[0]);
+	int count = ARRAY_COUNT(commands);
 	int index = rand() % count;
 
 	command = commands[index];
