@@ -38,8 +38,12 @@
 #define COLLISION_BUFFER 2.0f
 #define COLLISION_PUSH_BACK 2.0f
 
+// Sword swipe recovery: after the swipe animation ends, the fighter holds the last
+// frame (sword down) this how long before it can act again.
+#define ATTACK_RECOVERY 0.2f
+
 // Firing Cooldown (0.1 seconds)
-#define COMMAND_FIRE_COOLDOWN 0.1f
+// #define FIRE_COOLDOWN 0.1f
 
 // Firing Trigger Threshold
 #define FIRING_TRIGGER_THRESHOLD 0.1f
