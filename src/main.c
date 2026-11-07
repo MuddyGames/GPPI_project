@@ -79,6 +79,9 @@ void GameLoop(GameData *data)
 
 	UpdateGame(data, deltaTime);
 
+	// Keep the backing track streaming
+	UpdateAudioManager();
+
 	// Raylib function Draw
 	BeginDrawing();
 
