@@ -1,6 +1,5 @@
 #include "gameobjects/player.h"
 #include "utils/utils.h"
-#include "utils/audio_manager.h"
 #include "utils/mediator.h"
 
 /*
@@ -142,7 +141,7 @@ void InitPlayerFSM(GameObject *object)
 
 	// ---- STATE_SHIELD state configuration ----
 	// Define valid transitions from STATE_SHIELD
-	EventStateTransition sheildingValidTransitions[] = {
+	EventStateTransition shieldingValidTransitions[] = {
 		// EVENT -> STATE
 		{EVENT_NONE, STATE_IDLE},
 		{EVENT_ATTACK, STATE_ATTACKING},
@@ -150,7 +149,7 @@ void InitPlayerFSM(GameObject *object)
 	// Set up the state configuration for STATE_SHIELD
 	InitStateConfig(object, STATE_SHIELD, "Player_Shielding", PlayerEnterShielding, PlayerUpdateShielding, PlayerExitShielding);
 	// Configure valid transitions for STATE_SHIELD
-	StateTransitions(&object->stateConfigs[STATE_SHIELD], sheildingValidTransitions, sizeof(sheildingValidTransitions) / sizeof(EventStateTransition));
+	StateTransitions(&object->stateConfigs[STATE_SHIELD], shieldingValidTransitions, sizeof(shieldingValidTransitions) / sizeof(EventStateTransition));
 
 	// ---- STATE_DEAD state configuration ----
 	// Define valid transitions from STATE_DEAD
@@ -566,6 +565,9 @@ void PlayerEnterAttacking(GameObject *object, float deltaTime)
 	// A fresh swipe hasn't landed yet (see AttackHit in collision.c)
 	object->attackHit = false;
 
+	// Recovery timer starts again for this swipe (see PlayerUpdateAttacking)
+	object->timer = 0.0f;
+
 	// One swipe, facing the way the player was going
 	InitAttackAnimation(object);
 
@@ -584,10 +586,13 @@ void PlayerUpdateAttacking(GameObject *object, float deltaTime)
 	// Update the Animation
 	UpdateAnimation(&object->animation, deltaTime);
 
-	// Swipe finished? Tell the FSM, and the transition table decides what's next
+	// Swipe finished? Hold the last frame for ATTACK_RECOVERY (sword down,
+	// a missed swing leaves you open), then tell the FSM, and transition table decides what's next
 	if (object->animation.finished)
 	{
-		HandleEvent(object, EVENT_ANIMATION_END, deltaTime);
+		object->timer += deltaTime;
+		if (object->timer >= ATTACK_RECOVERY)
+			HandleEvent(object, EVENT_ANIMATION_END, deltaTime);
 	}
 }
 
