@@ -18,6 +18,12 @@ void InitAudioManager();
 // Play an action sound
 void PlayActionSound(ActionSound sound);
 
+// Play the background music
+void PlayBackingTrack();
+
+// Stop the background music
+void StopBackingTrack();
+
 // Cleanup: unloads the sounds and closes the audio device (call once, before CloseWindow)
 void DeleteAudioManager();
 

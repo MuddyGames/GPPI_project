@@ -14,6 +14,10 @@ static const char *soundFiles[SOUND_COUNT] = {
 	"resources/sounds/gameover.wav"	   // SOUND_GAMEOVER
 };
 
+// Game background music
+static Music background;
+static const char *backgroundFile = "resources/music/background.ogg";
+
 /**
  * InitAudioManager : Tunes up the band before the session starts.
  *
@@ -63,6 +67,51 @@ void PlayActionSound(ActionSound sound)
 }
 
 /**
+ * PlayBackingTrack : Strikes up the band.
+ *
+ * Starts the backing track from the top (stopping it first means a restart
+ * starts the tune again, rather than carrying on mid-verse). It loops until
+ * StopBackingTrack().
+ */
+
+void PlayBackingTrack()
+{
+	if (!IsMusicValid(background))
+		return; // No file, or no audio device: carry on quietly
+
+	StopMusicStream(background);
+	PlayMusicStream(background);
+}
+
+/**
+ * StopBackingTrack : The band stops (e.g. at game over, so the game-over
+ * sound isn't drowned out).
+ */
+
+void StopBackingTrack()
+{
+	if (IsMusicValid(background))
+		StopMusicStream(background);
+}
+
+/**
+ * UpdateAudioManager : Keeps the backing track fed.
+ *
+ * A Sound is loaded whole, so it just plays. A Music stream is read a
+ * little at a time, so raylib needs topping up every frame: forget this
+ * and the track plays a fraction of a second then goes quiet, like a
+ * session where nobody buys the next round.
+ *
+ * Called once a frame from main.c.
+ */
+
+void UpdateAudioManager()
+{
+	if (IsMusicValid(background))
+		UpdateMusicStream(background);
+}
+
+/**
  * DeleteAudioManager : Packs up the band at closing time.
  *
  * Unloads every sound, then closes the audio device. Called once from
@@ -76,6 +125,9 @@ void DeleteAudioManager()
 		if (IsSoundValid(sounds[i]))
 			UnloadSound(sounds[i]);
 	}
+
+	if (IsMusicValid(background))
+		UnloadMusicStream(background);
 
 	// Only close what was opened (no audio device on some lab machines or in WSL)
 	if (IsAudioDeviceReady())
