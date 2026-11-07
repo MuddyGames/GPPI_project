@@ -1,5 +1,6 @@
 #include <raylib.h>
 
+#include "utils/constants.h"
 #include "utils/audio_manager.h"
 
 // The loaded sounds, one per ActionSound. Only this file knows about them.
@@ -38,6 +39,11 @@ void InitAudioManager()
 	{
 		sounds[i] = LoadSound(soundFiles[i]);
 	}
+
+	// Backing track: loaded once, like the sounds. Streams loop by default.
+	background = LoadMusicStream(backgroundFile);
+	if (IsMusicValid(background))
+		SetMusicVolume(background, BACKING_TRACK_VOLUME);
 }
 
 /**

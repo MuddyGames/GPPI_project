@@ -70,4 +70,7 @@
 // Command Names buffer size for Debugging
 #define COMMAND_NAMES_SIZE 64
 
+// Backing Track Default Volume (0.0f to 1.0f)
+#define BACKING_TRACK_VOLUME 0.6f
+
 #endif // CONSTANTS_H
