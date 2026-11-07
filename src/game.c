@@ -5,7 +5,6 @@
 
 #include "utils/input_manager.h"
 #include "utils/ai_manager.h"
-#include "utils/audio_manager.h"
 
 // Frees everything InitGame() created, but not the GameData itself (see below)
 static void UnloadGameData(GameData *data);
@@ -155,11 +154,139 @@ void InitGame(GameData *data)
 	MediatorNotify(data->mediator, GAME_EVENT_LEVEL_START, NULL, NULL);
 }
 
+// ---------------------------------------------------------------------------
+// UpdateGame's helpers: one job each, so UpdateGame() reads like a list
+// ---------------------------------------------------------------------------
+
+/**
+ * UpdatePlayer : The player's turn. Input -> mediator -> FSM.
+ */
+
+static void UpdatePlayer(GameData *data, float deltaTime)
+{
+	// What's the player pressing? The mediator passes it on (and tells the HUD)
+	Command command = PollInput();
+	MediatorReceiveCommand(data->mediator, &data->player->base, command, deltaTime);
+
+	// Run the player's current state (animation, walking, the swipe ...)
+	UpdateState(&data->player->base, deltaTime);
+}
+
+/**
+ * UpdateNPC : The NPC's turn. AI -> mediator -> FSM, same road as the player.
+ *
+ * The AI makes up its mind once a second (see ai_manager.c), which is
+ * generous given its low IQ.
+ */
+
+static void UpdateNPC(GameData *data, float deltaTime)
+{
+	// What does the AI want? Same mediator, same road in as the player's commands
+	Command command = PollAI();
+	MediatorReceiveCommand(data->mediator, &data->npc->base, command, deltaTime);
+
+	// The NPC's target is always the player: it chases it while Walking
+	data->npc->target = data->player->base.position;
+
+	// The longer it chases, the angrier (and faster) it gets (see npc.c)
+	UpdateNPCAggression(data->npc, deltaTime);
+
+	// Run the NPC's current state
+	UpdateState(&data->npc->base, deltaTime);
+}
+
+/**
+ * UpdateCollisions : Have they bumped into each other?
+ *
+ * Three cases, like a door: just walked in (ENTER), still in the doorway
+ * (ONGOING), just walked out (EXIT). The FSMs hear about ENTER and EXIT as
+ * events; the push-back keeps them from standing inside each other.
+ */
+
+static void UpdateCollisions(GameData *data, float deltaTime)
+{
+	GameObject *player = &data->player->base;
+	GameObject *npc = &data->npc->base;
+
+	bool isColliding = CheckCollision(player, npc);
+
+	if (isColliding && !player->isColliding)
+	{
+		// ENTER: tell the FSMs (the NPC swings when it catches the player)
+		HandleEvent(player, EVENT_COLLISION_START, deltaTime);
+		HandleEvent(npc, EVENT_COLLISION_START, deltaTime);
+
+		CollisionEntry(player, npc);
+		HandleCollision(player, npc);
+	}
+	else if (isColliding && player->isColliding)
+	{
+		// ONGOING: keep them apart
+		HandleCollision(player, npc);
+	}
+	else if (!isColliding && player->isColliding)
+	{
+		// EXIT
+		HandleEvent(player, EVENT_COLLISION_END, deltaTime);
+		HandleEvent(npc, EVENT_COLLISION_END, deltaTime);
+
+		CollisionExit(player, npc);
+	}
+
+	// Remember for next frame
+	player->isColliding = isColliding;
+	npc->isColliding = isColliding;
+}
+
+/**
+ * UpdateCombat : Sword swipes land (or don't).
+ *
+ * Damage lands once per swipe, on the hit frame (see AttackHit in collision.c).
+ * AttackHit reports hits, blocks and misses to the mediator itself.
+ */
+
+static void UpdateCombat(GameData *data)
+{
+	AttackHit(&data->player->base, &data->npc->base);
+	AttackHit(&data->npc->base, &data->player->base);
+}
+
+/**
+ * CheckGameOver : Is anyone out of health?
+ *
+ * Whoever's still standing wins. Both down on the same frame (they can hit
+ * each other at once) is a draw, and the winner is NULL.
+ *
+ * Reports it to the mediator once: the mediator logs it, plays the sound and
+ * tells the HUD. game.c just says what happened.
+ */
+
+static void CheckGameOver(GameData *data)
+{
+	GameObject *player = &data->player->base;
+	GameObject *npc = &data->npc->base;
+
+	// Both still standing: on we go
+	if (player->health > 0 && npc->health > 0)
+		return;
+
+	data->gsm = STATE_GAMEOVER;
+
+	GameObject *winner = NULL; // A draw, unless someone's still standing
+	if (player->health > 0)
+		winner = player;
+	else if (npc->health > 0)
+		winner = npc;
+
+	MediatorNotify(data->mediator, GAME_EVENT_GAME_OVER, winner, NULL);
+}
+
 /**
  * UpdateGame : Runs one tick of game logic.
  *
- * Handles player input, NPC behaviour, state updates, and collisions.
- * The NPC gets a new "idea" every second, which is generous given its low IQ.
+ * Reads like the game loop itself: player, NPC, collisions, combat, game over.
+ * Each step is its own small function above, so when you add something new
+ * (pickups, a second NPC ...) it gets its own line here, not 20 lines in the middle.
  *
  * @data:      All the game's current state.
  * @deltaTime: Time since the last update.
@@ -167,116 +294,26 @@ void InitGame(GameData *data)
 
 void UpdateGame(GameData *data, float deltaTime)
 {
-	// Update if gsm == STATE_PLAY
-	if (data->gsm == STATE_PLAY)
+	switch (data->gsm)
 	{
-		// Poll input from the player and execute the corresponding command
-		Command command = PollInput();
-		MediatorReceiveCommand(data->mediator, &data->player->base, command, deltaTime);
+	case STATE_PLAY:
+		UpdatePlayer(data, deltaTime);	   // input -> mediator -> FSM
+		UpdateNPC(data, deltaTime);		   // AI -> mediator -> FSM, chase the player
+		UpdateCollisions(data, deltaTime); // enter / ongoing / exit
+		UpdateCombat(data);				   // sword hits land on the hit frame
+		CheckGameOver(data);			   // anyone out of health?
+		break;
 
-		// Update the player's state based on its current configuration
-		UpdateState(&data->player->base, deltaTime);
-
-		// Update NPC: the AI makes up its mind once a second (see ai_manager.c)
-		Command npcCommand = PollAI();
-		MediatorReceiveCommand(data->mediator, &data->npc->base, npcCommand, deltaTime);
-
-		// The NPC's target is always the player: it chases it while Walking
-		data->npc->target = data->player->base.position;
-
-		// Aggression builds while the NPC is chasing or attacking (it gets faster)
-		if (data->npc->base.currentState == STATE_WALKING ||
-			data->npc->base.currentState == STATE_ATTACKING)
-		{
-			data->npc->aggression += NPC_AGGRESSION_BUILD * deltaTime; // Increase aggression over time while chasing
-			if (data->npc->aggression > NPC_MAX_AGGRESSION)
-				data->npc->aggression = NPC_MAX_AGGRESSION;
-		}
-		else
-		{
-			// Reduce aggression when not chasing or attacking
-			data->npc->aggression -= NPC_AGGRESSION_DECAY * deltaTime;
-			if (data->npc->aggression < NPC_MIN_AGGRESSION)
-				data->npc->aggression = NPC_MIN_AGGRESSION; // Minimum aggression
-		}
-
-		// Update the NPC's state after handling the event
-		UpdateState(&data->npc->base, deltaTime);
-
-		// Check for Collisions
-		bool isColliding = CheckCollision(&data->player->base, &data->npc->base);
-
-		// ENTER Collision
-		if (isColliding && !data->player->base.isColliding)
-		{
-			// Notify FSMs
-			HandleEvent(&data->player->base, EVENT_COLLISION_START, deltaTime);
-			HandleEvent(&data->npc->base, EVENT_COLLISION_START, deltaTime);
-
-			// Respond to Collision
-			CollisionEntry(&data->player->base, &data->npc->base);
-			HandleCollision(&data->player->base, &data->npc->base);
-		}
-		else if (!isColliding && data->player->base.isColliding)
-		{
-			// EXIT Collision
-			HandleEvent(&data->player->base, EVENT_COLLISION_END, deltaTime);
-			HandleEvent(&data->npc->base, EVENT_COLLISION_END, deltaTime);
-
-			CollisionExit(&data->player->base, &data->npc->base);
-		}
-		else if (isColliding && data->player->base.isColliding)
-		{
-			// ONGOING Collision
-			HandleCollision(&data->player->base, &data->npc->base);
-		}
-
-		// Update isColliding for GameObjects
-		data->player->base.isColliding = isColliding;
-		data->npc->base.isColliding = isColliding;
-
-		// Sword swipes: damage lands once per swipe, on the hit frame (see collision.c)
-		AttackHit(&data->player->base, &data->npc->base);
-		AttackHit(&data->npc->base, &data->player->base);
-
-		// Game Over Check
-		if (data->player->base.health <= 0 || data->npc->base.health <= 0)
-		{
-			data->gsm = STATE_GAMEOVER;
-			//PlayActionSound(SOUND_GAMEOVER);
-
-			MediatorNotify(data->mediator, GAME_EVENT_GAME_OVER, (data->player->base.health <= 0) ? &data->npc->base : &data->player->base, NULL);
-
-			// Print the result once, when the game ends (not every frame after)
-			// Did the player lose
-			if (data->player->base.health <= 0)
-			{
-				TraceLog(LOG_INFO, "[Game] over: [%s] won", data->npc->base.name);
-				// Villian Won and Player Lost
-				MediatorNotify(data->mediator, GAME_EVENT_GAME_OVER, &data->npc->base, NULL);
-			}
-			// Did the NPC lose
-			else if (data->npc->base.health <= 0)
-			{
-				// NPC Lost
-				TraceLog(LOG_INFO, "[Game] Congratulations [%s] defeated [%s]", data->player->base.name, data->npc->base.name);
-				// Player Won and Villian Lost
-				MediatorNotify(data->mediator, GAME_EVENT_GAME_OVER, &data->player->base, NULL);
-			}
-		}
-	}
-	// Game Over State Logic handled here
-	else if (data->gsm == STATE_GAMEOVER)
-	{
-		// Restart Game (R key)
-		// Put in input manager so you can handle Keyboard/Controller
-		if (IsKeyPressed(KEY_R))
+	case STATE_GAMEOVER:
+		// R (or Start on a gamepad) for another go
+		if (PollRestart())
 		{
 			// Free the old game first, or every restart leaks the player, the NPC,
 			// the mediator and three textures
 			UnloadGameData(data);
 			InitGame(data);
 		}
+		break;
 	}
 }
 

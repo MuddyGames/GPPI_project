@@ -15,6 +15,9 @@ typedef enum
 // Init Audio Manager: opens the audio device and loads the sounds (call once, after InitWindow)
 void InitAudioManager();
 
+// Keep the backing track fed (call once every frame, see main.c)
+void UpdateAudioManager();
+
 // Play an action sound
 void PlayActionSound(ActionSound sound);
 
