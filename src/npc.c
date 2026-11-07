@@ -433,22 +433,21 @@ void NPCExitShielding(GameObject *object, float deltaTime)
 // Enter function for Dead state, executed once upon entering Dead
 void NPCEnterDead(GameObject *object, float deltaTime)
 {
-	// Initialization code for entering Dead state, such as playing death animation or disabling further actions.
 	(void)deltaTime;
-	NPC *npc = (NPC *)object;
-	(void)npc;
 
-	// DEAD (Row 21, 6 frames)
+	// DEAD (Row 21, 6 frames): plays ONCE, then stays on the last frame, lying down.
+	// (Looping it would have the poor divil keel over again and again.)
 	Rectangle dead[6];
 	SpriteRow(dead, 21, 6, SPRITE_CELL);
-	InitGameObjectAnimation(&npc->base, dead, 6, 0.2f);
+	InitGameObjectAnimationOnce(object, dead, 6, 0.2f);
 }
 
 // Update function for Dead state, called repeatedly during game ticks while in Dead
 void NPCUpdateDead(GameObject *object, float deltaTime)
 {
-	// During game loop and game ticks, execute Dead state behavior here, such as preventing any actions.
-	// This could be a place to check if the NPC should be removed or respawned.
+	// The animation stops by itself on its last frame (it plays once).
+	// When it's done, object->animation.finished is true: a good moment for
+	// game over, or to send EVENT_RESPAWN (see the tasks).
 	UpdateAnimation(&object->animation, deltaTime);
 }
 
