@@ -52,10 +52,13 @@ void InitAudioManager()
 void PlayActionSound(ActionSound sound)
 {
 	if (sound < 0 || sound >= SOUND_COUNT || !IsSoundValid(sounds[sound]))
+	{
+		TraceLog(LOG_ERROR, "[AudioManager] Invalid sound index %d", sound);
 		return;
+	}
 
 	// A little variety: 90% to 110% of the normal pitch
-	SetSoundPitch(sounds[sound], GetRandomValue(90, 110) / 100.0f);
+	// SetSoundPitch(sounds[sound], GetRandomValue(90, 110) / 100.0f);
 	PlaySound(sounds[sound]);
 }
 
