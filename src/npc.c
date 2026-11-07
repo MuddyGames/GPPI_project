@@ -1,6 +1,5 @@
 #include "gameobjects/npc.h"
 #include "utils/utils.h"
-#include "utils/audio_manager.h"
 #include "utils/mediator.h"
 
 /*
@@ -58,7 +57,7 @@ NPC *InitNPC(const char *name, Vector2 position, int radius)
 	);
 
 	// Set the default aggression level for the NPC
-	npc->aggression = NPC_MIN_AGGRESSION; // Mild agression
+	npc->aggression = NPC_MIN_AGGRESSION; // Mild aggression
 
 	// Nothing to chase yet: game.c sets the target to the player every frame
 	npc->target = position;
@@ -77,6 +76,29 @@ NPC *InitNPC(const char *name, Vector2 position, int radius)
 
 	// Return a pointer to the initialized NPC object
 	return npc;
+}
+
+/**
+ * UpdateNPCAggression : The longer the NPC chases you, the angrier it gets.
+ *
+ * Aggression builds while it's walking or swinging, and cools off when it
+ * stops (idle or behind its shield). NPCUpdateWalking() uses it as a speed
+ * factor, so an angry NPC is a fast NPC.
+ *
+ * @npc:       The NPC.
+ * @deltaTime: Time since last frame.
+ */
+
+void UpdateNPCAggression(NPC *npc, float deltaTime)
+{
+	State state = npc->base.currentState;
+
+	if (state == STATE_WALKING || state == STATE_ATTACKING)
+		npc->aggression += NPC_AGGRESSION_BUILD * deltaTime; // Hotting up
+	else
+		npc->aggression -= NPC_AGGRESSION_DECAY * deltaTime; // Cooling off
+
+	npc->aggression = Clamp(npc->aggression, NPC_MIN_AGGRESSION, NPC_MAX_AGGRESSION);
 }
 
 /**
@@ -157,7 +179,7 @@ void InitNPCFSM(GameObject *object)
 
 	// ---- STATE_SHIELD state configuration ----
 	// Define valid transitions from STATE_SHIELD
-	EventStateTransition sheildingValidTransitions[] = {
+	EventStateTransition shieldingValidTransitions[] = {
 		// EVENT -> STATE
 		{EVENT_NONE, STATE_IDLE},
 		{EVENT_MOVE, STATE_WALKING},
@@ -165,7 +187,7 @@ void InitNPCFSM(GameObject *object)
 	// Set up the state configuration for STATE_SHIELD
 	InitStateConfig(object, STATE_SHIELD, "NPC_Shielding", NPCEnterShielding, NPCUpdateShielding, NPCExitShielding);
 	// Configure valid transitions for STATE_SHIELD
-	StateTransitions(&object->stateConfigs[STATE_SHIELD], sheildingValidTransitions, sizeof(sheildingValidTransitions) / sizeof(EventStateTransition));
+	StateTransitions(&object->stateConfigs[STATE_SHIELD], shieldingValidTransitions, sizeof(shieldingValidTransitions) / sizeof(EventStateTransition));
 
 	// ---- STATE_DEAD state configuration ----
 	// Define valid transitions from STATE_DEAD
@@ -187,7 +209,6 @@ void NPCEnterIdle(GameObject *object, float deltaTime)
 	// Initialization code for entering Idle state, such as resetting timers or animation.
 	(void)deltaTime;
 	NPC *npc = (NPC *)object;
-
 
 	if (npc->base.previousState != npc->base.currentState && npc->base.currentState == STATE_IDLE)
 	{
@@ -330,7 +351,6 @@ void NPCEnterWalking(GameObject *object, float deltaTime)
 	(void)deltaTime;
 	NPC *npc = (NPC *)object;
 
-
 	// Face the target and start walking
 	Vector2 direction = DirectionToTarget(npc);
 	if (Vector2Length(direction) > 0.0f)
@@ -371,7 +391,7 @@ void NPCUpdateWalking(GameObject *object, float deltaTime)
 	// aggression already runs from NPC_MIN_AGGRESSION to NPC_MAX_AGGRESSION (see game.c),
 	// so it's used directly as a speed factor: 0.3 = 30% speed, 0.8 = 80% speed
 
-	// Make sure aggression factor is clamped between min and max agression
+	// Make sure aggression factor is clamped between min and max aggression
 	float aggression_factor = Clamp(npc->aggression, NPC_MIN_AGGRESSION, NPC_MAX_AGGRESSION);
 
 	float movement = DEFAULT_MOVEMENT_SPEED * aggression_factor * deltaTime;
@@ -403,7 +423,6 @@ void NPCExitWalking(GameObject *object, float deltaTime)
 	(void)deltaTime;
 	NPC *npc = (NPC *)object;
 	(void)npc;
-
 }
 
 /**
@@ -484,9 +503,11 @@ void NPCEnterAttacking(GameObject *object, float deltaTime)
 	(void)deltaTime;
 	NPC *npc = (NPC *)object;
 
-
 	// A fresh swipe hasn't landed yet (see AttackHit in collision.c)
 	object->attackHit = false;
+
+	// Recovery timer starts again for this swipe (see NPCUpdateAttacking)
+	object->timer = 0.0f;
 
 	// Turn to face the target, then swing
 	Vector2 direction = DirectionToTarget(npc);
@@ -507,10 +528,13 @@ void NPCUpdateAttacking(GameObject *object, float deltaTime)
 	// Update attack animation
 	UpdateAnimation(&object->animation, deltaTime);
 
-	// Swipe finished? Tell the FSM: the transition table sends the NPC back to chasing
+	// Swipe finished? Hold the last frame for ATTACK_RECOVERY (sword down), then tell
+	// FSM: the transition table sends the NPC back to chasing
 	if (object->animation.finished)
 	{
-		HandleEvent(object, EVENT_ANIMATION_END, deltaTime);
+		object->timer += deltaTime;
+		if (object->timer >= ATTACK_RECOVERY)
+			HandleEvent(object, EVENT_ANIMATION_END, deltaTime);
 	}
 }
 
@@ -534,7 +558,7 @@ void NPCEnterShielding(GameObject *object, float deltaTime)
 	// Each frame is 64 x 64, so Pixel X = (Column - 1) x 64
 	// Initialize shielding animation
 
-	Rectangle sheilding[8] = {
+	Rectangle shielding[8] = {
 		{0, 384, 64, 64},	// Frame 1: Column 1 (Pixel : X 0)
 		{64, 384, 64, 64},	// Frame 2: Column 2 (Pixel : X 64)
 		{128, 384, 64, 64}, // Frame 3: Column 3 (Pixel : X 128)
@@ -545,7 +569,7 @@ void NPCEnterShielding(GameObject *object, float deltaTime)
 		{448, 384, 64, 64}	// Frame 8: Column 8 (Pixel : X 448)
 	};
 
-	InitGameObjectAnimation(&npc->base, sheilding, 8, 0.08f);
+	InitGameObjectAnimation(&npc->base, shielding, 8, 0.08f);
 }
 
 // Update function for Shielding state, called repeatedly during game ticks while in Shielding
@@ -603,5 +627,4 @@ void NPCExitDead(GameObject *object, float deltaTime)
 	(void)deltaTime;
 	NPC *npc = (NPC *)object;
 	(void)npc;
-
 }
