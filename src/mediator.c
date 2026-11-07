@@ -115,6 +115,7 @@ void MediatorNotify(Mediator *mediator, GameEvent event, GameObject *source, Gam
 	switch (event)
 	{
 	case GAME_EVENT_LEVEL_START:
+		PlayBackingTrack(); // Starts stream every new game
 		PlayActionSound(SOUND_LEVEL_START);
 		break;
 
@@ -150,6 +151,7 @@ void MediatorNotify(Mediator *mediator, GameEvent event, GameObject *source, Gam
 		else
 			TraceLog(LOG_INFO, "[Game] Over: a draw");
 
+		StopBackingTrack(); // Stops stream, the Band stops!, so game-over sound is heard!
 		PlayActionSound(SOUND_GAMEOVER);
 		HudGameOver(mediator->hud, source ? source->name : NULL); // NULL shows "Nobody wins!"
 		break;
