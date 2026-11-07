@@ -26,6 +26,10 @@ void InitGameObject(GameObject *object,
 					Texture2D keyframes,
 					int health)
 {
+	// No mediator yet: CreateMediator() connects it once both fighters exist
+	// See mediator.c CreateMediator()
+	object->mediator = NULL;
+
 	// Set the GameObject's name
 	object->name = name;
 
@@ -52,9 +56,6 @@ void InitGameObject(GameObject *object,
 	// Initialise Other Data
 	object->timer = 0.0f;
 
-	// No mediator yet: CreateMediator() connects it once both fighters exist
-	// See mediator.c CreateMediator()
-	object->mediator = NULL;
 	object->isColliding = false;
 	object->attackHit = false;
 	object->stateConfigs = NULL;
