@@ -120,6 +120,26 @@ Command PollInput()
 }
 
 /**
+ * PollRestart : Has the player asked for another go?
+ *
+ * R on the keyboard, or Start on a gamepad.
+ * Only asked at game over, so it doesn't need to be a Command.
+ *
+ * @return: true on the frame the button goes down.
+ */
+
+bool PollRestart()
+{
+	if (IsKeyPressed(KEY_R))
+		return true;
+
+	if (IsGamepadAvailable(0) && IsGamepadButtonPressed(0, GAMEPAD_BUTTON_MIDDLE_RIGHT))
+		return true;
+
+	return false;
+}
+
+/**
  * DeleteInputManager - Gives the input system a polite send-off.
  *
  * Currently does nothing, but here's where you'd unplug whatever needs unplugging
