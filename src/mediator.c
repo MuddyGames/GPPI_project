@@ -86,30 +86,24 @@ void MediatorReceiveCommand(Mediator *mediator, GameObject *object, Command comm
 }
 
 /**
- * MediatorNotify : Something happened in game, and mediator decides who gets told.
+ * MediatorNotify : Something happened in the game, and the mediator decides who gets told.
  *
- * STUB: nothing calls this yet, and each case below is mostly comments.
- * It's here to show where the mediator earns its keep.
+ * Code only REPORTS what happened:
  *
- * Right now "who gets told" is spread around the code:
- *     collision.c         plays the hit and block sounds
- *     player.c and npc.c  play the swipe sound
- *     game.c              plays the game-over sound and tells the HUD who won
- *
- * Every time you add an effect (screen shake on a hit, a spark on a block),
- * you are hunting through files for every place that needs to know.
- *
- * With the mediator, code only REPORTS what happened:
- *
- *     MediatorNotify(data->mediator, GAME_EVENT_HIT, attacker, target);
+ *     MediatorNotify(object->mediator, GAME_EVENT_HIT, attacker, target);
  *
  * and this one function decides who hears about it. collision.c doesn't need
  * to know there's such a thing as sound, or a HUD. Adding screen shake on a
  * hit is one new line in here, not a search through the whole project.
  *
- * @mediator: Game mediator.
+ * Who reports what:
+ *     game.c              LEVEL_START, GAME_OVER
+ *     player.c / npc.c    SWIPE (when a swipe starts)
+ *     collision.c         HIT, BLOCK, MISS (when the blade comes round)
+ *
+ * @mediator: The game's mediator.
  * @event:    What happened (GAME_EVENT_HIT, GAME_EVENT_BLOCK ...).
- * @source:   Who did it (the attacker, the winner ...).
+ * @source:   Who did it (the attacker, the winner ...), or NULL if nobody.
  * @target:   Who it was done to, or NULL if nobody.
  */
 
@@ -121,62 +115,48 @@ void MediatorNotify(Mediator *mediator, GameEvent event, GameObject *source, Gam
 	switch (event)
 	{
 	case GAME_EVENT_LEVEL_START:
-		// Today: game.c resets the HUD and audio when the level starts.
-		// With the mediator, game.c just reports it:
-		PlayActionSound(SOUND_LEVEL_START); // Level Starts
+		PlayActionSound(SOUND_LEVEL_START);
 		break;
+
 	case GAME_EVENT_SWIPE:
-		// Today: player.c and npc.c each call PlayActionSound(SOUND_SWIPE) when the
-		// swipe starts. Report it instead, and play the sound here:
-		//
-		//     PlayActionSound(SOUND_SWIPE);
-		//
-		// Later: a whoosh trail behind the sword, a stamina cost on the HUD ...
 		PlayActionSound(SOUND_SWIPE);
+		// Later: a whoosh trail behind the sword, a stamina cost on the HUD ...
 		break;
 
 	case GAME_EVENT_HIT:
-		// Today: collision.c calls PlayActionSound(SOUND_HIT) inside AttackHit().
-		// One way to move it: have AttackHit() return what happened (hit, block
-		// or miss), then game.c reports it:
-		//
-		//     MediatorNotify(data->mediator, GAME_EVENT_HIT, attacker, target);
-		//
-		// and the reactions all live here:
-		//
-		//     PlayActionSound(SOUND_HIT);
-		//     HudFlash(mediator->hud, RED);   // something for you to write
-		//     ShakeCamera(0.2f);              // and this
+		TraceLog(LOG_INFO, "[%s] hit [%s] for %d, health %d", source->name, target->name, DAMAGE_DEFAULT, target->health);
+		PlayActionSound(SOUND_HIT);
+		// Later (yours to write):
+		//     HudFlash(mediator->hud, RED);
+		//     ShakeCamera(0.2f);
 		break;
 
 	case GAME_EVENT_BLOCK:
-		// Today: collision.c calls PlayActionSound(SOUND_BLOCK).
-		//
-		//     PlayActionSound(SOUND_BLOCK);
-		//
+		TraceLog(LOG_INFO, "[%s] blocked [%s]'s sword", target->name, source->name);
+		PlayActionSound(SOUND_BLOCK);
 		// Later: sparks where the sword meets the shield ...
 		break;
 
+	case GAME_EVENT_MISS:
+		// Nobody needs telling yet: just a quiet note in the debug log.
+		// Later: a "whiff" sound, or the AI learning you are out of reach ...
+		TraceLog(LOG_DEBUG, "[%s] missed [%s]", source->name, target->name);
+		break;
+
 	case GAME_EVENT_GAME_OVER:
-		// Today: game.c plays the sound and tells the HUD who won, itself.
-		// With the mediator, game.c just reports the winner:
-		//
-		//     MediatorNotify(data->mediator, GAME_EVENT_GAME_OVER, winner, NULL);
-		//
-		// and in here:
-		//
+		// source is the winner, or NULL for a draw (both down on the same frame)
+		if (source)
+			TraceLog(LOG_INFO, "[Game] Over: [%s] won", source->name);
+		else
+			TraceLog(LOG_INFO, "[Game] Over: a draw");
+
 		PlayActionSound(SOUND_GAMEOVER);
-		HudGameOver(mediator->hud, source->name);
+		HudGameOver(mediator->hud, source ? source->name : NULL); // NULL shows "Nobody wins!"
 		break;
 
 	default:
 		break;
 	}
-
-	// Stop the compiler moaning about unused parameters while this is a stub.
-	// Delete these once the cases above use them.
-	(void)source;
-	(void)target;
 }
 
 /**
