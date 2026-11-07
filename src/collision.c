@@ -3,7 +3,7 @@
 
 #include "utils/collision.h"
 #include "utils/utils.h"
-#include "utils/audio_manager.h"
+#include "utils/mediator.h"
 
 /**
  * CheckCollision : Checks if two game objects have bumped into each other.
@@ -104,6 +104,10 @@ void CollisionExit(GameObject *lhs, GameObject *rhs)
  *
  * Damage on the hit frame feels right: no damage while the sword is still
  * on its way, and none for standing too close for the whole swipe.
+ *
+ * It decides WHAT happened (hit, block or miss) and reports it to the
+ * mediator. Who gets told (sound, log, HUD ...) is the mediator's business,
+ * so there's no audio or HUD code in here.
  */
 
 void AttackHit(GameObject *attacker, GameObject *target)
@@ -123,18 +127,23 @@ void AttackHit(GameObject *attacker, GameObject *target)
 	float reach = attacker->collider.r + target->collider.r + ATTACK_REACH;
 	float distance = Vector2Distance(attacker->position, target->position);
 	if (distance > reach)
+	{
+		MediatorNotify(attacker->mediator, GAME_EVENT_MISS, attacker, target);
 		return;
+	}
 
 	// Facing the target? (dot product > 0 means the target is in front)
 	Vector2 toTarget = Vector2Normalize(Vector2Subtract(target->position, attacker->position));
 	if (Vector2DotProduct(toTarget, DirectionVector(attacker->currentDirection)) <= 0.0f)
+	{
+		MediatorNotify(attacker->mediator, GAME_EVENT_MISS, attacker, target);
 		return;
+	}
 
 	// Blocked by a shield?
 	if (target->currentState == STATE_SHIELD)
 	{
-		TraceLog(LOG_INFO, "[%s] blocked [%s]'s sword", target->name, attacker->name);
-		PlayActionSound(SOUND_BLOCK);
+		MediatorNotify(attacker->mediator, GAME_EVENT_BLOCK, attacker, target);
 		return;
 	}
 
@@ -143,7 +152,5 @@ void AttackHit(GameObject *attacker, GameObject *target)
 	if (target->health < 0)
 		target->health = 0;
 
-	// Play the hit sound effect
-	PlayActionSound(SOUND_HIT);
-	TraceLog(LOG_INFO, "[%s] hit [%s] damage %d, [%s] health %d", attacker->name, target->name, DAMAGE_DEFAULT, target->name, target->health);
+	MediatorNotify(attacker->mediator, GAME_EVENT_HIT, attacker, target);
 }
