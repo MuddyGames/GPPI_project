@@ -97,8 +97,8 @@ Command PollInput()
 	if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT))
 		command |= MOVE_RIGHT;
 
-	// Sword: S, Z, J or SPACE (held down: one swipe after another)
-	if (IsKeyDown(KEY_S) || IsKeyDown(KEY_Z) || IsKeyDown(KEY_J) || IsKeyDown(KEY_SPACE))
+	// Sword: Z, J or SPACE (held down: one swipe after another)
+	if (IsKeyDown(KEY_Z) || IsKeyDown(KEY_J) || IsKeyDown(KEY_SPACE))
 		command |= ATTACK;
 
 	// DEFEND is not bound to a key or button yet: that's one for you
