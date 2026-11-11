@@ -1143,7 +1143,10 @@ Keep a copy of the full log to read afterwards, as well as seeing it on screen:
 ```bash
 make run | tee game.log
 grep "\[The Villan\]" game.log
+cat game.log
 ```
+
+> `tee` shell command to copy data from standard input to one or more files.
 
 > The square brackets need a backslash (`\[`) because `[` means something special to `grep`. Leave it out and `grep` goes looking for any single letter from "Player Hero", and you'll get the whole log back.
 

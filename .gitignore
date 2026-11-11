@@ -61,3 +61,6 @@ compile_commands.json
 # Android files
 *apk*
 android.*
+
+# Logs
+*.log
