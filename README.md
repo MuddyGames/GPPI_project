@@ -914,6 +914,8 @@ The following tasks are suggested to help with your project.
    // Example: Transition based on distance to player
    float distanceToPlayer = Vector2Distance(npc->base.position, player->base.position);
 
+   Vector2Distance()
+
    if (distanceToPlayer < ATTACK_RANGE)
    {
        HandleEvent(&npc->base, EVENT_ATTACK, deltaTime);

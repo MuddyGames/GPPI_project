@@ -40,7 +40,7 @@
 
 // Sword swipe recovery: after the swipe animation ends, the fighter holds the last
 // frame (sword down) this how long before it can act again.
-#define ATTACK_RECOVERY 0.2f
+#define ATTACK_RECOVERY 0.1f
 
 // Firing Cooldown (0.1 seconds)
 // #define FIRE_COOLDOWN 0.1f
