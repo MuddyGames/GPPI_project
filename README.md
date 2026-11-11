@@ -1135,7 +1135,7 @@ make run | grep -v -E "\[(Input|AI)\]"
 Only state changes:
 
 ```bash
-make run | grep -E "\[FSM\] \["
+make run | grep -E "\[FSM\]"
 ```
 
 Keep a copy of the full log to read afterwards, as well as seeing it on screen:
