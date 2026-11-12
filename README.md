@@ -603,8 +603,8 @@ Command PollInput()
 	if (IsKeyDown(KEY_RIGHT))
 		command |= MOVE_RIGHT;
 
-	// Sword: S, Z, J or SPACE (held down: one swipe after another)
-	if (IsKeyDown(KEY_S) || IsKeyDown(KEY_Z) || IsKeyDown(KEY_J) || IsKeyDown(KEY_SPACE))
+	// Sword: SPACE (swipe with sword)
+	if (IsKeyDown(KEY_SPACE))
 		command |= ATTACK;
 
 	// Shield: D, X or K .... not bound yet: that's one for you
@@ -877,15 +877,15 @@ The following tasks are suggested to help with your project.
 4. **Add commands and events.** Each action needs a command bit in `command.h` (update `COMMAND_COUNT`), an event in `events.h`, and a line in `ExecuteCommand()` that sends the event. Then bind the keys in `input_manager.c`:
 
    ```c
-   if (IsKeyPressed(KEY_S) || IsKeyPressed(KEY_Z) || IsKeyPressed(KEY_J))
+   if (IsKeyPressed(KEY_Z) || IsKeyPressed(KEY_J))
        command |= SWORD;
-   if (IsKeyDown(KEY_D) || IsKeyDown(KEY_X) || IsKeyDown(KEY_K))
+   if (IsKeyDown(KEY_X) || IsKeyDown(KEY_K))
        command |= SHIELD;
-   if (IsKeyPressed(KEY_M) || IsKeyPressed(KEY_C) || IsKeyPressed(KEY_L))
+   if (IsKeyPressed(KEY_C) || IsKeyPressed(KEY_L))
        command |= MEGA;
    ```
 
-   Use the keys your project brief asks for (S / D / M), and keep the Z / X / C and J / K / L alternatives. Movement is on the arrow keys, so none of them clash.
+   Use the keys your project brief asks for Z / X / C and J / K / L alternatives. Movement is on the arrow keys, so none of them clash.
 
    > **`IsKeyPressed` or `IsKeyDown`?** A one-off action, like a blast, uses `IsKeyPressed`: true once, on the frame the key goes down. Something you hold, like a shield, uses `IsKeyDown`: true every frame the key is held.
 
