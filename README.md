@@ -144,13 +144,13 @@ A window opens on a field of grass (a new one every game), with the **Player Her
 
 Movement is on the arrow keys only, so the letters are free for actions. There are three sets of action keys, and they all work at once:
 
-| Action | Brief | Left hand | Right hand |
-|---|---|---|---|
-| Sword | **S** | **Z** | **J** |
-| Shield | **D** | **X** | **K** |
-| Mega Blast | **M** | **C** | **L** |
+| Action | Left hand | Right hand |
+|---|---|---|
+| Sword | **Z** | **J** |
+| Shield | **X** | **K** |
+| Mega Blast | **C** | **L** |
 
-Only the sword keys do something so far (plus SPACE, for now). Shield and Mega Blast are yours to add (see Task 1). Z/X/C sits next to the arrow keys for the other hand, which is how most players will find it comfortable.
+Only SPACE does something for now. Shield and Mega Blast are yours to add (see Task 1). Z/X/C or J/K/L keys are for the other hand, which is how most players will find it comfortable.
 
 The HUD in the top left shows the frame rate, the command bits, the player's current state and the active commands. At game over, a banner in the middle says who won. Keep the terminal where you can see it too: every state change and every hit is printed there (see [Running the game and filtering the log](#running-the-game-and-filtering-the-log)).
 
