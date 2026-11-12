@@ -580,7 +580,7 @@ Both use the same FSM system and animation pipeline, but have their own states, 
 **Keyboard and gamepad mapping:**
 
 - Arrow keys, D-pad or left thumbstick: directional movement
-- S, Z, J or SPACE, or the right trigger: attack (sword)
+- SPACE: attack (sword)
 - D, X or K: shield (not bound yet)
 - M, C or L: Mega Blast (not bound yet, and it needs its own command)
 
