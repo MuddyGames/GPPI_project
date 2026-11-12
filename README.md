@@ -144,7 +144,7 @@ A window opens on a field of grass (a new one every game), with the **Player Her
 
 Movement is on the arrow keys only, so the letters are free for actions. There are three sets of action keys, and they all work at once:
 
-| Action | Left hand | Right hand |
+| Action | Left hand (combined with arrow keys) | Right hand (combined with WASD)|
 |---|---|---|
 | Sword | **Z** | **J** |
 | Shield | **X** | **K** |
