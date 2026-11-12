@@ -144,11 +144,13 @@ A window opens on a field of grass (a new one every game), with the **Player Her
 
 Movement is on the arrow keys only, so the letters are free for actions. There are three sets of action keys, and they all work at once:
 
-| Action | Left hand (combined with arrow keys) | Right hand (combined with WASD)|
-|---|---|---|
-| Sword | **Z** | **J** |
-| Shield | **X** | **K** |
-| Mega Blast | **C** | **L** |
+| Action | Left Hand | Right Hand |
+|:---|:---:|:---:|
+| Sword | `Z` | `J` |
+| Shield | `X` | `K` |
+| Mega Blast | `C` | `L` |
+
+> *Left Hand: Arrow Keys · Right Hand: WASD*
 
 Only SPACE does something for now. Shield and Mega Blast are yours to add (see Task 1). Z/X/C or J/K/L keys are for the other hand, which is how most players will find it comfortable.
 
