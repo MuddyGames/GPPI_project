@@ -150,7 +150,7 @@ Movement is on the arrow keys only, so the letters are free for actions. There a
 | Shield | **`X`** | **`K`** |
 | Mega Blast | **`C`** | **`L`** |
 
-> Player Movement: *Left Hand + **Arrow Keys** **OR** Right Hand + **WASD***
+> Player Movement: *(Left Hand + **Arrow Keys**) **|** (Right Hand + **WASD**)*
 
 Only SPACE does something for now. Shield and Mega Blast are yours to add (see Task 1). Z/X/C or J/K/L keys are for other hand (movement on one hand and actions the other hand), which is how most players will find it comfortable.
 
