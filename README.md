@@ -150,9 +150,9 @@ Movement is on the arrow keys only, so the letters are free for actions. There a
 | Shield | **`X`** | **`K`** |
 | Mega Blast | **`C`** | **`L`** |
 
-> Player Movement: *Left Hand + **Arrow Keys** OR Right Hand + **WASD***
+> Player Movement: *Left Hand + **Arrow Keys** **OR** Right Hand + **WASD***
 
-Only SPACE does something for now. Shield and Mega Blast are yours to add (see Task 1). Z/X/C or J/K/L keys are for the other hand, which is how most players will find it comfortable.
+Only SPACE does something for now. Shield and Mega Blast are yours to add (see Task 1). Z/X/C or J/K/L keys are for other hand (movement on one hand and actions the other hand), which is how most players will find it comfortable.
 
 The HUD in the top left shows the frame rate, the command bits, the player's current state and the active commands. At game over, a banner in the middle says who won. Keep the terminal where you can see it too: every state change and every hit is printed there (see [Running the game and filtering the log](#running-the-game-and-filtering-the-log)).
 
@@ -440,7 +440,7 @@ During a sword swipe the facing direction doesn't change, so a swipe can't turn 
 
 ### 4. Animation System
 
-The animation system plays sprite-sheet frames, kept in step with the FSM: each state's `Entry()` sets up its animation, and its `Update()` moves it on.
+Animation system plays sprite-sheet frames, kept in step with the FSM: each state's `Entry()` sets up its animation, and its `Update()` moves `DrawTextureRec(..)` along sprite sheet.
 
 **Animation Structure:**
 
