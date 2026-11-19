@@ -54,7 +54,7 @@ void InitGame(GameData *data)
 
 	TraceLog(LOG_INFO, "[Game] Initialised");
 
-	MediatorNotify(data->mediator, GAME_EVENT_LEVEL_START, NULL, NULL);
+	MediatorNotifyAll(data->mediator, GAME_EVENT_LEVEL_START, NULL, NULL);
 }
 
 // ---------------------------------------------------------------------------
@@ -209,7 +209,7 @@ static void CheckGameOver(GameData *data, float deltaTime)
 	else if (npc->health > 0)
 		winner = npc;
 
-	MediatorNotify(data->mediator, GAME_EVENT_GAME_OVER, winner, NULL);
+	MediatorNotifyAll(data->mediator, GAME_EVENT_GAME_OVER, winner, NULL);
 }
 
 /**

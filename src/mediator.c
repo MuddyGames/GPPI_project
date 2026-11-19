@@ -44,10 +44,10 @@ Mediator *CreateMediator(GameObject *player, GameObject *npc, Hud *hud)
 }
 
 /**
- * MediatorReceiveCommand : Command for an object arrives, and gets passed on.
+ * MediatorReceiveCommand : Command for an source arrives, and gets passed on.
  *
  * Player's commands come from the input manager, NPC's from the AI.
- * Both arrive here the same way; the only difference is which object they're for.
+ * Both arrive here the same way; the only difference is which source they're for.
  *
  * The mediator doesn't decide what a command means .... ExecuteCommand() turns
  * it into events, and the FSM's transition tables decide what happens next,
@@ -58,39 +58,39 @@ Mediator *CreateMediator(GameObject *player, GameObject *npc, Hud *hud)
  * receives the command and sends it on, the FSM does the handling.
  *
  * @mediator:  The game's mediator.
- * @object:    Who the command is for (the player or the NPC).
+ * @source:    Who the command is for (the player or the NPC).
  * @command:   The command flags (big question: can it be executed?)
  * @deltaTime: Time since last frame, for anything needing it.
  */
 
-void MediatorReceiveCommand(Mediator *mediator, GameObject *object, Command command, float deltaTime)
+void MediatorReceiveCommand(Mediator *mediator, GameObject *source, Command command, float deltaTime)
 {
-	if (!mediator || !object)
+	if (!mediator || !source)
 	{
-		TraceLog(LOG_ERROR, "Mediator or object is NULL");
+		TraceLog(LOG_ERROR, "Mediator or source is NULL");
 		return;
 	}
 
-	// 1. The object acts on the command (via the Command System, which sends FSM events)
-	ExecuteCommand(command, object, deltaTime);
+	// 1. The source acts on the command (via the Command System, which sends FSM events)
+	ExecuteCommand(command, source, deltaTime);
 
 	// 2. The HUD shows the player's command and state, like the HUD in any game
 	//    shows YOUR stuff, not the enemy's.
 	//
 	//    STRETCH TASK: an F1 debug overlay that shows the NPC's command and state
 	//    too, so you can see what the AI is thinking. This is where you'd send it.
-	if (object == mediator->player && mediator->hud)
+	if (source == mediator->player && mediator->hud)
 	{
-		UpdateHud(mediator->hud, command, object->stateConfigs[object->currentState].name);
+		UpdateHud(mediator->hud, command, source->stateConfigs[source->currentState].name);
 	}
 }
 
 /**
- * MediatorNotify : Something happened in the game, and the mediator decides who gets told.
+ * MediatorNotifyAll : Something happened in the game, and the mediator decides who gets told.
  *
  * Code only REPORTS what happened:
  *
- *     MediatorNotify(object->mediator, GAME_EVENT_HIT, attacker, target);
+ *     MediatorNotifyAll(source->mediator, GAME_EVENT_HIT, attacker, target);
  *
  * and this one function decides who hears about it. collision.c doesn't need
  * to know there's such a thing as sound, or a HUD. Adding screen shake on a
@@ -107,7 +107,7 @@ void MediatorReceiveCommand(Mediator *mediator, GameObject *object, Command comm
  * @target:   Who it was done to, or NULL if nobody.
  */
 
-void MediatorNotify(Mediator *mediator, GameEvent event, GameObject *source, GameObject *target)
+void MediatorNotifyAll(Mediator *mediator, GameEvent event, GameObject *source, GameObject *target)
 {
 	if (!mediator)
 		return;

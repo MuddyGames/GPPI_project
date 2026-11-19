@@ -49,15 +49,15 @@ Mediator *CreateMediator(GameObject *player, GameObject *npc, Hud *hud);
 // If you want to be pure and use the pattern properly then a Notify that takes the arguments (object, command, deltaTime) and
 // then calls ExecuteCommand() on the object and UpdateHud() on the HUD would be more correct.
 // But this is a simple game and we can get away with this.
-// NOTE: Refactoring Task: This should be folded into MediatorNotify() 
-// and the object should handle it, but the HUD is a special case: it shows the player's stuff (commands). We can still fold this into MediatorNotify().
-// Unused arguments? set them to NULL or 0.0f as appropriate, into MediatorNotify().
-void MediatorReceiveCommand(Mediator *mediator, GameObject *object, Command command, float deltaTime);
+// NOTE: Refactoring Task: This should be folded into MediatorNotifyAll() 
+// and the object should handle it, but the HUD is a special case: it shows the player's stuff (commands). We can still fold this into MediatorNotifyAll().
+// Unused arguments? set them to NULL or 0.0f as appropriate, into MediatorNotifyAll().
+void MediatorReceiveCommand(Mediator *mediator, GameObject *source, Command command, float deltaTime);
 
 // Something happened in the game: the mediator decides who gets told.
 // target can be NULL when there isn't one (e.g. a swipe that hits nothing).
 // STUB: the cases in mediator.c only show, in comments, what could go there.
-void MediatorNotify(Mediator *mediator, GameEvent event, GameObject *source, GameObject *target);
+void MediatorNotifyAll(Mediator *mediator, GameEvent event, GameObject *source, GameObject *target);
 
 // Mediator Cleanup: frees what CreateMediator() allocated
 void DeleteMediator(Mediator *mediator);
