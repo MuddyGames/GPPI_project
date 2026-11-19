@@ -300,7 +300,7 @@ void PlayerEnterAttacking(GameObject *object, float deltaTime)
 	InitAttackAnimation(object);
 
 	// Entry runs once per swipe, so this is the place for the swoosh
-	MediatorNotifyAll(object->mediator, GAME_EVENT_SWIPE, object, NULL);
+	MediatorNotifyAll(object->mediator, GAME_EVENT_SWIPE, NONE, object, NULL, 0.0f);
 }
 
 void PlayerUpdateAttacking(GameObject *object, float deltaTime)

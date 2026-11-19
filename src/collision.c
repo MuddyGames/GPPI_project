@@ -132,7 +132,7 @@ void AttackHit(GameObject *attacker, GameObject *target)
 	float distance = Vector2Distance(attacker->position, target->position);
 	if (distance > reach)
 	{
-		MediatorNotifyAll(attacker->mediator, GAME_EVENT_MISS, attacker, target);
+		MediatorNotifyAll(attacker->mediator, GAME_EVENT_MISS, NONE, attacker, target, 0.0f);
 		return;
 	}
 
@@ -140,14 +140,14 @@ void AttackHit(GameObject *attacker, GameObject *target)
 	Vector2 toTarget = Vector2Normalize(Vector2Subtract(target->position, attacker->position));
 	if (Vector2DotProduct(toTarget, DirectionVector(attacker->currentDirection)) <= 0.0f)
 	{
-		MediatorNotifyAll(attacker->mediator, GAME_EVENT_MISS, attacker, target);
+		MediatorNotifyAll(attacker->mediator, GAME_EVENT_MISS, NONE, attacker, target, 0.0f);
 		return;
 	}
 
 	// Blocked by a shield?
 	if (target->currentState == STATE_SHIELD)
 	{
-		MediatorNotifyAll(attacker->mediator, GAME_EVENT_BLOCK, attacker, target);
+		MediatorNotifyAll(attacker->mediator, GAME_EVENT_BLOCK, NONE, attacker, target, 0.0f);
 		return;
 	}
 
@@ -156,5 +156,5 @@ void AttackHit(GameObject *attacker, GameObject *target)
 	if (target->health < 0)
 		target->health = 0;
 
-	MediatorNotifyAll(attacker->mediator, GAME_EVENT_HIT, attacker, target);
+	MediatorNotifyAll(attacker->mediator, GAME_EVENT_HIT, NONE, attacker, target, 0.0f);
 }

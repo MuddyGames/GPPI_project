@@ -43,21 +43,11 @@ typedef enum
 // Create the game's mediator
 Mediator *CreateMediator(GameObject *player, GameObject *npc, Hud *hud);
 
-// A command for an object (from the input or the AI): passes it on to the object,
-// and tells the HUD if it's the player's
-// Ideally we would just have Notify() and the object would handle it, but the HUD is a special case: it shows the player's stuff (commands)
-// If you want to be pure and use the pattern properly then a Notify that takes the arguments (object, command, deltaTime) and
-// then calls ExecuteCommand() on the object and UpdateHud() on the HUD would be more correct.
-// But this is a simple game and we can get away with this.
-// NOTE: Refactoring Task: This should be folded into MediatorNotifyAll() 
-// and the object should handle it, but the HUD is a special case: it shows the player's stuff (commands). We can still fold this into MediatorNotifyAll().
-// Unused arguments? set them to NULL or 0.0f as appropriate, into MediatorNotifyAll().
-void MediatorReceiveCommand(Mediator *mediator, GameObject *source, Command command, float deltaTime);
-
 // Something happened in the game: the mediator decides who gets told.
 // target can be NULL when there isn't one (e.g. a swipe that hits nothing).
 // STUB: the cases in mediator.c only show, in comments, what could go there.
-void MediatorNotifyAll(Mediator *mediator, GameEvent event, GameObject *source, GameObject *target);
+// Unused arguments? set them to NULL or 0.0f as appropriate
+void MediatorNotifyAll(Mediator *mediator, GameEvent event, Command command, GameObject *source, GameObject *target, float deltaTime);
 
 // Mediator Cleanup: frees what CreateMediator() allocated
 void DeleteMediator(Mediator *mediator);

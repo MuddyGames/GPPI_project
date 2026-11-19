@@ -90,7 +90,7 @@ void MediatorReceiveCommand(Mediator *mediator, GameObject *source, Command comm
  *
  * Code only REPORTS what happened:
  *
- *     MediatorNotifyAll(source->mediator, GAME_EVENT_HIT, attacker, target);
+ *     MediatorNotifyAll(source->mediator, GAME_EVENT_HIT, command, attacker, target, deltaTime);
  *
  * and this one function decides who hears about it. collision.c doesn't need
  * to know there's such a thing as sound, or a HUD. Adding screen shake on a
@@ -101,14 +101,19 @@ void MediatorReceiveCommand(Mediator *mediator, GameObject *source, Command comm
  *     player.c / npc.c    SWIPE (when a swipe starts)
  *     collision.c         HIT, BLOCK, MISS (when the blade comes round)
  *
- * @mediator: The game's mediator.
+ * @mediator: Game mediator.
  * @event:    What happened (GAME_EVENT_HIT, GAME_EVENT_BLOCK ...).
+ * @command:   Command flags (big question: can it be executed?)
  * @source:   Who did it (the attacker, the winner ...), or NULL if nobody.
  * @target:   Who it was done to, or NULL if nobody.
+ * @deltaTime: Time since last frame, for anything needing it.
  */
 
-void MediatorNotifyAll(Mediator *mediator, GameEvent event, GameObject *source, GameObject *target)
+void MediatorNotifyAll(Mediator *mediator, GameEvent event, Command command, GameObject *source, GameObject *target, float deltaTime)
 {
+	(void)command;
+	(void)deltaTime;
+
 	if (!mediator)
 		return;
 

@@ -54,7 +54,7 @@ void InitGame(GameData *data)
 
 	TraceLog(LOG_INFO, "[Game] Initialised");
 
-	MediatorNotifyAll(data->mediator, GAME_EVENT_LEVEL_START, NULL, NULL);
+	MediatorNotifyAll(data->mediator, GAME_EVENT_LEVEL_START, NONE, NULL, NULL, 0.0f);
 }
 
 // ---------------------------------------------------------------------------
@@ -209,7 +209,7 @@ static void CheckGameOver(GameData *data, float deltaTime)
 	else if (npc->health > 0)
 		winner = npc;
 
-	MediatorNotifyAll(data->mediator, GAME_EVENT_GAME_OVER, winner, NULL);
+	MediatorNotifyAll(data->mediator, GAME_EVENT_GAME_OVER, NONE, winner, NULL, 0.0f);
 }
 
 /**
@@ -261,9 +261,9 @@ void DrawGame(const GameData *data)
 {
 	// Back to front: whatever is drawn last ends up on top
 	DrawTexture(data->background, 0, 0, WHITE); // The field
-	DrawGameObject(&data->npc->base);           // The NPC
-	DrawGameObject(&data->player->base);        // The player, over the NPC
-	DrawHud(&data->hud);                        // The HUD, over everything
+	DrawGameObject(&data->npc->base);			// The NPC
+	DrawGameObject(&data->player->base);		// The player, over the NPC
+	DrawHud(&data->hud);						// The HUD, over everything
 }
 
 /**
