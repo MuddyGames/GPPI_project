@@ -219,7 +219,7 @@ GPPI_project/
 ├── include/
 │   ├── animation/          animation.h, sprites.h (the sprite sheet reference card)
 │   ├── command/            command.h      the command bit flags
-│   ├── events/             events.h       the Event enum
+│   ├── events/             events.h, game_events.h (FSM Events and Game Events)
 │   ├── fsm/                fsm.h          the State enum, StateConfig, EventStateTransition
 │   ├── game/               game.h, background.h
 │   ├── gameobjects/        gameobject.h, player.h, npc.h
@@ -244,7 +244,7 @@ _StarterKit_ is built from several design patterns and systems working together.
 
 ### Game System Flow
 
-[![](https://mermaid.ink/img/pako:eNp1k1FrgzAUhf_KJXvYBitbYX3pw8DZloZVK7NlD2kZQZM1TGPRuK3U_vfFaG1TtkAQ73dO7jExexRlMUNDQDzJvqMNzRUsRisJemCPYLktFXhU0g-Wr6HXe6q2Cd2x_LqAKEtTKuMKPOKxWFCV5evG6GDiYNvlB65laYSeYSs0_mFRqZjb4JvbFarAJe3r-lx72R3qWSiqWAXT5Yjo2epdo2dfTKqiggmZhF5LJjUBhzhSpFSJTFr1gASmh1X0if6AthKYijuf6YBJIgq9gEnhKEWjz6lQrc4_6to885lJpJ8zHOK5_x4unNcF3MPYH-mAtmqKa_I8m7sv-unhMOw2zfSvwjccjLua_0et2bAiK2VcmIBpWYioAmdJnDIWWXdAK9kYCrVLmD514CJJhleszwecnyN9qP-ho4lz_sj658Q9ebhNJp2nXs9qdCSD2nVOglOfB3s1_19S7-mpk830_3LMZ4aVYnmB0B2glOUpFbG-MXukNiw1dydmnJaJQofDL00UAuY?type=png)](https://mermaid.live/edit#pako:eNp1k1FrgzAUhf_KJXvYBitbYX3pw8DZloZVK7NlD2kZQZM1TGPRuK3U_vfFaG1TtkAQ73dO7jExexRlMUNDQDzJvqMNzRUsRisJemCPYLktFXhU0g-Wr6HXe6q2Cd2x_LqAKEtTKuMKPOKxWFCV5evG6GDiYNvlB65laYSeYSs0_mFRqZjb4JvbFarAJe3r-lx72R3qWSiqWAXT5Yjo2epdo2dfTKqiggmZhF5LJjUBhzhSpFSJTFr1gASmh1X0if6AthKYijuf6YBJIgq9gEnhKEWjz6lQrc4_6to885lJpJ8zHOK5_x4unNcF3MPYH-mAtmqKa_I8m7sv-unhMOw2zfSvwjccjLua_0et2bAiK2VcmIBpWYioAmdJnDIWWXdAK9kYCrVLmD514CJJhleszwecnyN9qP-ho4lz_sj658Q9ebhNJp2nXs9qdCSD2nVOglOfB3s1_19S7-mpk830_3LMZ4aVYnmB0B2glOUpFbG-MXukNiw1dydmnJaJQofDL00UAuY)
+[![](https://mermaid.ink/img/pako:eNp1kd2umkAUhV9lsnvRNlEPiIhw0YTCMZIKkqJpUjDNBAYlhRkzDK1WfPcGxB-aHpK5mPWttdfOcIaYJQQMSHP2O95jLtDajihCCDlu6NBDJZCLKd4RvkXD4af6kOMT4e9LFLOiwDSpkRu6JMmwYHx7DZpOaDr9lOdbvcjV6LYsgtcjiStBrCv-8DGCGllhd90-e_9tR80pBRakRouNHS42due3Wj_5RagoazQP54HbkXlDkBmaNCuwyBjt6X7otx090Qs93-oUv1Ws1TK0WJ5nZcZou4UpBI5_LjLR-bybr9tntWw3slbLpRM4K-9HsDa_rtELevXsGs37roXTkM_LlfUFvSDXCYL7o7X9dfDN8V_vmvcf7fpgJatoUrYLFlWZxTUyN6FZJRm7_6CIXgOlOOUEOS5Kszw33hE5VdP0GZnOm-gWStN0QuRnYj0yaZ_M75lmXq_oRtQm9Uz8R4_Un-a9SZo3fTT12WJj3_Zrv94Wmx6CAex4loAheEUGUBBe4OYK5yYUgdiTgkRgoAg4SarjMGY54xFE9AIDOGD6nbHiluas2u3BSHFekgFUhwQLYmd4x_HDQmhCuMUqKsCQ9XYEGGc4gjHWZyNVV3RFkSV1Mp1p6gBOYMjSeKSNZzNlKqm6qkmKfBnAn7ZVGmnyeDaVVV1TFU3XJ5PLXw3dNL4?type=png)](https://mermaid.live/edit#pako:eNp1kd2umkAUhV9lsnvRNlEPiIhw0YTCMZIKkqJpUjDNBAYlhRkzDK1WfPcGxB-aHpK5mPWttdfOcIaYJQQMSHP2O95jLtDajihCCDlu6NBDJZCLKd4RvkXD4af6kOMT4e9LFLOiwDSpkRu6JMmwYHx7DZpOaDr9lOdbvcjV6LYsgtcjiStBrCv-8DGCGllhd90-e_9tR80pBRakRouNHS42due3Wj_5RagoazQP54HbkXlDkBmaNCuwyBjt6X7otx090Qs93-oUv1Ws1TK0WJ5nZcZou4UpBI5_LjLR-bybr9tntWw3slbLpRM4K-9HsDa_rtELevXsGs37roXTkM_LlfUFvSDXCYL7o7X9dfDN8V_vmvcf7fpgJatoUrYLFlWZxTUyN6FZJRm7_6CIXgOlOOUEOS5Kszw33hE5VdP0GZnOm-gWStN0QuRnYj0yaZ_M75lmXq_oRtQm9Uz8R4_Un-a9SZo3fTT12WJj3_Zrv94Wmx6CAex4loAheEUGUBBe4OYK5yYUgdiTgkRgoAg4SarjMGY54xFE9AIDOGD6nbHiluas2u3BSHFekgFUhwQLYmd4x3FxVzmhCeEWq6gAQ560M8A4wxGMsT4bqbqiK4osqZPpTFMHcAJDlsYjbTybKVNJ1VVNUuTLAP60tdJIk8ezqazqmqpouj6ZXP4CRQU1BA)
 
 1. **Input Manager** captures keyboard and gamepad input; the **AI Manager** does the same job for the NPC.
 2. **Mediator** passes each command on to its game object, and tells the HUD about the player's.
@@ -256,17 +256,17 @@ _StarterKit_ is built from several design patterns and systems working together.
 
 ### Command Flow
 
-[![](https://mermaid.ink/img/pako:eNptUtFugkAQ_JUNL8UE_QAeTAylQlq0KehTE7NyW6XCHT0OW2P99-6BGhPLyx03M7tzc3t0ciXI8cFp6KslmdNjgRuN1bsE_mrUpsiLGqWBOAFsIJZ1ayBBiRvS96SOk5Ao0Kh_4CC1eKCqCqW4h5_STs_LPTadW2iKFc3Xn5Sbe0ZkCdHi8V32WJwMx-M48eFVlWXn2x34sKPDWqEWwA5gw-VqFDd8pl_sv1FOxZ7Obt26xANpD5L5Mly9hE8Z_MIkyybB86DXW3mQ-hD-UN6aqy7vVw_6AmdykDKbL-pDxGBJ4Z6kccNlOMtWtoMH_b7vAKPR6CxkzUX5otQOzJaArBjaGgrZ_eet1vakMWjooQGD65Ju5dO5D8EW5YZSS7G5qFKw84Iz8mwNCZK-IZRGH9yb-0U-LGrBkqi9uVnXBySHObiEP1N8ovakOVaPVRnbmr0GbGVHTWeyYTpohaJ_oEnsDmA4vqZv9-cI7daOhrvm0bNSfmRQsjxAs1XffbVruI4HTkW6wkLwWB8dBqtuwAV9YFsa53T6AzV883I?type=png)](https://mermaid.live/edit#pako:eNptUtFugkAQ_JUNL8UE_QAeTAylQlq0KehTE7NyW6XCHT0OW2P99-6BGhPLyx03M7tzc3t0ciXI8cFp6KslmdNjgRuN1bsE_mrUpsiLGqWBOAFsIJZ1ayBBiRvS96SOk5Ao0Kh_4CC1eKCqCqW4h5_STs_LPTadW2iKFc3Xn5Sbe0ZkCdHi8V32WJwMx-M48eFVlWXn2x34sKPDWqEWwA5gw-VqFDd8pl_sv1FOxZ7Obt26xANpD5L5Mly9hE8Z_MIkyybB86DXW3mQ-hD-UN6aqy7vVw_6AmdykDKbL-pDxGBJ4Z6kccNlOMtWtoMH_b7vAKPR6CxkzUX5otQOzJaArBjaGgrZ_eet1vakMWjooQGD65Ju5dO5D8EW5YZSS7G5qFKw84Iz8mwNCZK-IZRGH9yb-0U-LGrBkqi9uVnXBySHObiEP1N8ovakOVaPVRnbmr0GbGVHTWeyYTpohaJ_oEnsDmA4vqZv9-cI7daOhrvm0bNSfmRQsjxAs1XffbVruI4HTkW6wkLwWB8dBqtuwAV9YFsa53T6AzV883I)
+[![](https://mermaid.ink/img/pako:eNptU1tv2jAU_itHflmQAoKUNOAHJBQCQauhUmgfpkiVSU4ha2JnjtPCWP_75IQiNPaUY3-Xc3NOJJEpEkoq_FWjSHCW8Z3iRSwAAEqudJZkJRcalgx4BUtR1hoYF3yH6pbUcBimGdfyP7AfGdyXRcFFegvPo0Y_j9gttlgbaMELXG9_YqJvGaEhhE-zWLTYknUnkyWj8CjzvKnb6lB4w-NWcpUCFynseIElT6_4jF7KX0mdvR6neW4tpix4CZ6D1ebFXzM2Xc1sYOvn4OUhmG_gD0w3m6n_3YYy50dUndbOuPkRheCASa3x3LSVtN9_yH7UnUzmEaMQcpHmGLyj0Fab0mSyoY3bTNDr9c7CecS-lA9SvoHeI6ARQ11CJppzUitlbirNNX6rQPNtjtfyxZqCv-dih5GhmDHJPIXgkGmrYxsPAQI_IBBaHa2r_kIKT2XKNYb1VWdNHhC8wM7XLlZSI8h3VLBkdkhhs0dYPfqg-RtWTZEVLxCU5Gm7r-nS6kB3clmGic8jNKF5Kda21o00fJqBFPkRqr38aN2uhktsslNZSqhWNdqkQFVwcyQng8ZE77HAmFCIicK0PnQTmUsVk1h8EpuUXPyQsvhSK1nv9oS-8rxCm9RN7-c_5nKrUKSofFkLTehg1HgQeiIHQp1hv-eMx33Pce7de8e1yZFQ587tOe5o2PfcseN5d8Php01-N0n7PXcwuHfdkeP1PW_gjpzPvxXUKeE?type=png)](https://mermaid.live/edit#pako:eNptU1tv2jAU_itHflmQAiIwSvADEgqBoNVQKbQPU6TKxKeQNbEzx2mhXf_75IRWaOwpx_4u5-a8k1QJJJRU-LtGmeI843vNi0QCAJRcmyzNSi4NrBjwClayrA0wLvke9TWp4TAUGTfqP3AQWzxQRcGluIYXcaNfxOwaW24stOQFbna_MDXXjMgSovt5IltsxbrT6YpRuFN53tTtdCg842mnuBbApYA9L7Dk4oLP6Ff5a2Wyp9Msz53ljIWP4UO43j4GG8Zm67kLbPMQPt6Giy38gdl2Owt-uFDm_IS609pZtyCmEB4xrQ2em3bS9vsPOYi70-kiZhQiLkWO4QtK47QpbSYX2rjNBL1e7yxcxOxTeavUM5gDAlox1CVksjmntdb2pjLc4LcKDN_leClfbigEBy73GFuKHZPKBYTHzDgd13pIkPgKoTT65Fz0F1G4LwU3GNUXnTV5QPICO5-7WCuDoF5Qw4q5EYXtAWF9F4Dhz1g1RVa8QNCKi3Zfs5XTge70axk2Po_QhvalOLvaNNLofg5K5ieoDuq1dbsYLnHJXmeCUKNrdEmBuuD2SN4tmhBzwAITQiEhGkV97KYqVzohifwgLim5_KlU8anWqt4fCH3ieYUuqZvez3_M161GKVAHqpaGUG_YeBD6To6EDiZ-bzQZToZDrz_6fuOPRy45Eer1B73xwPeHN_3RZDTuD70Pl7w1afu9sTfwb7yR70_63tj7-AsVISnm)
 
 1. **Input Manager** polls the keyboard and gamepad (the **AI Manager** chooses the NPC's input).
-2. **Mediator** receives the command bits (`MediatorReceiveCommand()`) and hands them on.
+2. **Mediator** receives the command bits (`MediatorNotify()`) and hands them on.
 3. **Command System** turns the bits into events, such as `EVENT_MOVE` or `EVENT_ATTACK`.
 4. **FSM** checks the event against the current state's transition table, in `HandleEvent()`.
 5. **GameObject** changes state if the table allows it: the old state's `Exit()` runs, then the new state's `Entry()`.
 
 ### Control Flow (Game Loop)
 
-[![](https://mermaid.ink/img/pako:eNqNlG1v2jAUhf-KlX4BKdUqFVBBU1GIHYooEAWyqVqmyRATLBIbJaYUAf99tvMCUreofMN-zjn3Xl_lZKx4SIweMNYxP6w2OBVgAQMG5G8u5L_Gr8AY4oS8cr5rNAPjdxPc3z8DfyjP_V2IBVG3-iZX-UMNzE_qHGRCEv1LwApLdXeeL6wF-uO-Wm9n4FY-boyPJG00vy_Tb88uj-MR2-2FCSYkpFjw1CMrQt-JzZMEs9AEuWquAqpwV2dPK8-pa98YWqP_u-EoSkmWUc7-7TzVznblbEs_qvCsCCBMkNQEnEWcssgE5IOKSm1r9fhGnSyxKJSWEHi1faGy1yUXG3DAx6xSjrVSTdvekNVWDXX2rsakic9THVoTNPuBvDPwToGhuvZIph-y2Q-MSy7wtOCNZJIaqaJYzHGovCEWuChrxKi4edtcmT-u5VedWPuQ8glmOKqKuiZM-VmyxcmokJZWlq8PoLSCKT7kUTp5KccRpXyv3kW-oAl2ejVM8OLDKgFq9ez0k7KQH-Si0TgGfEdYv2hydm1Sb_LtqSoMsVAttx3z7LrDzbK6TBxjkgvBWlr37roPCHUfzEykfEt6d4-tVreNbmFpWKCOM-jYnRp0XoGoNWjXgN5XwdlXQbcAYQdZzlMNOC3BFnKgUwPaZTREENk14LgELTiAddHDErSdR7suWi5VTqKB03YGNaTctoJ8ghaq84TVgGSVn0HDBEZC0gTTUH42T4bYkER_QEOyxvtYGJfLX_rhoGY?type=png)](https://mermaid.live/edit#pako:eNqNlG1v2jAUhf-KlX4BKdUqFVBBU1GIHYooEAWyqVqmyRATLBIbJaYUAf99tvMCUreofMN-zjn3Xl_lZKx4SIweMNYxP6w2OBVgAQMG5G8u5L_Gr8AY4oS8cr5rNAPjdxPc3z8DfyjP_V2IBVG3-iZX-UMNzE_qHGRCEv1LwApLdXeeL6wF-uO-Wm9n4FY-boyPJG00vy_Tb88uj-MR2-2FCSYkpFjw1CMrQt-JzZMEs9AEuWquAqpwV2dPK8-pa98YWqP_u-EoSkmWUc7-7TzVznblbEs_qvCsCCBMkNQEnEWcssgE5IOKSm1r9fhGnSyxKJSWEHi1faGy1yUXG3DAx6xSjrVSTdvekNVWDXX2rsakic9THVoTNPuBvDPwToGhuvZIph-y2Q-MSy7wtOCNZJIaqaJYzHGovCEWuChrxKi4edtcmT-u5VedWPuQ8glmOKqKuiZM-VmyxcmokJZWlq8PoLSCKT7kUTp5KccRpXyv3kW-oAl2ejVM8OLDKgFq9ez0k7KQH-Si0TgGfEdYv2hydm1Sb_LtqSoMsVAttx3z7LrDzbK6TBxjkgvBWlr37roPCHUfzEykfEt6d4-tVreNbmFpWKCOM-jYnRp0XoGoNWjXgN5XwdlXQbcAYQdZzlMNOC3BFnKgUwPaZTREENk14LgELTiAddHDErSdR7suWi5VTqKB03YGNaTctoJ8ghaq84TVgGSVn0HDBEZC0gTTUH42T4bYkER_QEOyxvtYGJfLX_rhoGY)
+[![](https://mermaid.ink/img/pako:eNqNk21v2jAUhf-K5X4pUtqFkPASTa1CXihqCxE0m7pmmgwxIcLYyHFGGfDfp5gkILWK-jHXzznn3mtnD-cswtCEC8K28yXiArw4IQUAgKlAXFy_hXCA1viJsc11I4S_G-Dm5g4Eg7cQBpsICZyfypOTKhhIYLrP6yAVSOD7Y0gLy_zsMH2xXtw__pP1egB-5eMTtMP8uvF9xr_d-YyQId1kQgHPOEqQYHzERLLYWYQo4CSY5t5Vri9jR5XdyLcvvKzhp0YojjlO04TRz01H0tSuTG1GSJLjaeGNqcBcAYzGLKGxAvB7Iiq1LdWPF-r1DIlCaQmB5quHRChgxsQSbNEurZSPUpnv2F7i-Spf5fhvvhxJfNzlwHp2xz_cyQFM9iHMB57gVF5f4z6Ex5NgIgWvOD2AyTBvihKGotzbQQIVbQ1pIi5u9KQ8XakVVJNYWZSwZ0RRXDV1ThixA7CCojIspKWVFciC8xZCh6PtKUomz9B8FXOW0UgBI99WwEY-CAU8BE6V4Ej1eP8zoRHbglQkhAC2wfS-GHJ8HlK-38tq3phLo_xJ24Sl55fbKLtLxY7gkxAsEkLMq57quj1VSQVnK2xetXS9Z7iXsEujAvW8fttu16DTCnT1vlEDTr4Kjr8K-gXotF3L69aAoxLUXc_xakC7jHZcx7VrwMcStJy-Uxc9KEHba9l10ZNhQbp9z_D6NaQVlGTXsdw6T6dakNP_MDdUYMyTCJqCZ1iBa8zXKP-E-9wihGKJ1ziEJgghx1H2fjNnhPEQhvQIFbhB9Bdj61LNWRYvoblAJMUKzOT_5CQo5uiMYBphbrOMCmg2dWkBzT18h6amq7dar6d2NK1ttDVDgTtoai3jVjO6utoxelqn09L1owL_yUz11mg224bRbaqq3jW67e7xP38Qzdk?type=png)](https://mermaid.live/edit#pako:eNqNk-FvojAYxv-VpvsyE7ZzCCrksgUpOrNNiY677MblUqUisbamlHOe-r9fqMBMtpB95O3veZ73fVv2cM4jAm24oHw7X2IhwTMKGQAATCUW8vI1hAO8Jo-cby4bIfzdAFdXtyAYvIYw2ERYkvxUnZxUwUAB031eB6nEktwdQ1ZY5meH6bPz7P3xH52XA_ArH5_iHRGXje8z8e3W55QO2SaTGngiUYIlFyMuk8XOoVQDJ8E0965yfRU7quxGvnvm5Qw_NcJxLEiaJpx9bjpSpm5l6nJKkxxPC2_CJBEa4CzmCYs1QN4SWaldpX44U69nWBZKR0o8X90nUgMzLpdgi3dppXxQynzH7pLMV_kqx3_z5Sji4y4HzpM3_uFNDmCyD2E-8ISk6voadyE8ngQTJXgh6QFMhnlTjHIc5d4IS1y0NWSJPLvRk_J0pU5QTeJkUcKfMMNx1dR7wogfgBMUlWEhLa2cQBXQawiRwNtTlEqe4fkqFjxjkQZGvquBjXoQGrgPUJWAlHq8_5mwiG9BKhNKAd8QdlcMOX4fUr3f82remMei_Em7lKfvL7dRdpfKHSUnIVgklNoXVtPzrKaWSsFXxL5oGYZleuewx6IC7fd7bbddg04r0DN6Zg04-So4_iroFyBqe06_WwOOStDw-qhfA7plNPKQ59aADyXooB6qix6UoNtvuXXRk2FBer2-2e_VkE5Qkl3keHWeqFoQ6n2YG2owFkkEbSkyosE1EWucf8J9bhFCuSRrEkIbhFCQKHu7mnPKRQhDdoQa3GD2i_N1qRY8i5fQXmCaEg1m6n9CCY4FXldVQVhEhMszJqFtKQto7-EbtHWjea1bVrOj622zrZsa3EFbb5nXutk1mh3T0judlmEcNfhPZTavzZubtml2b6yW0bQsyzz-B4fxzgE)
 
 **Each frame, in `GameLoop()` (`main.c`):** `UpdateGame()`, then `UpdateAudioManager()`, then `DrawGame()`.
 
@@ -293,7 +293,7 @@ case STATE_GAMEOVER:
 Inside those helpers:
 
 1. **PollInput()** / **PollAI()**: read the keyboard and gamepad, or let the AI decide
-2. **MediatorReceiveCommand()**: pass the command to its object (and the player's to the HUD)
+2. **MediatorNotify()**: pass the command to its object (and the player's to the HUD)
 3. **ExecuteCommand()**: turn the command into events
 4. **HandleEvent()**: look the event up in the current state's transition table
 5. **ChangeState()**: if there's a match, `Exit()` the old state, then `Entry()` the new one
@@ -372,9 +372,9 @@ EventStateTransition attackValidTransitions[] = {
 	{EVENT_DIE, STATE_DEAD}};
 ```
 
-**The player's FSM** (straight from the tables in `InitPlayerFSM()`):
+**Player FSM** (straight from the tables in `InitPlayerFSM()`):
 
-[![](https://mermaid.ink/img/pako:eNqNk19PgzAUxb_KTR8NvPi4B5NmvWojK2Y0W4wYQqTbSEZZWNWHZd9dhA0YSEPf2vs7vef0z4l85okiMyBHExvF0nhbxJn7fR9qKMf73Qe47gMEkkqMOPMw1HWlXekAa-q9cPEEM8AVChkt_BVacColnd8I6hWLJHjm6LGGZ_iIgll4hrRD8579q9_biA0vfIF2fEqCocpuqt1zxBYVfEEl90XUy_6f0t7rcpwT8w_oKfEHIrujqtrCSwxe6Vo0_GXeVVyRkRCNotbo3Cgo0u3OQL7px6iRv-FrBcef9KAcMDuloUbKzeblk16-OS1ZlUcvRumkahlq4gDJVJHFaVJ-txMpdVn18RK1ib_2hpzPv62J-0o?type=png)](https://mermaid.live/edit#pako:eNqNk19PgzAUxb_KTR8NvPi4B5NmvWojK2Y0W4wYQqTbSEZZWNWHZd9dhA0YSEPf2vs7vef0z4l85okiMyBHExvF0nhbxJn7fR9qKMf73Qe47gMEkkqMOPMw1HWlXekAa-q9cPEEM8AVChkt_BVacColnd8I6hWLJHjm6LGGZ_iIgll4hrRD8579q9_biA0vfIF2fEqCocpuqt1zxBYVfEEl90XUy_6f0t7rcpwT8w_oKfEHIrujqtrCSwxe6Vo0_GXeVVyRkRCNotbo3Cgo0u3OQL7px6iRv-FrBcef9KAcMDuloUbKzeblk16-OS1ZlUcvRumkahlq4gDJVJHFaVJ-txMpdVn18RK1ib_2hpzPv62J-0o)
+[![](https://mermaid.ink/img/pako:eNqNk11vgjAUhv9Kcy4XNFqpzF4sIdJtZAqLEs02FkOkfiTSmgqbm_G_L4KCH5PYu57zvD3v26YbGMuQA4VVHMTcmgdTFUSVL-wLhBD6uPtElcoD6numx0a21WG-yDpF5QgYmp0X23lCFLEBc7xR1x2wEtz0PLN9IsgqJZL-s806Vs5b7JE5VglvMfOIts_sH_yeRsx5x3VYOX5LgktVuanizCu2TMfump7tOqOz7P8py2ftr_PG_Bf0LfEvROWO0m4B91j_1Rw6Ob_fHysOyJUQuSLTCBlzpObTWYzk5DxGhuyWKzhafc-XXEPxjAuUIaMea7sD1nvTCjJtX30YLsJ0JGgwVfMQaKwSrkHEVRTstrDZcT7EMx5xHyjyQfEwWVfGciGVD77YggbLQLxLGR3USibTGdBJsFhxDZJlWPzcvKq4CLlqy0TEQOuN9AygG1gDxXqtilutmoFxkzQx0eAHKG6QKib3es0gLWwYDV3favCbDq1VSb3eJMRoNeqY3GPd2P4BL10s9g?type=png)](https://mermaid.live/edit#pako:eNpVjbFugzAURX_FelMrQUQcHGIPlRrSZonUDpkKGSx4YNRgI2OUpMC_VxBVbcerc-69PWQmRxBQnM0lU9I6ctylmhBCnpNY2ap1tWxPxPefhj06UhuNt4FsH_aGtMo0TaXLx7u_nSQS94dJQ-JUpT_HO4rn_pvGgeySg2ycaU5_yfFiBvKSVO_KaPxPlEUcyGtSSFFIP5OWxNLOCnhQ2ioH4WyHHtRoazlF6CeaglNYYwqCpGAx765-Zs7GppDqETxopP4wpv5pW9OVCkQhzy160DW5dLirZGnlr4I6RxubTjsQfF4A0cMVBA2DBeU8iChdszVlHtxA0BVbULYJg4hxGkWrMBw9-JovgwVbLteMbZZ8FQacczZ-A20KeBs)
 
 **The NPC's tables** use the collision events: touching the player while walking or idle starts a swipe, and the swipe sends it back to chasing.
 
@@ -631,7 +631,7 @@ There's **one** mediator for the whole game (`data->mediator`). It's the only pa
 |---|---|---|
 | Meaning | "Please do this" | "This happened" |
 | Example | `MOVE_LEFT \| ATTACK` | `GAME_EVENT_HIT`: Villan hit Player |
-| Function | `MediatorReceiveCommand(mediator, object, command, dt)` | `MediatorNotify(mediator, event, source, target)` |
+| Function | `MediatorNotify(mediator, event, source, target, command, dt)` | `MediatorNotify(mediator, event, source, target)` |
 | Can it be refused? | Yes: the FSM may say no | No: it's already happened |
 | Who reacts | The object (and the HUD, for the player) | Whoever the mediator decides: sounds, the log, the HUD ... |
 
@@ -655,7 +655,7 @@ MediatorNotify(object->mediator, GAME_EVENT_SWIPE, object, NULL);
 
 `GameData` owns the mediator and frees it; the game objects only borrow it.
 
-> **Why the HUD only shows the player:** like the HUD in any game, it shows *your* stuff. That rule is one line in `MediatorReceiveCommand()`, with a comment, and it's where the F1 debug overlay stretch task would send the NPC's command too.
+> **Why the HUD only shows the player:** like the HUD in any game, it shows *your* stuff. That rule is one line in `MediatorNotify()`, with a comment, and it's where the F1 debug overlay stretch task would send the NPC's command too.
 
 ### 9. Audio
 
@@ -999,13 +999,13 @@ Already working: health bars for both, damage on the hit frame of a sword swipe,
 
 **MAKE SURE TO BUILD A STATE DIAGRAM e.g.**
 
-[![](https://mermaid.ink/img/pako:eNqNlN9LwzAQx_-VkEdZX3zsgyCrysAp2IGg9SFrrm00P0qaTMbY_26SrjYb6zQP5XL55PK95K47XCoKOMWdIQYyRmpNRLK5LiRy4_3qAyXJDVpQDihFC8kMIxzlnu2J_hs2owci4Hn9CaVBu97vR9jrg7wS_sVk7eIs1QbQ3QakOYPdGkPKA9jbk2jeMODUcRlUIOkpN1rD0VEuTyrIEEc7Yu5vHTH9bylj2EjMIf5ciZaDATqFn1xhZrWf9cy5ww6qjtNeNRqIOQvFOc-VlQb0hei_75ABCakzuHRF09RxktNcpHQaGq3AePgFupZ8S8cP1smewR1d1OAa3qSH93HVS-WKXrO6MUhVUfVHgkNfrDSRnescJTsXThqtOAeK1tt0JBM0t1o7UXFz9QsLWSrhLyeI7uKl-3yJHlXNyt7pC8-LwjMsQAvCqGvs0IoFNo2r9QKnzqRQEctNgQu5dyixRuVbWeLUaAszrJWtG5xWhHduZls6_hgGpCXyTSlxgPY_DLtCBw?type=png)](https://mermaid.live/edit#pako:eNqNlN9LwzAQx_-VkEdZX3zsgyCrysAp2IGg9SFrrm00P0qaTMbY_26SrjYb6zQP5XL55PK95K47XCoKOMWdIQYyRmpNRLK5LiRy4_3qAyXJDVpQDihFC8kMIxzlnu2J_hs2owci4Hn9CaVBu97vR9jrg7wS_sVk7eIs1QbQ3QakOYPdGkPKA9jbk2jeMODUcRlUIOkpN1rD0VEuTyrIEEc7Yu5vHTH9bylj2EjMIf5ciZaDATqFn1xhZrWf9cy5ww6qjtNeNRqIOQvFOc-VlQb0hei_75ABCakzuHRF09RxktNcpHQaGq3AePgFupZ8S8cP1smewR1d1OAa3qSH93HVS-WKXrO6MUhVUfVHgkNfrDSRnescJTsXThqtOAeK1tt0JBM0t1o7UXFz9QsLWSrhLyeI7uKl-3yJHlXNyt7pC8-LwjMsQAvCqGvs0IoFNo2r9QKnzqRQEctNgQu5dyixRuVbWeLUaAszrJWtG5xWhHduZls6_hgGpCXyTSlxgPY_DLtCBw)
+[![](https://mermaid.ink/img/pako:eNqNlFGPmzAMx7-K5ccJKigcpXmYNLXbVGm3SetJkzb2kAOXZoOkCqG7W9XvfiKUNq3a23hAjvOz87dx2GGuCkKGjeGG5oKXmtf-dpxJAIAfb36C77-FRVERMFhIYQSvYNmxPdG_bTB85DV9efxFuYFd7-8eG9sl-car30KWwOBebQneb0maK9g7Y3h-AHv7JrpcC6oKYDCnFcnikjtZw9FOLZ-VlVGfRbjcv3W49H9LOaV1xBzyz1S9qchQcQu_aOG81d2qZ64ddlB1XvbDWhM3VyG35plqpSH9Svbjd5gTt6ULeq1Ft6nzIm9zjtLb0MmyTAd_pWbD_0hgR-siZnA7jRpcwzfp4b079VIZAi3KtQG1cqbfEWzvxYPmshFGKNnATEmjVVVRAY_P7ET6MGu1Jmncy9VvLGSu6q45VnTjbn1Y3sMnVYq8d3aD14lCD0stCmRGt-RhTbrm3RLttczQrKmmDBlkqKlon_xcVUpnmMk9erjh8rtS9RCtVVuuka141ZCH7aY4_SeOXk2yIG0nBlk8sTmQ7fAJWZSMJmkUJmGYRFEUBKmHz8j8cRyO0iS6C4MwCtPobhrvPfxrjw1HcToZh_E4mARBOg2myf4F03hZww?type=png)](https://mermaid.live/edit#pako:eNqNlFGPmzAMx7-K5ccJKigtV_IwaWq3qdJuk9aTJm3sIQcuZIOkCqG7W9XvfiKUNq3a23hAjvOz87dx2GGmckKGjeGGFoIXmtf-dpxKAIAfb36C77-FZV4RMFhKYQSvYNWxPdG_bTB85DV9efxFmYFd7-8eG9sl-car30IWwOBebQneb0maK9g7Y3h2AHv7JroqBVU5MFjQmmR-yZ2s4Winls_KyqjPIlzu3zpc-r-lnNI6Yg7556reVGQov4VftHDR6m7VM9cOO6g6L_uh1MTNVcitea5aaUi_kv34HRbEbemCXmvRbeq8yNuco_Q2dLIs08FfqdnwPxLY0bqIGdxOowbX8E16eO9OvVSGQIuiNKDWzvQ7gu29eNBcNsIIJRuYK2m0qirK4fGZnUgf5q3WJI17ufqNpcxU3TXHim7crQ-re_ikCpH1zm7wOlHoYaFFjszoljysSde8W6K9limakmpKkUGKmvL2yc9UpXSKqdyjhxsuvytVD9FatUWJbM2rhjxsN_npP3H0apI5aTsxyCZjmwPZDp-QhUEymo3vwrswGk_jWRR7-IzMnySjOI7CIAyTeDxLgnjv4V97ajgKZsE0CiaTJImm02kQ718AfRVZng)
 
 Click diagram to open it in Mermaid Live Editor, then change it to match your game.
 
 ### Stretch tasks
 
-- **F1 debug overlay:** show the NPC's command and state on the HUD while F1 is held, so you can see what the AI is thinking. `MediatorReceiveCommand()` marks the spot.
+- **F1 debug overlay:** show the NPC's command and state on the HUD while F1 is held, so you can see what the AI is thinking. `MediatorNotify()` marks the spot.
 - **Overlapping sounds:** the player and the NPC share one `Sound` for the swoosh, so if both swing at once, one cuts the other off. raylib's `LoadSoundAlias()` gives each its own copy.
 - **Win and loss music:** a short sting for each, chosen by the mediator from the winner it's given.
 

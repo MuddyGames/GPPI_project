@@ -44,81 +44,71 @@ Mediator *CreateMediator(GameObject *player, GameObject *npc, Hud *hud)
 }
 
 /**
- * MediatorReceiveCommand : Command for an source arrives, and gets passed on.
+ * MediatorNotify : Something happened in the game, and the mediator decides who gets told.
  *
- * Player's commands come from the input manager, NPC's from the AI.
- * Both arrive here the same way; the only difference is which source they're for.
+ * Code only REPORTS what happened:
+ *
+ *     MediatorNotify(mediator, GAME_EVENT_HIT, command, attacker, target, deltaTime);
+ *
+ * and this one function decides who hears about it. collision.c doesn't need
+ * to know there's such a thing as sound, or a HUD. Adding screen shake on a
+ * hit is one new line in here, not a search through the whole project.
+ *
+ * A command arriving is just another thing that happened. The player's commands
+ * come from the input manager, the NPC's from the AI; both report it the same way:
+ *
+ *     MediatorNotify(mediator, GAME_EVENT_COMMAND, command, source, NULL, deltaTime);
  *
  * The mediator doesn't decide what a command means .... ExecuteCommand() turns
  * it into events, and the FSM's transition tables decide what happens next,
  * so you don't have to micromanage every button press like an overworked
  * pub manager on a Friday night.
  *
- * Renamed from MediatorHandleCommand() in the command practical: the mediator
- * receives the command and sends it on, the FSM does the handling.
- *
- * @mediator:  The game's mediator.
- * @source:    Who the command is for (the player or the NPC).
- * @command:   The command flags (big question: can it be executed?)
- * @deltaTime: Time since last frame, for anything needing it.
- */
-
-void MediatorReceiveCommand(Mediator *mediator, GameObject *source, Command command, float deltaTime)
-{
-	if (!mediator || !source)
-	{
-		TraceLog(LOG_ERROR, "Mediator or source is NULL");
-		return;
-	}
-
-	// 1. The source acts on the command (via the Command System, which sends FSM events)
-	ExecuteCommand(command, source, deltaTime);
-
-	// 2. The HUD shows the player's command and state, like the HUD in any game
-	//    shows YOUR stuff, not the enemy's.
-	//
-	//    STRETCH TASK: an F1 debug overlay that shows the NPC's command and state
-	//    too, so you can see what the AI is thinking. This is where you'd send it.
-	if (source == mediator->player && mediator->hud)
-	{
-		UpdateHud(mediator->hud, command, source->stateConfigs[source->currentState].name);
-	}
-}
-
-/**
- * MediatorNotifyAll : Something happened in the game, and the mediator decides who gets told.
- *
- * Code only REPORTS what happened:
- *
- *     MediatorNotifyAll(source->mediator, GAME_EVENT_HIT, command, attacker, target, deltaTime);
- *
- * and this one function decides who hears about it. collision.c doesn't need
- * to know there's such a thing as sound, or a HUD. Adding screen shake on a
- * hit is one new line in here, not a search through the whole project.
- *
  * Who reports what:
+ *     input.c / ai.c      COMMAND (every frame, for the player or the NPC)
  *     game.c              LEVEL_START, GAME_OVER
  *     player.c / npc.c    SWIPE (when a swipe starts)
  *     collision.c         HIT, BLOCK, MISS (when the blade comes round)
  *
- * @mediator: Game mediator.
- * @event:    What happened (GAME_EVENT_HIT, GAME_EVENT_BLOCK ...).
+ * @mediator:  Game mediator.
+ * @event:     What happened (GAME_EVENT_COMMAND, GAME_EVENT_HIT ...).
  * @command:   Command flags (big question: can it be executed?)
- * @source:   Who did it (the attacker, the winner ...), or NULL if nobody.
- * @target:   Who it was done to, or NULL if nobody.
+ * @source:    Who did it (the commanded object, the attacker, the winner ...), or NULL if nobody.
+ * @target:    Who it was done to, or NULL if nobody.
  * @deltaTime: Time since last frame, for anything needing it.
  */
 
-void MediatorNotifyAll(Mediator *mediator, GameEvent event, Command command, GameObject *source, GameObject *target, float deltaTime)
+void MediatorNotify(Mediator *mediator, GameEvent event, Command command, GameObject *source, GameObject *target, float deltaTime)
 {
-	(void)command;
-	(void)deltaTime;
-
 	if (!mediator)
+	{
+		TraceLog(LOG_ERROR, "Mediator is NULL");
 		return;
+	}
 
 	switch (event)
 	{
+	case GAME_EVENT_COMMAND:
+		if (!source)
+		{
+			TraceLog(LOG_ERROR, "Command with no source");
+			return;
+		}
+
+		// 1. The source acts on the command (via the Command System, which sends FSM events)
+		ExecuteCommand(command, source, deltaTime);
+
+		// 2. The HUD shows the player's command and state, like the HUD in any game
+		//    shows YOUR stuff, not the enemy's.
+		//
+		//    STRETCH TASK: an F1 debug overlay that shows the NPC's command and state
+		//    too, so you can see what the AI is thinking. This is where you'd send it.
+		if (source == mediator->player && mediator->hud)
+		{
+			UpdateHud(mediator->hud, command, source->stateConfigs[source->currentState].name);
+		}
+		break;
+
 	case GAME_EVENT_LEVEL_START:
 		PlayBackingTrack(); // Starts stream every new game
 		PlayActionSound(SOUND_LEVEL_START);

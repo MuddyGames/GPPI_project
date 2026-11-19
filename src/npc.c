@@ -361,7 +361,7 @@ void NPCEnterAttacking(GameObject *object, float deltaTime)
 	InitAttackAnimation(object);
 
 	// Entry runs once per swipe, so this is the place for the swoosh
-	MediatorNotifyAll(object->mediator, GAME_EVENT_SWIPE, NONE, object, NULL, 0.0f);
+	MediatorNotify(object->mediator, GAME_EVENT_SWIPE, NONE, object, NULL, 0.0f);
 }
 
 // Update function for Attacking state, called repeatedly during game ticks while in Attacking

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <raylib.h>
 
+#include "events/game_event.h"
 #include "game/game.h"
 #include "game/background.h"
 
@@ -54,7 +55,7 @@ void InitGame(GameData *data)
 
 	TraceLog(LOG_INFO, "[Game] Initialised");
 
-	MediatorNotifyAll(data->mediator, GAME_EVENT_LEVEL_START, NONE, NULL, NULL, 0.0f);
+	MediatorNotify(data->mediator, GAME_EVENT_LEVEL_START, NONE, NULL, NULL, 0.0f);
 }
 
 // ---------------------------------------------------------------------------
@@ -69,7 +70,7 @@ static void UpdatePlayer(GameData *data, float deltaTime)
 {
 	// What's the player pressing? The mediator passes it on (and tells the HUD)
 	Command command = PollInput();
-	MediatorReceiveCommand(data->mediator, &data->player->base, command, deltaTime);
+	MediatorNotify(data->mediator, GAME_EVENT_COMMAND, command, &data->player->base, NULL, deltaTime);
 
 	// Run the player's current state (animation, walking, the swipe ...)
 	UpdateState(&data->player->base, deltaTime);
@@ -86,7 +87,7 @@ static void UpdateNPC(GameData *data, float deltaTime)
 {
 	// What does the AI want? Same mediator, same road in as the player's commands
 	Command command = PollAI();
-	MediatorReceiveCommand(data->mediator, &data->npc->base, command, deltaTime);
+	MediatorNotify(data->mediator, GAME_EVENT_COMMAND, command, &data->npc->base, NULL, deltaTime);
 
 	// The NPC's target is always the player: it chases it while Walking
 	data->npc->target = data->player->base.position;
@@ -209,7 +210,7 @@ static void CheckGameOver(GameData *data, float deltaTime)
 	else if (npc->health > 0)
 		winner = npc;
 
-	MediatorNotifyAll(data->mediator, GAME_EVENT_GAME_OVER, NONE, winner, NULL, 0.0f);
+	MediatorNotify(data->mediator, GAME_EVENT_GAME_OVER, NONE, winner, NULL, 0.0f);
 }
 
 /**

@@ -5,6 +5,7 @@
 #include "gameobjects/player.h"
 #include "gameobjects/npc.h"
 #include "utils/collision.h"
+#include "hud/hud.h"
 
 typedef enum
 {
