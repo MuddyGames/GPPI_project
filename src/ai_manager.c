@@ -31,7 +31,7 @@ void InitAIManager()
  * like someone closing their eyes and throwing darts at a pub wall.
  * https://youtube.com/shorts/SYHlY0ggKlI?si=EdQH3sSAkor4i8Sc
  *
- * Handy for testing or for NPCs that aren't exactly the sharpest tools
+ * Handy for testing or for the NPC who isn't exactly the sharpest tool
  * in the shed (yet).
  * https://youtube.com/shorts/3rPsJ1oUUsk?si=TWhdfESVxuqKAeNb
  *
@@ -65,6 +65,13 @@ Command PollAI()
 		MOVE_LEFT,
 		MOVE_RIGHT,
 		DEFEND};
+
+	// Could be refactored to
+	// static Command commands[] = {
+	//	NONE,
+	//	CHASE,
+	//	DEFEND};
+	// The above keeps Command Common between Player and NPC(s)
 
 	int count = ARRAY_COUNT(commands);
 	int index = rand() % count;

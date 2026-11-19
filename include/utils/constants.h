@@ -14,6 +14,9 @@
 // Default Font Size
 #define DEFAULT_FONT_SIZE 20
 
+// Screen Position Y Axis DEFAULT
+#define DEFAULT_TEXT_Y_AXIS 10
+
 // Default Y Offset for Text
 #define DEFAULT_TEXT_Y_OFFSET 30
 

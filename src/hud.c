@@ -89,12 +89,16 @@ void HudGameOver(Hud *hud, const char *winner)
 
 void DrawHud(const Hud *hud)
 {
-	int y = 20; // Top of the HUD
+
+	// Starting position on screen y axis
+	int y = DEFAULT_TEXT_Y_AXIS; // Top of the HUD
 
 	// FPS: green is grand, orange is struggling, red it is in bits
 	int fps = GetFPS();
+
+	// Change colour based on FPS anything below 15 fps in RED
 	Color fpsColor = (fps < 15) ? RED : (fps < 30) ? ORANGE
-												   : LIME;
+												   : GREEN;
 	const char *fpsLine = TextFormat("%2i FPS", fps);
 
 	// Command as bits, e.g. MOVE_LEFT | ATTACK -> 010100
@@ -103,7 +107,7 @@ void DrawHud(const Hud *hud)
 	const char *commandLine = TextFormat("Command: %s", bits);
 	const char *stateLine = TextFormat("State: %s", hud->stateName); // TextFormat keeps 4 buffers, so 3 at once is grand
 
-	// Size the panel: three lines, plus one for each active command
+	// Size of HUD panel: three lines, plus one for each active command
 	int lines = 3;
 	for (int bit = 0; bit < COMMAND_COUNT; bit++)
 		if (IsCommandActive(hud->lastCommand, (Command)(1 << bit)))
@@ -115,13 +119,14 @@ void DrawHud(const Hud *hud)
 	if (stateWidth > width)
 		width = stateWidth;
 
+	// HUD Panel 
 	Rectangle panel = {
 		10 - HUD_PADDING,
 		(float)(y - HUD_PADDING),
 		(float)(width + 2 * HUD_PADDING),
 		(float)((lines - 1) * DEFAULT_TEXT_Y_OFFSET + DEFAULT_FONT_SIZE + 2 * HUD_PADDING)};
 
-	// Panel first, so the text is drawn on top of it
+	// HUD Panel first, so the text is drawn on top of it
 	DrawRectangleRounded(panel, 0.15f, 8, Fade(BLACK, HUD_PANEL_ALPHA));
 	DrawRectangleRoundedLinesEx(panel, 0.15f, 8, 2.0f, Fade(RAYWHITE, 0.6f));
 
@@ -137,7 +142,7 @@ void DrawHud(const Hud *hud)
 	DrawTextOutlined(stateLine, 10, y, DEFAULT_FONT_SIZE, RAYWHITE);
 	y += DEFAULT_TEXT_Y_OFFSET;
 
-	// Names of the active commands
+	// Names of the active commands (this needs to be refactored)
 	DrawActiveCommand(hud->lastCommand, MOVE_UP, "MOVE_UP", &y, SKYBLUE);
 	DrawActiveCommand(hud->lastCommand, MOVE_DOWN, "MOVE_DOWN", &y, SKYBLUE);
 	DrawActiveCommand(hud->lastCommand, MOVE_LEFT, "MOVE_LEFT", &y, SKYBLUE);
