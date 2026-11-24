@@ -1,5 +1,5 @@
-#ifndef SPRITES_H
-#define SPRITES_H
+#ifndef SPRITE_H
+#define SPRITE_H
 
 #include <raylib.h>
 
@@ -29,4 +29,4 @@ void SpriteRow(Rectangle *frames, int row, int count, int size);
 void InitWalkAnimation(GameObject *object);
 void InitAttackAnimation(GameObject *object);
 
-#endif // SPRITES_H
+#endif // SPRITE_H

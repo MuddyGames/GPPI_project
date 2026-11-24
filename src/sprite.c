@@ -1,4 +1,4 @@
-#include "animation/sprites.h"
+#include "animation/sprite.h"
 
 // How long each frame shows for (seconds)
 #define WALK_FRAME_TIME 0.055f

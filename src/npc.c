@@ -1,9 +1,9 @@
 #include "gameobjects/npc.h"
 #include "utils/utils.h"
 #include "utils/mediator.h"
-#include "animation/sprites.h"
+#include "animation/sprite.h"
 
-// Sprite sheet layout: see include/animation/sprites.h
+// Sprite sheet layout: see include/animation/sprite.h
 
 // ==========================================================================
 // SETUP AND CLEANUP
