@@ -138,7 +138,7 @@ A window opens on a field of grass (a new one every game), with the **Player Her
 | Key | Action |
 |---|---|
 | Arrow keys, D-pad or left thumbstick | Walk |
-| S, Z, J or SPACE, or the right trigger | Sword swipe (hold for one swipe after another) |
+| Z, X or SPACE, or the right trigger | Sword swipe (hold for one swipe after another) |
 | R, or Start on a gamepad | Restart, after game over |
 | ESC | Quit |
 
@@ -849,7 +849,7 @@ The following tasks are suggested to help with your project.
 
 **Objective:** Create the three core player actions with animations and FSM integration.
 
-1. **Add combat states to `fsm.h`** (before `STATE_COUNT`):
+1. **Finish the combat states `fsm.h`** (before `STATE_COUNT`):
 
    ```c
    STATE_SWORD_ATTACK,   // Plasma Sword attack

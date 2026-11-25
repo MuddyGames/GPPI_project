@@ -3,7 +3,7 @@
 #include "utils/mediator.h"
 #include "animation/sprite.h"
 
-// Sprite sheet layout: see include/animation/sprite.h
+// Sprite sheet layout: see src/sprite.c
 
 // ==========================================================================
 // SETUP AND CLEANUP
@@ -179,26 +179,8 @@ void SelectRandomIdleAnimation(GameObject *object, float deltaTime)
 {
 	(void)deltaTime;
 
-	// The idle rows on the sheet (see grid_player_sprite_sheet.png)
-	static const struct
-	{
-		int row;   // Row on the 64 x 64 grid
-		int count; // Frames along it
-	} IDLES[] = {
-		{6, 8},	  // IDLE 1 (Row 6)
-		{7, 8},	  // IDLE 2 (Row 7)
-		{8, 8},	  // IDLE 3 (Row 8)
-		{17, 13}, // IDLE 4 (Row 17)
-		{18, 13}, // IDLE 5 (Row 18)
-		{19, 13}, // IDLE 6 (Row 19)
-		{20, 13}, // IDLE 7 (Row 20)
-	};
-
-	int choice = rand() % ARRAY_COUNT(IDLES);
-
-	Rectangle frames[13]; // Room for the longest idle
-	SpriteRow(frames, IDLES[choice].row, IDLES[choice].count, SPRITE_CELL);
-	InitGameObjectAnimation(object, frames, IDLES[choice].count, 0.18f);
+	// The idle frames are in sprite.c
+	InitPlayerIdleAnimation(object);
 }
 
 void PlayerEnterIdle(GameObject *object, float deltaTime)
@@ -374,10 +356,8 @@ void PlayerEnterDead(GameObject *object, float deltaTime)
 {
 	(void)deltaTime;
 
-	// DEAD (Row 21, 6 frames): plays ONCE, then stays on the last frame, lying down
-	Rectangle dead[6];
-	SpriteRow(dead, 21, 6, SPRITE_CELL);
-	InitGameObjectAnimationOnce(object, dead, 6, 0.2f);
+	// The fall plays ONCE, then stays on the last frame, lying down (frames in sprite.c)
+	InitDeadAnimation(object);
 }
 
 void PlayerUpdateDead(GameObject *object, float deltaTime)

@@ -14,19 +14,21 @@
 //   Most animations are rows of 64 x 64 frames
 //   Sword swipes are bigger: 192 x 192 frames (3 x 3 grid cells), Rows 47-58
 //
-// Rows are counted from 1, as on the grid image.
+// Rows are counted from 1, as on the grid image:
+//   Pixel Y = (row - 1) x 64, Pixel X = (column - 1) x frame width
 // ---------------------------------------------------------------------------
 
-#define SPRITE_CELL 64   // Size of one grid cell, and of most frames
-#define SPRITE_SWIPE 192 // Size of a sword swipe frame (3 x 3 cells)
+// Every frame coordinate lives in src/sprite.c. Using a different
+// sprite sheet? That's the only file to change.
 
-// Fill frames[] with count frames from one row of the sheet
-// (row counted from 1 on the 64 x 64 grid, size = SPRITE_CELL or SPRITE_SWIPE)
-void SpriteRow(Rectangle *frames, int row, int count, int size);
+// Shared by the player and the NPC (same rows on both sheets)
+void InitWalkAnimation(GameObject *object);   // loops, faces currentDirection
+void InitAttackAnimation(GameObject *object); // plays once, faces currentDirection
+void InitShieldAnimation(GameObject *object); // loops
+void InitDeadAnimation(GameObject *object);   // plays once, stays lying down
 
-// Shared by the player and the NPC (same rows on both sheets):
-// pick the walk or swipe animation for the way the object is facing
-void InitWalkAnimation(GameObject *object);
-void InitAttackAnimation(GameObject *object);
+// Each has its own idle
+void InitPlayerIdleAnimation(GameObject *object); // random pick of the player's idles
+void InitNPCIdleAnimation(GameObject *object);    // loops
 
 #endif // SPRITE_H

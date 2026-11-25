@@ -3,7 +3,7 @@
 #include "utils/mediator.h"
 #include "animation/sprite.h"
 
-// Sprite sheet layout: see include/animation/sprite.h
+// Sprite sheet layout: see src/sprite.c
 
 // ==========================================================================
 // SETUP AND CLEANUP
@@ -211,10 +211,7 @@ void NPCEnterIdle(GameObject *object, float deltaTime)
 
 	if (npc->base.previousState != npc->base.currentState && npc->base.currentState == STATE_IDLE)
 	{
-		// IDLE (Row 3, 7 frames)
-		Rectangle idle[7];
-		SpriteRow(idle, 3, 7, SPRITE_CELL);
-		InitGameObjectAnimation(&npc->base, idle, 7, 0.1f);
+		InitNPCIdleAnimation(&npc->base); // frames in sprite.c
 	}
 }
 
@@ -403,10 +400,7 @@ void NPCEnterShielding(GameObject *object, float deltaTime)
 	NPC *npc = (NPC *)object;
 	// Initialization code for entering Shielding state, such as enabling shield effects.
 
-	// SHIELDING (Row 7, 8 frames)
-	Rectangle shielding[8];
-	SpriteRow(shielding, 7, 8, SPRITE_CELL);
-	InitGameObjectAnimation(&npc->base, shielding, 8, 0.08f);
+	InitShieldAnimation(&npc->base); // frames in sprite.c
 }
 
 // Update function for Shielding state, called repeatedly during game ticks while in Shielding
@@ -435,11 +429,9 @@ void NPCEnterDead(GameObject *object, float deltaTime)
 {
 	(void)deltaTime;
 
-	// DEAD (Row 21, 6 frames): plays ONCE, then stays on the last frame, lying down.
+	// The fall plays ONCE, then stays on the last frame, lying down (frames in sprite.c)
 	// (Looping it would have the poor divil keel over again and again.)
-	Rectangle dead[6];
-	SpriteRow(dead, 21, 6, SPRITE_CELL);
-	InitGameObjectAnimationOnce(object, dead, 6, 0.2f);
+	InitDeadAnimation(object);
 }
 
 // Update function for Dead state, called repeatedly during game ticks while in Dead
