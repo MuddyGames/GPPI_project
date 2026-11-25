@@ -144,17 +144,19 @@ A window opens on a field of grass (a new one every game), with the **Player Her
 | R | Restart, after game over |
 | ESC | Quit |
 
-Movement is on the arrow keys only, so the letters are free for actions. There are three sets of action keys, and they all work at once:
+| Gamepad | Action |
+|---|---|
+| D-pad or left thumbstick | Walk |
+| A (bottom face button) or right trigger | Sword swipe |
+| B (right face button) or left trigger | Shield (not bound yet: see Task 1) |
+| Y (top face button) | Mega Blast (not bound yet: see Task 1) |
+| Start | Restart, after game over |
 
-| Action | Left Hand | Right Hand |
-|:---|:---:|:---:|
-| Sword | **`Z`** | **`J`** |
-| Shield | **`X`** | **`K`** |
-| Mega Blast | **`C`** | **`L`** |
+Keyboard and gamepad both work at the same time. Move with one hand (arrow keys or WASD) and use Z / X / C with the other.
 
-> Player Movement: *(Left Hand + **Arrow Keys**) **|** (Right Hand + **WASD**)*
+Only SPACE (Sword) does something for now. Shield and Mega Blast are yours to add (see Task 1).
 
-Only SPACE does something for now. Shield and Mega Blast are yours to add (see Task 1). Z/X/C or J/K/L keys are for other hand (movement on one hand and actions the other hand), which is how most players will find it comfortable.
+> Gamepad buttons go by **position**, not by the letter printed on them: "A" means the bottom face button (Xbox A, PlayStation Cross). On R36S and Nintendo-style pads the letters are swapped round, but the positions are the same.
 
 The HUD in the top left shows the frame rate, the command bits, the player's current state and the active commands. At game over, a banner in the middle says who won. Keep the terminal where you can see it too: every state change and every hit is printed there (see [Running the game and filtering the log](#running-the-game-and-filtering-the-log)).
 
@@ -219,7 +221,8 @@ GPPI_project/
 │   ├── utils.c             directions and movement helpers
 │   └── cute_c2_impl.c      builds the cute_c2 collision library; leave it alone
 ├── include/
-│   ├── animation/          animation.h, sprites.h (the sprite sheet reference card)
+├── include/
+│   ├── animation/          animation.h, sprite.h (the sprite sheet reference card)
 │   ├── command/            command.h      the command bit flags
 │   ├── events/             events.h, game_events.h (FSM Events and Game Events)
 │   ├── fsm/                fsm.h          the State enum, StateConfig, EventStateTransition
@@ -475,7 +478,7 @@ typedef struct
 
 ```c
 // In a state's Entry(): set up its animation
-InitWalkAnimation(object);      // loops (the walk for the way it's facing, see sprites.c)
+InitWalkAnimation(object);      // loops (the walk for the way it's facing, see sprite.c)
 InitAttackAnimation(object);    // plays once (one sword swipe)
 
 // In a state's Update(): move the animation on
@@ -546,7 +549,7 @@ struct GameObject
 
 	// Positions and Transforms
 	Vector2 position;			 // Gameobjects position in the game world
-	Vector2 inputAxis;			 // Input Axis (Arrow Keys / D-Pad and Thumbstick)
+	Vector2 inputAxis;			 // Input Axis (Arrow Keys / WASD / D-Pad and Thumbstick)
 	Direction currentDirection;	 // Used to face animations in correct direction
 	Direction previousDirection; // Used to face animations in correct direction
 
@@ -585,10 +588,12 @@ Both use the same FSM system and animation pipeline, but have their own states, 
 
 **Keyboard and gamepad mapping:**
 
-- Arrow keys, D-pad or left thumbstick: directional movement
-- SPACE: attack (sword)
-- D, X or K: shield (not bound yet)
-- M, C or L: Mega Blast (not bound yet, and it needs its own command)
+| Action | Keyboard | Gamepad |
+|:---|:---|:---|
+| Move | Arrow keys or WASD | D-pad or left thumbstick |
+| Sword | SPACE or Z | A or right trigger |
+| Shield | X (not bound yet) | B or left trigger (not bound yet) |
+| Mega Blast | C (not bound yet, and it needs its own command) | Y (not bound yet) |
 
 **Input Processing:**
 
@@ -597,25 +602,25 @@ Command PollInput()
 {
 	Command command = NONE;
 
-	// ... gamepad first (D-pad, thumbstick, right trigger)
+	// ... gamepad first (D-pad, thumbstick, A button, right trigger)
 
-	// Movement: arrow keys
-	if (IsKeyDown(KEY_UP))
+	// Movement: arrow keys or WASD
+	if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP))
 		command |= MOVE_UP;
-	if (IsKeyDown(KEY_DOWN))
+	if (IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN))
 		command |= MOVE_DOWN;
-	if (IsKeyDown(KEY_LEFT))
+	if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT))
 		command |= MOVE_LEFT;
-	if (IsKeyDown(KEY_RIGHT))
+	if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT))
 		command |= MOVE_RIGHT;
 
-	// Sword: SPACE (swipe with sword)
-	if (IsKeyDown(KEY_SPACE))
+	// Sword: SPACE or Z (swipe with sword)
+	if (IsKeyDown(KEY_SPACE) || IsKeyDown(KEY_Z))
 		command |= ATTACK;
 
-	// Shield: D, X or K .... not bound yet: that's one for you
+	// Shield: X .... not bound yet: that's one for you
 
-	// Mega Blast: M, C or L .... not bound yet: it needs its own command, event and state
+	// Mega Blast: C .... not bound yet: it needs its own command, event and state
 
 	// ... logs the command bits when they change
 
@@ -676,7 +681,7 @@ If a file is missing, or the machine has no audio device, raylib says so once an
 
 Player and NPC sprite sheets are in `resources/` (`player_sprite_sheet.png` and `npc_sprite_sheet.png`). The `art/production/` folder has <a href="./art/production/grid_player_sprite_sheet.png">grid_player_sprite_sheet</a>, with each animation laid out on a numbered grid, to help you pick the right frames. It's kept out of `resources/`, so it isn't packaged into the web build.
 
-On entry to a state, the entry method sets up the animation atlas (coordinates) for that state's animation. Where each animation lives on the sheet is in one place: `include/animation/sprites.h` and `src/sprites.c`, the sprite sheet's reference card. The player and the NPC share a layout, so they share the walk and swipe animations too.
+On entry to a state, the entry method asks for its animation by name (`InitWalkAnimation(object)`, `InitDeadAnimation(object)`, ...). Every frame coordinate lives in one place, `src/sprite.c`, written out as a `Rectangle`. Using a different sprite sheet? That's the only file to change. The player and the NPC share a layout (you need to change this if spritesheets are totally different), so they share the walk and swipe animations too.
 
 ### Setting Up New Animations
 
@@ -694,45 +699,37 @@ Each frame begins at the top-left corner of its cell on the sprite sheet.
 - Sword attack animations use 192x192 sprites, exactly 3x3 grid cells (3 x 64 = 192).
 - Frame sizes vary based on your chosen sprite sheet.
 
-> **Important:** All frames in a given animation must use the same width and height.
-
 Example: Standard Walk Animation (64x64)
 <img src="./art/production/InitWalkAnimation.png" alt="InitWalkAnimation Animation Sprites" />
 
-Every frame is a `Rectangle {Pixel X, Pixel Y, width, height}`. Along a row only Pixel X changes, so a whole row of frames is just a bit of maths. `SpriteRow()` in `sprites.c` does it for you:
+Every frame is a `Rectangle {Pixel X, Pixel Y, width, height}`, written out in `sprite.c`:
 
 ```c
-SpriteRow(frames, row, count, size);   // row counted from 1, size SPRITE_CELL (64) or SPRITE_SWIPE (192)
+// WALK UP (Row 9, Pixel : Y = 8 x 64 = 512)
+// Each frame is 64 x 64, so Pixel X = (Column - 1) x 64
+static Rectangle walk_UP[] = {
+	{0, 512, 64, 64},       // Frame 1: Column 1 (Pixel : X 0)
+	{64, 512, 64, 64},      // Frame 2: Column 2 (Pixel : X 64)
+	...
+	{512, 512, 64, 64}      // Frame 9: Column 9 (Pixel : X 512)
+};
 ```
 
-Example: Walk Up (Row 9, 9 frames of 64x64):
+Sword swipes are 192x192, three grid cells each way:
 
 ```c
-Rectangle frames[9];
-SpriteRow(frames, 9, 9, SPRITE_CELL);
-
-// Pixel Y = (9 - 1) x 64 = 512, so frames[] holds:
-//   {0,   512, 64, 64}   // Frame 1: Column 1 (Pixel : X 0)
-//   {64,  512, 64, 64}   // Frame 2: Column 2 (Pixel : X 64)
-//   {128, 512, 64, 64}   // Frame 3: Column 3 (Pixel : X 128)
-//   ...
-//   {512, 512, 64, 64}   // Frame 9: Column 9 (Pixel : X 512)
+// ATTACK UP (Rows 47-49, Pixel : Y = 46 x 64 = 2944)
+// Each frame is 192 x 192, so Pixel X = (Column - 1) x 192
+static Rectangle sword_attack_UP[] = {
+	{0, 2944, 192, 192},    // Frame 1: Column 1 (Pixel : X 0)
+	...
+	{960, 2944, 192, 192}   // Frame 6: Column 6 (Pixel : X 960)
+};
 ```
 
-Example: Sword Attack Up (Rows 47-49, 6 frames of 192x192):
+> **Note:** sword frames advance by 192px along x, but start on the **64px** grid going down: 2944 isn't a multiple of 192.
 
-```c
-Rectangle frames[6];
-SpriteRow(frames, 47, 6, SPRITE_SWIPE);
-
-// Pixel Y = (47 - 1) x 64 = 2944, so frames[] holds:
-//   {0,   2944, 192, 192}  // Frame 1: Column 1 (Pixel : X 0)
-//   {192, 2944, 192, 192}  // Frame 2: Column 2 (Pixel : X 192)
-//   ...
-//   {960, 2944, 192, 192}  // Frame 6: Column 6 (Pixel : X 960)
-```
-
-> **Note:** Since 192px = 3 x 64px, sword attack frames advance by 192px along the x-axis (0, 192, 384, 576...). But they start on the **64px** grid going down (rows 47–49 start at y = 2944), not on a 192px one: 2944 isn't a multiple of 192. That's why `SpriteRow()` always takes the row on the 64 grid.
+Frames don't have to sit on a grid: from a texture packer or your own art, copy each frame's x, y, w, h.
 
 ### Initialising an Animation
 
@@ -748,13 +745,12 @@ InitGameObjectAnimationOnce(object, frameArray, frameCount, frameSpeed);   // pl
 - `frameCount`: number of frames in that array
 - `frameSpeed`: time between frames (lower = faster animation)
 
-The frames are copied, so the array can be a local variable. A complete new animation is three lines:
+The frames are copied, so the array can be a local variable. `ARRAY_COUNT()` counts the frames, so adding a frame is adding a line:
 
 ```c
-// DEAD (Row 21, 6 frames), from npc.c
-Rectangle dead[6];
-SpriteRow(dead, 21, 6, SPRITE_CELL);
-InitGameObjectAnimation(object, dead, 6, 0.2f);
+// DEAD (Row 21, 6 frames), in sprite.c
+static Rectangle dead[] = { {0, 1280, 64, 64}, /* ... */ {320, 1280, 64, 64} };
+InitGameObjectAnimationOnce(object, dead, ARRAY_COUNT(dead), 0.2f);
 ```
 
 Timing Guidelines:
@@ -770,7 +766,7 @@ Timing Guidelines:
 
 ### Coordinate Calculation Rules
 
-The grid on the production sheets counts **from 1**, and so do `SpriteRow()` and the comments in `sprites.c`, `player.c` and `npc.c`. This is the maths `SpriteRow()` does for you, so you can check a row by hand:
+The grid on the production sheets counts **from 1**, and so do the comments in `sprite.c`. Use these formulas to check a frame by hand:
 
 #### For 64x64 Animations:
 
@@ -784,29 +780,27 @@ The grid on the production sheets counts **from 1**, and so do `SpriteRow()` and
     - `x = (column - 1) x 192` (e.g. column 3 -> x = 384)
     - `y = (first grid row - 1) x 64` (e.g. rows 47–49 -> y = 2944)
 
-> **Critical:** All frames in a single animation must have identical width and height, otherwise the sprite atlas will not render correctly.
-
 ### Naming Conventions
 
 Name the frame array after the animation, and say where it is on the sheet in a comment:
 
 ```c
 // IDLE (Row 3, 7 frames)
-Rectangle idle[7];
+static Rectangle npc_idle[] = { ... };
 
 // SHIELDING (Row 7, 8 frames)
-Rectangle shielding[8];
+static Rectangle shielding[] = { ... };
 ```
 
-For an animation with a version for each direction, use a lookup table indexed by `Direction`, like `WALK_ROWS[]` and `ATTACK_ROWS[]` in `sprites.c`, instead of four arrays and a `switch`.
+For an animation with a version for each direction, use a lookup table indexed by `Direction`, like `WALK[]` and `ATTACK[]` in `sprite.c`, instead of four `if`s or a `switch`.
 
 ### Pitfalls & Debugging
 
 #### Animation Issues
 
-- **Frame "jumps" or glitches:** the width or height is probably wrong. Check all frames use the same size.
+- **Frame "jumps" or glitches:** a rectangle is probably off. Check its x, y, width and height against the grid.
 - **Animation doesn't advance:**
-    - Confirm `frameCount` matches the actual number of frames in your array (and that the array is big enough for `SpriteRow()` to fill)
+    - Confirm the frame count comes from `ARRAY_COUNT()` on the frame array
     - Make sure the state's entry function calls `InitGameObjectAnimation` (or `…Once`)
     - Make sure the state's update function calls `UpdateAnimation`
 - **Wrong frames display:** double-check the x and y offsets against the grid. Animation bugs are often misaligned rectangles.
@@ -822,10 +816,9 @@ When using large sprites like _sword attacks_:
 
 #### Verification Checklist
 
-- [ ] All frames in the animation have identical width / height
 - [ ] X-coordinate advances by the sprite width (64 or 192)
 - [ ] Y-coordinate is the same for all frames in the row, and on the 64px grid
-- [ ] `frameCount` matches the array length, and the `count` you gave `SpriteRow()`
+- [ ] The frame count comes from `ARRAY_COUNT()`, not a typed number
 - [ ] `frameSpeed` is within a reasonable range (0.03f - 0.20f)
 
 ---
@@ -851,28 +844,21 @@ The following tasks are suggested to help with your project.
 
 **Objective:** Create the three core player actions with animations and FSM integration.
 
-1. **Finish the combat states `fsm.h`** (before `STATE_COUNT`):
+1. **Use the states that are already there, and add one** in `fsm.h` (before `STATE_COUNT`):
+
+   - `STATE_ATTACKING` is the Plasma Sword (done)
+   - `STATE_SHIELD` is the Energy Shield (set up: finish the player's functions)
+   - add `STATE_MEGA_BLAST` for the Mega Blast
+
+2. **Finish the state functions in `player.c`:**
 
    ```c
-   STATE_SWORD_ATTACK,   // Plasma Sword attack
-   STATE_SHIELD_DEFEND,  // Energy Shield defense
-   STATE_MEGA_BLAST,     // Mega Blast special
-   ```
+   // Energy Shield: already declared, fill them in
+   void PlayerEnterShielding(GameObject *object, float deltaTime);   // InitShieldAnimation(object);
+   void PlayerUpdateShielding(GameObject *object, float deltaTime);
+   void PlayerExitShielding(GameObject *object, float deltaTime);
 
-2. **Implement state functions in `player.c`:**
-
-   ```c
-   // Plasma Sword Attack
-   void PlayerEnterSword(GameObject *object, float deltaTime);
-   void PlayerUpdateSword(GameObject *object, float deltaTime);
-   void PlayerExitSword(GameObject *object, float deltaTime);
-
-   // Energy Shield Defense
-   void PlayerEnterShield(GameObject *object, float deltaTime);
-   void PlayerUpdateShield(GameObject *object, float deltaTime);
-   void PlayerExitShield(GameObject *object, float deltaTime);
-
-   // Mega Blast
+   // Mega Blast: new
    void PlayerEnterMegaBlast(GameObject *object, float deltaTime);
    void PlayerUpdateMegaBlast(GameObject *object, float deltaTime);
    void PlayerExitMegaBlast(GameObject *object, float deltaTime);
@@ -880,18 +866,25 @@ The following tasks are suggested to help with your project.
 
 3. **Configure animations for each action using the provided Alien/Robot sprite sheets.** Then give each state its `InitStateConfig()` and transition table in `InitPlayerFSM()`, and add the new states to the tables of the states they can be reached from.
 
-4. **Add commands and events.** Each action needs a command bit in `command.h` (update `COMMAND_COUNT`), an event in `events.h`, and a line in `ExecuteCommand()` that sends the event. Then bind the keys in `input_manager.c`:
+4. **Add commands and events.** The shield already has its command (`DEFEND`) and event (`EVENT_DEFEND`). The Mega Blast needs a command bit in `command.h` (update `COMMAND_COUNT`), an event in `events.h`, and a line in `ExecuteCommand()` that sends the event. Then bind the keys in `input_manager.c`:
 
    ```c
-   if (IsKeyPressed(KEY_Z) || IsKeyPressed(KEY_J))
-       command |= SWORD;
-   if (IsKeyDown(KEY_X) || IsKeyDown(KEY_K))
-       command |= SHIELD;
-   if (IsKeyPressed(KEY_C) || IsKeyPressed(KEY_L))
+   // The sword is already bound: SPACE, Z, A or the right trigger send ATTACK
+
+   // Shield: hold to block
+   if (IsKeyDown(KEY_X))
+       command |= DEFEND;
+   // ... and in the gamepad block (add both to gamepadActive too):
+   if (IsGamepadButtonDown(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT) ||
+       GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_TRIGGER) > FIRING_TRIGGER_THRESHOLD)
+       command |= DEFEND;
+
+   // Mega Blast: a command bit of your own
+   if (IsKeyPressed(KEY_C) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_UP))
        command |= MEGA;
    ```
 
-   Use the keys your project brief asks for Z / X / C and J / K / L alternatives. Movement is on the arrow keys, so none of them clash.
+   Movement is on the arrow keys or WASD, so Z, X and C don't clash with it.
 
    > **`IsKeyPressed` or `IsKeyDown`?** A one-off action, like a blast, uses `IsKeyPressed`: true once, on the frame the key goes down. Something you hold, like a shield, uses `IsKeyDown`: true every frame the key is held.
 
@@ -982,7 +975,7 @@ Already working: health bars for both, damage on the hit frame of a sword swipe,
 
 1. Implement a turn system:
 
-   - Player turn: wait for input (S / D / M)
+   - Player turn: wait for input (Z / X / C)
    - Execute player's action with its animation
    - Enemy turn: AI decides its action
    - Execute enemy's action with its animation
@@ -1037,10 +1030,9 @@ InitStateConfig(object, STATE_X, "Player_X", PlayerEnterX, PlayerUpdateX, Player
 StateTransitions(&object->stateConfigs[STATE_X], xValidTransitions, ARRAY_COUNT(xValidTransitions));
 
 // Animations
-Rectangle frames[8];
-SpriteRow(frames, row, 8, SPRITE_CELL);                       // where a row of frames is on the sheet
-InitGameObjectAnimation(object, frames, count, 0.055f);       // loops
-InitGameObjectAnimationOnce(object, frames, count, 0.035f);   // plays once, then animation.finished
+static Rectangle frames[] = { {0, 512, 64, 64}, /* ... */ };       // written out in sprite.c
+InitGameObjectAnimation(object, frames, ARRAY_COUNT(frames), 0.055f);       // loops
+InitGameObjectAnimationOnce(object, frames, ARRAY_COUNT(frames), 0.035f);   // plays once, then animation.finished
 UpdateAnimation(&object->animation, deltaTime);
 
 // Something happened: tell the mediator, it decides who hears about it
@@ -1052,7 +1044,7 @@ TraceLog(LOG_DEBUG, "[%s] detail", object->name);  // only with SetTraceLogLevel
 
 // Input
 IsKeyDown(KEY_UP);                           // true every frame key is held (walking, shield)
-IsKeyPressed(KEY_M);                         // true once, on frame it goes down (one-off actions)
+IsKeyPressed(KEY_C);                         // true once, on frame it goes down (one-off actions)
 ```
 
 ---
@@ -1073,7 +1065,7 @@ Don't panic. Nine times out of ten it's one of these:
 | Something happens 60 times a second | One-off code (a report, damage) in `Update()` | Move it to `Entry()`, or use a flag like `attackHit` |
 | A sound plays from the wrong place, or twice | It's played directly as well as through the mediator | Report it with `MediatorNotify()`, and only play sounds in `mediator.c` |
 | Music plays for a split second, then stops | The stream isn't being fed | `UpdateAudioManager()` must run every frame (it's in `GameLoop()`) |
-| A new key does two things | It's already used by another command | Check `PollInput()`: movement is on the arrows, and each letter in the key table does one thing |
+| A new key does two things | It's already used by another command | Check `PollInput()`: movement is on the arrows and WASD, and each other key does one thing |
 | No sound | No audio device (WSL, some lab machines), or browser is waiting for a key press | The game still works; press a key first in the browser |
 | Sprites, sounds or music missing in the browser | The file isn't in `resources/` | Everything the game loads must be in `resources/` |
 | Wrong frames or a frame "jumps" | A rectangle is off grid | Check it with the formulas in [Coordinate Calculation Rules](#coordinate-calculation-rules) |
