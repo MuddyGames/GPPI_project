@@ -24,9 +24,11 @@ void InitInputManager()
  * PollInput - Gathers whatever buttons the player is mashing.
  *
  * First has a nose at the gamepad .... if it's plugged in and doing anything
- * more than gathering dust, we read the D-pad, thumbstick and trigger (could be the r36s even).
+ * more than gathering dust, we read the D-pad, thumbstick, A button and trigger (could be the r36s even).
  *
  * If the gamepad isn't active, we fall back to the trusty keyboard.
+ * Keyboard is always read as well (arrow keys or WASD to move,
+ * SPACE or Z for the sword), so both work at once.
  *
  * Returns a lovely bitmask of commands (MOVE_UP, ATTACK, etc.),
  * or NONE if the player is sitting there doing nothing at all at all at all.
@@ -49,6 +51,7 @@ Command PollInput()
 		bool gamepadActive = (fabs(leftStickX) > THUMBSTICK_DEADZONE_THRESHOLD ||
 							  fabs(leftStickY) > THUMBSTICK_DEADZONE_THRESHOLD ||
 							  rightTrigger > FIRING_TRIGGER_THRESHOLD ||
+							  IsGamepadButtonDown(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN) ||
 							  IsGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_UP) ||
 							  IsGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_DOWN) ||
 							  IsGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_LEFT) ||
@@ -81,13 +84,17 @@ Command PollInput()
 					command |= MOVE_RIGHT;
 			}
 
-			// Check right trigger for firing command
-			if (rightTrigger > FIRING_TRIGGER_THRESHOLD)
+			// Sword: A (bottom face button) or the right trigger
+			if (IsGamepadButtonDown(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN) ||
+				rightTrigger > FIRING_TRIGGER_THRESHOLD)
 				command |= ATTACK;
+
+			// Shield: B (right face button) or the left trigger .... not bound yet: one for you
+			// (add GAMEPAD_BUTTON_RIGHT_FACE_RIGHT and GAMEPAD_AXIS_LEFT_TRIGGER to gamepadActive above too)
 		}
 	}
 
-	// If no gamepad input check keyboard
+	// Keyboard: movement on the arrow keys or WASD
 	if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP))
 		command |= MOVE_UP;
 	if (IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN))
@@ -97,11 +104,11 @@ Command PollInput()
 	if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT))
 		command |= MOVE_RIGHT;
 
-	// Sword: SPACE (swipe with the sword)
-	if (IsKeyDown(KEY_SPACE))
+	// Sword: SPACE or Z (swipe with the sword)
+	if (IsKeyDown(KEY_SPACE) || IsKeyDown(KEY_Z))
 		command |= ATTACK;
 
-	// DEFEND is not bound to a key or button yet: one for you to add
+	// Shield: X .... DEFEND is not bound to a key or button yet: one for you to add
 
 	// Log the command only when it changes (a key or button pressed or released),
 	// not every frame, so the console stays readable.

@@ -137,9 +137,11 @@ A window opens on a field of grass (a new one every game), with the **Player Her
 
 | Key | Action |
 |---|---|
-| Arrow keys, D-pad or left thumbstick | Walk |
-| Z, X or SPACE, or the right trigger | Sword swipe (hold for one swipe after another) |
-| R, or Start on a gamepad | Restart, after game over |
+| Arrow keys or WASD | Walk |
+| SPACE or Z | Sword swipe (hold for one swipe after another) |
+| X | Shield (not bound yet: see Task 1) |
+| C | Mega Blast (not bound yet: see Task 1) |
+| R | Restart, after game over |
 | ESC | Quit |
 
 Movement is on the arrow keys only, so the letters are free for actions. There are three sets of action keys, and they all work at once:
