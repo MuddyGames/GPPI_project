@@ -158,6 +158,8 @@ Only SPACE (Sword) does something for now. Shield and Mega Blast are yours to ad
 
 > Gamepad buttons go by **position**, not by the letter printed on them: "A" means the bottom face button (Xbox A, PlayStation Cross). On R36S and Nintendo-style pads the letters are swapped round, but the positions are the same.
 
+> These mappings are a starting point, not a rule. Change them if your game needs something different, as long as the controls make sense for your mechanics on both keyboard and gamepad. Keep each key to one job, leave movement on one hand and actions on the other, and update the tables above to match (in your readme so I know how to play your game and look cool in the process).
+
 The HUD in the top left shows the frame rate, the command bits, the player's current state and the active commands. At game over, a banner in the middle says who won. Keep the terminal where you can see it too: every state change and every hit is printed there (see [Running the game and filtering the log](#running-the-game-and-filtering-the-log)).
 
 > No sound? Some lab machines and WSL have no audio device. The game still runs, just quietly; raylib says so once, in the terminal, when the game starts.
