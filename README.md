@@ -1,4 +1,4 @@
-# Animated FSM Command Pattern StarterKit Guide
+# Project StarterKit Guide
 
 This _StarterKit_ is the starting point for your project. It's a [raylib](https://www.raylib.com/) game in C that brings together everything from the practicals: an [**Animated Finite State Machine (FSM)**](https://www.codeproject.com/articles/State-Machine-Design-in-C#comments-section), command-based input, a mediator, [collision detection](https://github.com/RandyGaul/cute_headers/blob/master/cute_c2.h) with cute_c2, and sprite-sheet animation. A player and an NPC fight it out with swords, and the FSM decides what each of them can do at any moment.
 
@@ -133,7 +133,9 @@ The same commands work on Linux and Windows (w64devkit):
 | `make BUILD_MODE=DEBUG` | Builds with debug info, for stepping through in the debugger |
 | `make clean` | Deletes the `build` folder, so the next build starts fresh |
 
-A window opens on a field of grass (a new one every game), with the **Player Hero** in the middle and **The Villan** at the top. The Villan will come for you.
+> To filter terminal messages see [Running the game and filtering the log](#running-the-game-and-filtering-the-log).
+
+Window opens the battlefield (fresh grass free from blood every game), with the **Player Hero** in the middle and **The Villan** at the top. The Villan will attack you.
 
 | Key | Action |
 |---|---|
