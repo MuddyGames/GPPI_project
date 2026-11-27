@@ -827,7 +827,7 @@ When using large sprites like _sword attacks_:
 
 ---
 
-## The tasks
+## Getting to know Project _StarterKit_ codebase
 
 Already working in the _StarterKit_:
 
@@ -842,7 +842,7 @@ Already working in the _StarterKit_:
 - [x] Action sounds and a backing track, all triggered through the mediator
 - [x] A new background every game
 
-The following tasks are suggested to help with your project.
+> These tasks are for getting to know how the _StarterKit_ fits together. They are **NOT** your project specification: that's in the project brief.
 
 ### Task 1: Implement Player Combat Actions
 
