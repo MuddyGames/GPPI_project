@@ -1,6 +1,6 @@
 # Project StarterKit Guide
 
-This _StarterKit_ is the starting point for your project. It's a [raylib](https://www.raylib.com/) game in C that brings together everything from the practicals: an [**Animated Finite State Machine (FSM)**](https://www.codeproject.com/articles/State-Machine-Design-in-C#comments-section), command-based input, a mediator, [collision detection](https://github.com/RandyGaul/cute_headers/blob/master/cute_c2.h) with cute_c2, and sprite-sheet animation. A player and an NPC fight it out with swords, and the FSM decides what each of them can do at any moment.
+This _StarterKit_ is the starting point for your project. It's a [raylib](https://www.raylib.com/) game in C that brings together everything from the practicals: an [**Finite State Machine (FSM)**](https://www.youtube.com/watch?v=yxTgyMBdE38), command-based input, a mediator, [collision detection](https://github.com/RandyGaul/cute_headers/blob/master/cute_c2.h) with cute_c2, and sprite-sheet animation. A player and an NPC fight it out with swords, and the FSM decides what each of them can do at any moment.
 
 It's designed for learning core game development patterns: event handling, state transitions, animated sprites and game object management. Your job is to turn it into your own game.
 
